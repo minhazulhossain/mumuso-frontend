@@ -7,10 +7,6 @@
     </main>
     
     <AppFooter />
-    
-    <!-- Global UI Components -->
-    <UNotifications />
-    <UModals />
   </div>
 </template>
 

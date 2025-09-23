@@ -52,12 +52,12 @@
           
           <!-- CTA Button -->
           <UButton
-            to="/contact"
+            to="/auth/login"
             color="primary"
             size="sm"
             class="hidden sm:inline-flex"
           >
-            Get Started
+            Login
           </UButton>
 
           <!-- Mobile menu button -->
@@ -164,22 +164,22 @@ const navigation = [
   },
   { 
     name: 'About', 
-    to: '/about',
+    to: '/',
     icon: 'i-heroicons-information-circle'
   },
   { 
     name: 'Services', 
-    to: '/services',
+    to: '/',
     icon: 'i-heroicons-briefcase'
   },
   { 
     name: 'Blog', 
-    to: '/blog',
+    to: '/',
     icon: 'i-heroicons-document-text'
   },
   { 
     name: 'Contact', 
-    to: '/contact',
+    to: '/',
     icon: 'i-heroicons-envelope'
   }
 ]
