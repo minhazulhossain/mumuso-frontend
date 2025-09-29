@@ -8,7 +8,7 @@
             <div class="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center">
               <UIcon name="i-heroicons-cube" class="w-5 h-5 text-white" />
             </div>
-            <span class="text-xl font-bold text-gray-900 dark:text-white">NuxtUI</span>
+            <span class="text-xl font-bold text-gray-900 dark:text-white">Mumuso</span>
           </NuxtLink>
         </div>
 
@@ -52,12 +52,12 @@
           
           <!-- CTA Button -->
           <UButton
-            to="/contact"
+            to="/auth/login"
             color="primary"
             size="sm"
             class="hidden sm:inline-flex"
           >
-            Get Started
+            Login
           </UButton>
 
           <!-- Mobile menu button -->
@@ -174,7 +174,7 @@ const navigation = [
   },
   { 
     name: 'Blog', 
-    to: '/blog',
+    to: '/',
     icon: 'i-heroicons-document-text'
   },
   { 
