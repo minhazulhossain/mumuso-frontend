@@ -4,7 +4,7 @@
       <UButton
         to="/shop"
         icon="i-heroicons-arrow-left"
-        color="gray"
+        color="secondary"
         variant="ghost"
         class="mb-6"
       >
@@ -51,7 +51,7 @@
           <!-- Price -->
           <div class="flex items-baseline gap-2">
             <span class="text-4xl font-bold text-primary-500">${{ product.price }}</span>
-            <UBadge :color="product.stock > 10 ? 'green' : 'orange'" size="lg">
+            <UBadge :color="product.stock > 10 ? 'success' : 'warning'" size="lg">
               {{ product.stock }} in stock
             </UBadge>
           </div>
@@ -86,14 +86,14 @@
               <UButton
                 @click="quantity = Math.max(1, quantity - 1)"
                 icon="i-heroicons-minus"
-                color="gray"
+                color="secondary"
                 size="sm"
               />
               <span class="w-12 text-center font-semibold">{{ quantity }}</span>
               <UButton
                 @click="quantity = Math.min(product.stock, quantity + 1)"
                 icon="i-heroicons-plus"
-                color="gray"
+                color="secondary"
                 size="sm"
               />
             </div>
@@ -101,10 +101,24 @@
 
           <!-- Actions -->
           <div class="flex gap-4 pt-4">
-            <UButton size="xl" class="flex-1" icon="i-heroicons-shopping-cart">
+            <UButton
+                v-if="product.stock > 0"
+                @click="handleAddToCart"
+                size="xl"
+                class="flex-1"
+                icon="i-heroicons-shopping-cart"
+            >
               Add to Cart
             </UButton>
-            <UButton size="xl" color="gray" variant="soft" icon="i-heroicons-heart">
+            <UButton
+                v-else
+                size="xl"
+                class="flex-1"
+                disabled
+            >
+              Out of Stock
+            </UButton>
+            <UButton size="xl" color="secondary" variant="soft" icon="i-heroicons-heart">
               Save
             </UButton>
           </div>
@@ -121,11 +135,29 @@
 <script setup lang="ts">
 const route = useRoute()
 const { products } = useProducts()
-
+const { addToCart, toggleCart } = useCart()
 const quantity = ref(1)
 
 const product = computed(() => {
   return products.value.find(p => p.slug === route.params.slug)
+})
+
+const handleAddToCart = () => {
+  if (product.value) {
+    const success = addToCart(product.value.id, quantity.value)
+    if (success) {
+      quantity.value = 1
+      setTimeout(() => {
+        toggleCart()
+      }, 500)
+    }
+  }
+}
+
+watch(product, (newProduct) => {
+  if (newProduct) {
+    quantity.value = 1
+  }
 })
 
 useHead({

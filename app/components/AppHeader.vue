@@ -60,6 +60,19 @@
             Login
           </UButton>
 
+          <UButton
+              icon="i-heroicons-shopping-cart"
+              color="gray"
+              variant="ghost"
+              @click="toggleCart"
+          >
+            <template #trailing>
+              <UBadge v-if="cartItemsCount > 0" color="primary" variant="solid">
+                {{ cartItemsCount }}
+              </UBadge>
+            </template>
+          </UButton>
+
           <!-- Mobile menu button -->
           <UButton
             :icon="isMenuOpen ? 'i-heroicons-x-mark' : 'i-heroicons-bars-3'"
@@ -125,8 +138,11 @@
 </template>
 
 <script setup>
+import {useCart} from "~/composables/useCart.js";
+
 const colorMode = useColorMode()
 const route = useRoute()
+const { cartItemsCount, toggleCart } = useCart()
 
 const isDark = computed(() => colorMode.value === 'dark')
 const isMenuOpen = ref(false)

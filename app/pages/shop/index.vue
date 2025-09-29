@@ -127,6 +127,17 @@
                     </UBadge>
                   </div>
                 </div>
+                <template #footer>
+                  <UButton
+                      @click="addToCart(product.id, 1)"
+                      icon="i-heroicons-shopping-cart"
+                      color="primary"
+                      block
+                      :disabled="product.stock === 0"
+                  >
+                    {{ product.stock === 0 ? 'Out of Stock' : 'Add to Cart' }}
+                  </UButton>
+                </template>
               </UCard>
             </NuxtLink>
           </div>
@@ -161,7 +172,7 @@
 
 <script setup lang="ts">
 const { products, categories } = useProducts()
-
+const { addToCart } = useCart()
 // Filters
 const selectedCategory = ref('all')
 const minPrice = ref('')
