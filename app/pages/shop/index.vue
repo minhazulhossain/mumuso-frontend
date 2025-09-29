@@ -44,7 +44,6 @@
                 <UCheckbox
                   v-for="brand in brands"
                   :key="brand"
-                  v-model="selectedBrands"
                   :value="brand"
                   :label="brand"
                 />
@@ -63,7 +62,7 @@
               />
             </div>
 
-            <UButton @click="clearFilters" color="gray" variant="soft" block>
+            <UButton @click="clearFilters" color="primary" variant="soft" block>
               Clear Filters
             </UButton>
           </div>
@@ -123,7 +122,7 @@
                   <p class="text-sm text-gray-500 dark:text-gray-400">{{ product.brand }}</p>
                   <div class="flex items-center justify-between pt-2">
                     <span class="text-xl font-bold text-primary-500">${{ product.price }}</span>
-                    <UBadge :color="product.stock > 10 ? 'green' : 'orange'" variant="soft">
+                    <UBadge :color="product.stock > 10 ? 'primary' : 'secondary'" variant="soft">
                       {{ product.stock }} in stock
                     </UBadge>
                   </div>
