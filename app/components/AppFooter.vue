@@ -90,19 +90,19 @@
           
           <div class="flex items-center space-x-6">
             <NuxtLink
-              to="/privacy"
+              to="/"
               class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm transition-colors"
             >
               Privacy Policy
             </NuxtLink>
             <NuxtLink
-              to="/terms"
+              to="/"
               class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm transition-colors"
             >
               Terms of Service
             </NuxtLink>
             <NuxtLink
-              to="/cookies"
+              to="/"
               class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm transition-colors"
             >
               Cookies
@@ -171,29 +171,29 @@ const footerSections = [
   {
     title: 'Product',
     links: [
-      { name: 'Features', to: '/features' },
-      { name: 'Pricing', to: '/pricing' },
-      { name: 'Documentation', to: '/docs' },
-      { name: 'API Reference', to: '/api' },
-      { name: 'Changelog', to: '/changelog' }
+      { name: 'Features', to: '/' },
+      { name: 'Pricing', to: '/' },
+      { name: 'Documentation', to: '/' },
+      { name: 'API Reference', to: '/' },
+      { name: 'Changelog', to: '/' }
     ]
   },
   {
     title: 'Company',
     links: [
-      { name: 'About', to: '/about' },
+      { name: 'About', to: '/' },
       { name: 'Blog', to: '/blog' },
-      { name: 'Careers', to: '/careers' },
-      { name: 'Press Kit', to: '/press' },
-      { name: 'Contact', to: '/contact' }
+      { name: 'Careers', to: '/' },
+      { name: 'Press Kit', to: '/' },
+      { name: 'Contact', to: '/' }
     ]
   },
   {
     title: 'Resources',
     links: [
       { name: 'Community', to: 'https://discord.gg/nuxt', external: true },
-      { name: 'Help Center', to: '/help' },
-      { name: 'Status Page', to: '/status' },
+      { name: 'Help Center', to: '/' },
+      { name: 'Status Page', to: '/' },
       { name: 'GitHub', to: 'https://github.com', external: true },
       { name: 'npm Package', to: 'https://npmjs.com', external: true }
     ]

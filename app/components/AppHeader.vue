@@ -164,12 +164,12 @@ const navigation = [
   },
   { 
     name: 'About', 
-    to: '/about',
+    to: '/',
     icon: 'i-heroicons-information-circle'
   },
   { 
     name: 'Services', 
-    to: '/services',
+    to: '/',
     icon: 'i-heroicons-briefcase'
   },
   { 
@@ -179,7 +179,7 @@ const navigation = [
   },
   { 
     name: 'Contact', 
-    to: '/contact',
+    to: '/',
     icon: 'i-heroicons-envelope'
   }
 ]
