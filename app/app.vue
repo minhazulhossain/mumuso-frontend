@@ -2,7 +2,7 @@
   <UApp>
     <NuxtLayout>
       <NuxtPage />
-      <CartSidebar />
+        <CartSidebar />
     </NuxtLayout>
   </UApp>
 </template>

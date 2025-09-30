@@ -23,13 +23,13 @@
             </p>
             
             <div class="mt-10 flex items-center justify-center gap-x-6 flex-wrap">
-              <UButton size="xl" to="/about">
+              <UButton size="xl" to="/">
                 Get Started
                 <template #trailing>
                   <UIcon name="i-heroicons-arrow-right" />
                 </template>
               </UButton>
-              <UButton variant="outline" size="xl" to="/services" color="gray">
+              <UButton variant="outline" size="xl" to="/" color="gray">
                 View Demo
                 <template #trailing>
                   <UIcon name="i-heroicons-play" />
@@ -123,13 +123,13 @@
             Join thousands of developers building with Nuxt UI
           </p>
           <div class="mt-8 flex items-center justify-center gap-4 flex-wrap">
-            <UButton size="xl" color="white" to="/contact">
+            <UButton size="xl" color="white" to="/">
               Start Your Project
               <template #trailing>
                 <UIcon name="i-heroicons-rocket-launch" />
               </template>
             </UButton>
-            <UButton size="xl" variant="outline" color="white" to="/docs">
+            <UButton size="xl" variant="outline" color="white" to="/">
               View Documentation
             </UButton>
           </div>

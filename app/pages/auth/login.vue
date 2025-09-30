@@ -67,10 +67,12 @@
 
 <script setup>
 
-const {$auth} = useNuxtApp()
-const router = useRouter()
-const route = useRoute()
+definePageMeta({
+  middleware: 'guest'
+})
 
+const { login } = useAuth()
+const toast = useToast()
 const form = reactive({
   email: '',
   password: '',
@@ -82,13 +84,24 @@ const error = ref('')
 
 const handleLogin = async () => {
   loading.value = true
-  error.value = ''
-
   try {
-    await $auth.login(form)
-    // Redirect handled in plugin
-  } catch (err) {
-    error.value = err.data?.message || 'Login failed'
+    await login(form.email, form.password)
+
+    toast.add({
+      title: 'Success',
+      description: 'Login successful! Welcome back.',
+      color: 'success'
+    })
+
+    await navigateTo('/')
+  } catch (error) {
+
+    toast.add({
+      title: 'Login Failed',
+      description: error.message || 'Something went wrong',
+      color: 'error'
+    })
+
   } finally {
     loading.value = false
   }

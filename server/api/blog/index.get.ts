@@ -1,32 +1,32 @@
-
-import { posts } from '../_posts'
-
 export default defineEventHandler(async (event) => {
+  const config = useRuntimeConfig()
   const query = getQuery(event)
-  const page = parseInt(query._page as string) || 1
-  const limit = parseInt(query._limit as string) || 9
-  const category = query.category as string
 
-  // Mock data - replace with actual database calls
-  const allPosts = posts;
-  
+  try {
+    const response = await $fetch(`${config.public.apiBase}/v1/blog`, {
+      query: {
+        per_page: query._limit || 9,
+        page: query._page || 1,
+        search: query.search,
+        category: query.category // if you add category support later
+      }
+    })
 
+    console.log('response', response)
 
-  // Simulate delay
-  await new Promise(resolve => setTimeout(resolve, 500))
-
-  let filteredPosts = category 
-    ? allPosts.filter(p => p.category === category)
-    : allPosts
-
-  const start = (page - 1) * limit
-  const end = start + limit
-  const paginatedPosts = filteredPosts.slice(start, end)
-
-  return {
-    posts: paginatedPosts,
-    total: filteredPosts.length,
-    page,
-    totalPages: Math.ceil(filteredPosts.length / limit)
+    // Transform Laravel pagination to match your frontend format
+    return {
+      posts: response.data,
+      total: response.meta.total,
+      page: response.meta.current_page,
+      totalPages: response.meta.last_page,
+      perPage: response.meta.per_page
+    }
+  } catch (error) {
+    console.log(error)
+    throw createError({
+      statusCode: error.statusCode || 500,
+      message: error.message || 'Failed to fetch blog posts'
+    })
   }
 })

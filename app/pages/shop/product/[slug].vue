@@ -14,13 +14,14 @@
       <div v-if="product" class="grid grid-cols-1 lg:grid-cols-2 gap-12">
         <!-- Product Image -->
         <div class="space-y-4">
-          <div class="aspect-square bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg">
-            <img
-              :src="product.image"
-              :alt="product.name"
-              class="w-full h-full object-cover"
-            />
-          </div>
+<!--          <div class="aspect-square bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg">-->
+<!--            <img-->
+<!--              :src="product.image"-->
+<!--              :alt="product.name"-->
+<!--              class="w-full h-full object-cover"-->
+<!--            />-->
+<!--          </div>-->
+          <ImageGallery />
         </div>
 
         <!-- Product Details -->

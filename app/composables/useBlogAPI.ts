@@ -1,32 +1,28 @@
+// composables/useBlogAPI.ts
 export const useBlogAPI = () => {
-  const config = useRuntimeConfig()
+  const fetchPosts = async (category?: string, page: number = 1, search?: string) => {
+    const params: any = {
+      _page: page,
+      _limit: 9
+    }
 
-  const fetchPosts = async (category?: string, page = 1, limit = 9) => {
-    const query = new URLSearchParams({
-      _page: page.toString(),
-      _limit: limit.toString(),
-      ...(category && { category })
-    })
-    
-    return await $fetch(`/api/blog?${query}`)
-  }
+    if (category) params.category = category
+    if (search) params.search = search
 
-  const fetchPost = async (slug: string) => {
-    return await $fetch(`/api/blog/${slug}`)
+    return await $fetch('/api/blog', { params })
   }
 
   const fetchCategories = async () => {
     return await $fetch('/api/blog/categories')
   }
 
-  const searchPosts = async (query: string) => {
-    return await $fetch(`/api/posts/search?q=${query}`)
+  const fetchPost = async (slug: string) => {
+    return await $fetch(`/api/blog/posts/${slug}`)
   }
 
   return {
     fetchPosts,
-    fetchPost,
     fetchCategories,
-    searchPosts
+    fetchPost
   }
 }
