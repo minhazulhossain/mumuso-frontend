@@ -1,20 +1,21 @@
 // composables/useReviews.ts
-import type {Purchase, Review, ReviewForm, ReviewStats} from '../../types/review';
+import type {Purchase, Review, ReviewStats} from '~~/types/review';
 
 export const useReviews = (productId: string) => {
     const reviews = ref<Review[]>([])
     const stats = ref<ReviewStats | null>(null)
     const userPurchase = ref<Purchase | null>(null)
+    const userReview = ref<Review | null>(null)
     const loading = ref(false)
     const error = ref<string | null>(null)
+    const config = useRuntimeConfig()
 
-    // Fetch reviews for a product
     const fetchReviews = async (sortBy: 'recent' | 'helpful' | 'rating' = 'recent') => {
         loading.value = true
         error.value = null
 
         try {
-            reviews.value = await $fetch<Review[]>(`/api/reviews/${productId}`, {
+            reviews.value = await $fetch<Review[]>(`${config.public.apiBase}/v1/reviews/${productId}`, {
                 query: {sortBy}
             })
         } catch (e: any) {
@@ -24,57 +25,67 @@ export const useReviews = (productId: string) => {
         }
     }
 
-    // Fetch review statistics
     const fetchStats = async () => {
         try {
-            stats.value = await $fetch<ReviewStats>(`/api/reviews/${productId}/stats`)
+            const data = await $fetch<{ data: ReviewStats }>(`${config.public.apiBase}/api/reviews/${productId}/stats`)
+            stats.value = data.data
         } catch (e: any) {
             console.error('Failed to fetch stats:', e)
         }
     }
 
-    // Check if user has purchased this product
     const checkPurchase = async () => {
         try {
-            userPurchase.value = await $fetch<Purchase | null>(`/api/purchases/check/${productId}`)
+            const data = await $fetch<{ data: Purchase | null }>(`${config.public.apiBase}/api/purchases/check/${productId}`, {
+                headers: useRequestHeaders(['cookie'])
+            })
+            userPurchase.value = data.data
         } catch (e: any) {
             console.error('Failed to check purchase:', e)
         }
     }
 
-    // Submit a review
-    const submitReview = async (formData: ReviewForm) => {
+    const fetchUserReview = async () => {
+        try {
+            const data = await $fetch<{ data: Review | null }>(`${config.public.apiBase}/api/reviews/${productId}/user-review`, {
+                headers: useRequestHeaders(['cookie'])
+            })
+            userReview.value = data.data
+        } catch (e: any) {
+            console.error('Failed to fetch user review:', e)
+        }
+    }
+
+    const submitReview = async (formData: FormData) => {
         loading.value = true
         error.value = null
 
         try {
-            const data = await $fetch<Review>(`/api/reviews/${productId}`, {
+            const data = await $fetch<{ data: Review }>(`${config.public.apiBase}/api/reviews/${productId}`, {
                 method: 'POST',
-                body: formData
+                body: formData,
+                headers: useRequestHeaders(['cookie'])
             })
 
-            reviews.value.unshift(data)
+            reviews.value.unshift(data.data)
             await fetchStats()
+            await fetchUserReview()
 
-            if (userPurchase.value) {
-                userPurchase.value.hasReviewed = true
-            }
-
-            return data
+            return data.data
         } catch (e: any) {
-            error.value = e.message || 'Failed to submit review'
+            error.value = e.data?.message || 'Failed to submit review'
             throw e
         } finally {
             loading.value = false
         }
     }
 
-    // Mark review as helpful
     const markHelpful = async (reviewId: string, helpful: boolean) => {
         try {
-            await $fetch(`/api/reviews/${reviewId}/helpful`, {
+            await $fetch(`${config.public.apiBase}/api/reviews/${reviewId}/helpful`, {
                 method: 'POST',
-                body: { helpful }
+                body: { helpful },
+                headers: useRequestHeaders(['cookie'])
             })
 
             const review = reviews.value.find(r => r.id === reviewId)
@@ -82,29 +93,27 @@ export const useReviews = (productId: string) => {
                 if (helpful) {
                     review.helpful++
                 } else {
-                    review.notHelpful++
+                    review.not_helpful++
                 }
             }
         } catch (e: any) {
             console.error('Failed to mark helpful:', e)
+            throw e
         }
     }
 
-    // Delete review
     const deleteReview = async (reviewId: string) => {
         try {
-            await $fetch(`/api/reviews/${reviewId}`, {
-                method: 'DELETE'
+            await $fetch(`${config.public.apiBase}/api/reviews/${reviewId}`, {
+                method: 'DELETE',
+                headers: useRequestHeaders(['cookie'])
             })
 
             reviews.value = reviews.value.filter(r => r.id !== reviewId)
             await fetchStats()
-
-            if (userPurchase.value) {
-                userPurchase.value.hasReviewed = false
-            }
+            userReview.value = null
         } catch (e: any) {
-            throw new Error(e.message || 'Failed to delete review')
+            throw new Error(e.data?.message || 'Failed to delete review')
         }
     }
 
@@ -112,11 +121,13 @@ export const useReviews = (productId: string) => {
         reviews,
         stats,
         userPurchase,
+        userReview,
         loading,
         error,
         fetchReviews,
         fetchStats,
         checkPurchase,
+        fetchUserReview,
         submitReview,
         markHelpful,
         deleteReview

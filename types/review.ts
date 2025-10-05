@@ -1,4 +1,3 @@
-// types/review.ts
 export interface User {
     id: string
     name: string
@@ -6,29 +5,30 @@ export interface User {
     avatar?: string
 }
 
-export interface Product {
-    id: string
+export interface ReviewImage {
+    id: string | number
+    url: string
+    thumb: string
+    preview: string
     name: string
-    description: string
-    price: number
-    image?: string
 }
 
 export interface Review {
     id: string
-    productId: string
-    userId: string
-    rating: number // 1-5
+    product_id: string
+    user_id: string
+    rating: number
     title: string
     comment: string
-    isVerifiedPurchase: boolean
-    purchaseDate?: Date
+    is_verified_purchase: boolean
+    purchase_date?: string
     helpful: number
-    notHelpful: number
-    images?: string[]
-    createdAt: Date
-    updatedAt: Date
+    not_helpful: number
+    helpful_percentage: number
+    images?: ReviewImage[]
     user?: User
+    created_at: string
+    updated_at: string
 }
 
 export interface ReviewForm {
@@ -39,23 +39,23 @@ export interface ReviewForm {
 }
 
 export interface ReviewStats {
-    averageRating: number
-    totalReviews: number
-    ratingDistribution: {
+    average_rating: number
+    total_reviews: number
+    rating_distribution: {
         1: number
         2: number
         3: number
         4: number
         5: number
     }
-    verifiedPurchases: number
+    verified_purchases: number
 }
 
 export interface Purchase {
     id: string
-    userId: string
-    productId: string
-    purchaseDate: Date
-    orderId: string
-    hasReviewed: boolean
+    user_id: string
+    product_id: string
+    purchase_date: string
+    order_id: string
+    has_reviewed: boolean
 }
