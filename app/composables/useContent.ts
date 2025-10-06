@@ -1,14 +1,35 @@
-import type {HeroBanner} from "~~/types/content";
+import type {HeroBanner, Category} from "~~/types/content";
+import type {ApiResponse} from "../../types/api";
+
 
 export const useContent = () => {
 
     const config = useRuntimeConfig()
 
     const fetchHeroBanners = async () => {
-        return await $fetch<HeroBanner[]>(`${config.public.apiBase}/v1/content/hero-banners`)
+        let response = await $fetch<ApiResponse<HeroBanner[]>>(`${config.public.apiBase}/v1/content/hero-banners`)
+
+        if (!response.status) {
+            throw new Error(response.message)
+        }
+
+        return response.data
+
+    }
+
+    const fetchCategories = async () => {
+        let response = await $fetch<ApiResponse<Category[]>>(`${config.public.apiBase}/v1/content/navigation-items`)
+
+        if (!response?.status) {
+            throw new Error(response.message)
+        }
+
+        return response.data
+
     }
 
     return {
-        fetchHeroBanners
+        fetchHeroBanners,
+        fetchCategories
     }
 }

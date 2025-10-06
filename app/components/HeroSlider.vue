@@ -73,7 +73,7 @@
                   class="animate-fade-in-up animation-delay-300"
               >
                 <UButton
-                    :color="banner.button_style === 'primary' ? 'primary' : 'white'"
+                    :color="banner.button_style === 'primary' ? 'primary' : 'secondary'"
                     :variant="banner.button_style === 'outline' ? 'outline' : 'solid'"
                     size="xl"
                 >
@@ -86,23 +86,26 @@
       </TransitionGroup>
 
       <!-- Navigation Arrows -->
-      <button
-          v-if="banners?.length > 1"
-          @click="prev"
-          class="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 backdrop-blur-sm rounded-full p-3 transition-all z-10"
-          aria-label="Previous slide"
-      >
-        <UIcon name="i-heroicons-chevron-left" class="w-6 h-6 text-white" />
-      </button>
 
-      <button
-          v-if="banners?.length > 1"
-          @click="next"
-          class="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 backdrop-blur-sm rounded-full p-3 transition-all z-10"
-          aria-label="Next slide"
-      >
-        <UIcon name="i-heroicons-chevron-right" class="w-6 h-6 text-white" />
-      </button>
+      <template v-if="navigation">
+        <button
+            v-if="banners?.length > 1"
+            @click="prev"
+            class="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 backdrop-blur-sm rounded-full p-3 transition-all z-10"
+            aria-label="Previous slide"
+        >
+          <UIcon name="i-heroicons-chevron-left" class="w-6 h-6 text-white" />
+        </button>
+
+        <button
+            v-if="banners?.length > 1"
+            @click="next"
+            class="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 backdrop-blur-sm rounded-full p-3 transition-all z-10"
+            aria-label="Next slide"
+        >
+          <UIcon name="i-heroicons-chevron-right" class="w-6 h-6 text-white" />
+        </button>
+      </template>
 
       <!-- Dots Indicator -->
       <div
@@ -113,8 +116,8 @@
             v-for="(banner, index) in banners"
             :key="`dot-${banner.id}`"
             @click="currentIndex = index"
-            class="w-2 h-2 rounded-full transition-all"
-            :class="currentIndex === index ? 'bg-white w-8' : 'bg-white/50 hover:bg-white/75'"
+            class="w-14 h-2 rounded-full transition-all"
+            :class="currentIndex === index ? 'bg-white w-20' : 'bg-white/50 hover:bg-white/75'"
             :aria-label="`Go to slide ${index + 1}`"
         />
       </div>
@@ -128,6 +131,7 @@ import type { HeroBanner } from '~~/types/content'
 const props = defineProps<{
   banners: HeroBanner[]
   autoplay?: boolean
+  navigation ?: boolean
   interval?: number
   height?: string
 }>()

@@ -3,7 +3,13 @@
     <!-- Hero Section -->
     <section class="relative overflow-hidden bg-gradient-to-br from-white via-primary-50 to-primary-100 dark:from-gray-950 dark:via-primary-950 dark:to-gray-900">
 
-        <HeroCarousel />
+      <HeroSlider
+          v-if="heroBanners"
+          :banners="heroBanners"
+          :autoplay="true"
+          :interval="10000000"
+          height="600px"
+      />
 
     </section>
 
@@ -94,12 +100,16 @@
 </template>
 
 <script setup>
-// Page-specific head configuration
-import HeroCarousel from "../components/HeroCarousel.vue";
+
+const { fetchHeroBanners } = useContent()
 
 useHead({
   title: 'Home',
 })
+
+const [heroBanners  ] = await Promise.all([
+  fetchHeroBanners(),
+])
 
 // Page-specific SEO
 useSeoMeta({
@@ -156,4 +166,5 @@ const techStack = [
   { name: 'Nuxt UI', icon: 'i-lucide-layout' },
   { name: 'Vite', icon: 'i-lucide-lightning' }
 ]
+
 </script>

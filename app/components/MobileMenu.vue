@@ -3,7 +3,7 @@
 
     <UButton
         :icon="isMenuOpen ? 'i-heroicons-x-mark' : 'i-heroicons-bars-3'"
-        color="gray"
+        color="secondary"
         variant="ghost"
         size="sm"
         class="md:hidden"
@@ -19,7 +19,7 @@
               </div>
               <span class="font-semibold">Navigation</span>
             </div>
-            <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark" @click="isMenuOpen = false" />
+            <UButton color="secondary" variant="ghost" icon="i-heroicons-x-mark" @click="isMenuOpen = false" />
           </div>
         </template>
 

@@ -155,10 +155,5 @@ const handleCheckout = async () => {
   checkoutLoading.value = false
 }
 
-// Debug logging
-console.log('CartSidebar mounted, isCartOpen:', isCartOpen.value)
-watch(isCartOpen, (newVal) => {
-  console.log('isCartOpen changed to:', newVal)
-})
 
 </script>

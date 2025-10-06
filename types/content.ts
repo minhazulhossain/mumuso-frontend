@@ -16,3 +16,11 @@ export interface HeroBanner {
         thumb: string
     }
 }
+
+export interface Category{
+    label: string,
+    icon: string,
+    to: string,
+    description: string,
+    children: Array<Category>
+}

@@ -6,9 +6,10 @@
              color="primary"
              size="sm"
              class="hidden sm:inline-flex"
-    >
-      Login
-    </UButton>
+             icon="i-heroicons-user"
+             variant="ghost"
+    />
+
 
     <UDropdownMenu v-else
         :items="items"

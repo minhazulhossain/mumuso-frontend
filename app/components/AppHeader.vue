@@ -14,35 +14,10 @@
           </NuxtLink>
         </div>
 
-        <!-- Desktop Navigation -->
-        <nav class="hidden md:flex items-center space-x-8">
-          <NuxtLink
-              v-for="item in navigation"
-              :key="item.name"
-              :to="item.to"
-              class="relative text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors group"
-              :class="{ 'text-primary-600 dark:text-primary-400': isActiveRoute(item.to) }"
-          >
-            {{ item.name }}
-            <span
-                v-if="isActiveRoute(item.to)"
-                class="absolute -bottom-6 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-primary-500 rounded-full"
-            />
-          </NuxtLink>
-        </nav>
-
         <!-- Right side actions -->
         <div class="flex items-center space-x-3">
-          <!-- Search Button -->
-<!--          <UButton-->
-<!--              icon="i-heroicons-magnifying-glass"-->
-<!--              color="gray"-->
-<!--              variant="ghost"-->
-<!--              size="sm"-->
-<!--              class="hidden sm:inline-flex"-->
-<!--              @click="openSearch"-->
-<!--          />-->
-        <GlobalSearch />
+
+
           <!-- Theme toggle -->
           <UButton
               :icon="isDark ? 'i-heroicons-sun' : 'i-heroicons-moon'"
@@ -53,24 +28,21 @@
           />
 
           <!-- CTA Button -->
-          <UserMenu />
+          <UserMenu/>
 
-
-                      <CartSidebar />
-
+          <CartSidebar/>
 
           <!-- Mobile menu button -->
-          <LazyMobileMenu />
+          <LazyMobileMenu/>
         </div>
       </div>
-
+      <HeaderDesktop />
     </UContainer>
   </header>
 </template>
 
 <script setup>
 import {useCart} from "~/composables/useCart.js";
-import GlobalSearch from "./GlobalSearch.vue";
 
 const colorMode = useColorMode()
 const route = useRoute()
@@ -93,36 +65,4 @@ const isActiveRoute = (path) => {
   return route.path.startsWith(path)
 }
 
-const navigation = [
-  {
-    name: 'Home',
-    to: '/',
-    icon: 'i-heroicons-home'
-  },
-  {
-    name: 'Shop',
-    to: '/shop',
-    icon: 'i-heroicons-information-circle'
-  },
-  {
-    name: 'Services',
-    to: '/',
-    icon: 'i-heroicons-briefcase'
-  },
-  {
-    name: 'Blog',
-    to: '/blog',
-    icon: 'i-heroicons-document-text'
-  },
-  {
-    name: 'Contact',
-    to: '/',
-    icon: 'i-heroicons-envelope'
-  }
-]
-
-// Close mobile menu when route changes
-watch(() => route.path, () => {
-  isMenuOpen.value = false
-})
 </script>
