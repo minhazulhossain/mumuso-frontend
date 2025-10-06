@@ -1,83 +1,66 @@
-<!-- components/ReviewStats.vue -->
-<script setup lang="ts">
-import type { ReviewStats } from '../../../types/review'
-
-const props = defineProps<{
-  stats: ReviewStats | null
-}>()
-
-const ratingPercentage = (rating: number) => {
-  if (!props.stats || props.stats.totalReviews === 0) return 0
-  const count = props.stats.ratingDistribution[rating as 1 | 2 | 3 | 4 | 5]
-  return (count / props.stats.totalReviews) * 100
-}
-</script>
-
 <template>
-  <UCard v-if="stats">
-    <div class="space-y-6">
-      <!-- Overall Rating -->
-      <div class="text-center">
-        <div class="text-5xl font-bold mb-2">
-          {{ stats.averageRating.toFixed(1) }}
+  <div v-if="stats" class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
+    <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Customer Reviews</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <!-- Average Rating -->
+      <div class="flex items-center gap-4">
+        <div class="text-center">
+          <div class="text-5xl font-bold text-gray-900 dark:text-white">
+            {{ stats.average_rating.toFixed(1) }}
+          </div>
+          <div class="flex items-center justify-center gap-1 my-2">
+            <UIcon
+                v-for="i in 5"
+                :key="i"
+                name="i-heroicons-star-solid"
+                :class="i <= Math.floor(stats.average_rating) ? 'text-yellow-400' : 'text-gray-300'"
+                class="w-5 h-5"
+            />
+          </div>
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            {{ stats.total_reviews }} {{ stats.total_reviews === 1 ? 'review' : 'reviews' }}
+          </p>
+          <p v-if="stats.verified_purchases > 0" class="text-xs text-green-600 dark:text-green-400 mt-1">
+            {{ stats.verified_purchases }} verified purchases
+          </p>
         </div>
-        <div class="flex items-center justify-center gap-1 mb-2">
-          <UIcon
-              v-for="star in 5"
-              :key="star"
-              name="i-heroicons-star-solid"
-              :class="[
-              'w-6 h-6',
-              star <= Math.round(stats.averageRating) ? 'text-yellow-400' : 'text-gray-300'
-            ]"
-          />
-        </div>
-        <p class="text-gray-600">
-          Based on {{ stats.totalReviews }} {{ stats.totalReviews === 1 ? 'review' : 'reviews' }}
-        </p>
-        <p v-if="stats.verifiedPurchases > 0" class="text-sm text-gray-500 mt-1">
-          {{ stats.verifiedPurchases }} verified {{ stats.verifiedPurchases === 1 ? 'purchase' : 'purchases' }}
-        </p>
       </div>
 
       <!-- Rating Distribution -->
-      <div class="space-y-3">
+      <div class="space-y-2">
         <div
             v-for="rating in [5, 4, 3, 2, 1]"
             :key="rating"
             class="flex items-center gap-3"
         >
-          <div class="flex items-center gap-1 w-20">
-            <span class="text-sm font-medium">{{ rating }}</span>
-            <UIcon name="i-heroicons-star-solid" class="w-4 h-4 text-yellow-400" />
-          </div>
-
-          <div class="flex-1 bg-gray-200 rounded-full h-2 overflow-hidden">
+          <span class="text-sm font-medium text-gray-700 dark:text-gray-300 w-16">
+            {{ rating }} star{{ rating !== 1 ? 's' : '' }}
+          </span>
+          <div class="flex-1 h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
             <div
-                class="bg-yellow-400 h-full transition-all duration-300"
-                :style="{ width: `${ratingPercentage(rating)}%` }"
+                class="h-full bg-yellow-400 transition-all duration-300"
+                :style="{ width: getPercentage(rating) + '%' }"
             />
           </div>
-
-          <span class="text-sm text-gray-600 w-12 text-right">
-            {{ stats.ratingDistribution[rating as 1 | 2 | 3 | 4 | 5] }}
+          <span class="text-sm text-gray-600 dark:text-gray-400 w-12 text-right">
+            {{ stats.rating_distribution[rating as keyof typeof stats.rating_distribution] }}
           </span>
         </div>
       </div>
-
-      <!-- Rating Breakdown Percentages -->
-      <div class="grid grid-cols-5 gap-2 pt-4 border-t">
-        <div
-            v-for="rating in [5, 4, 3, 2, 1]"
-            :key="rating"
-            class="text-center"
-        >
-          <div class="text-xs font-medium text-gray-600 mb-1">{{ rating }}★</div>
-          <div class="text-sm font-semibold">
-            {{ ratingPercentage(rating).toFixed(0) }}%
-          </div>
-        </div>
-      </div>
     </div>
-  </UCard>
+  </div>
 </template>
+
+<script setup lang="ts">
+import type { ReviewStats } from '~~/types/review'
+
+const props = defineProps<{
+  stats: ReviewStats
+}>()
+
+const getPercentage = (rating: number) => {
+  if (!props.stats || props.stats.total_reviews === 0) return 0
+  return (props.stats.rating_distribution[rating as keyof typeof props.stats.rating_distribution] / props.stats.total_reviews) * 100
+}
+</script>

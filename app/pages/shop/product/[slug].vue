@@ -14,13 +14,6 @@
       <div v-if="product" class="grid grid-cols-1 lg:grid-cols-2 gap-12">
         <!-- Product Image -->
         <div class="space-y-4">
-<!--          <div class="aspect-square bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg">-->
-<!--            <img-->
-<!--              :src="product.image"-->
-<!--              :alt="product.name"-->
-<!--              class="w-full h-full object-cover"-->
-<!--            />-->
-<!--          </div>-->
           <ImageGallery />
         </div>
 
@@ -124,6 +117,11 @@
             </UButton>
           </div>
         </div>
+        <!-- Reviews Section -->
+        <div class="mt-12 space-y-6">
+          <ProductReviewStats v-if="stats" :stats="stats" />
+        </div>
+
       </div>
 
       <div v-else class="text-center py-16">
@@ -136,12 +134,35 @@
 <script setup lang="ts">
 const route = useRoute()
 const { products } = useProducts()
+const { user } = useAuth()
+const toast = useToast()
+
+
 const { addToCart, toggleCart } = useCart()
 const quantity = ref(1)
 
 const product = computed(() => {
   return products.value.find(p => p.slug === route.params.slug)
 })
+
+
+const productId = computed(() => route.params.slug as string)
+const showEditForm = ref(false)
+
+const {
+  reviews,
+  stats,
+  userPurchase,
+  userReview,
+  loading,
+  fetchReviews,
+  fetchStats,
+  checkPurchase,
+  fetchUserReview,
+  submitReview,
+  markHelpful,
+  deleteReview
+} = useReviews(productId.value)
 
 const handleAddToCart = () => {
   if (product.value) {
@@ -152,6 +173,89 @@ const handleAddToCart = () => {
         toggleCart()
       }, 500)
     }
+  }
+}
+
+onMounted(async () => {
+  await Promise.all([
+    fetchReviews(),
+    fetchStats(),
+  ])
+
+  if (user.value) {
+    await Promise.all([
+      checkPurchase(),
+      fetchUserReview()
+    ])
+  }
+})
+
+const handleSubmitReview = async (formData: FormData) => {
+  try {
+    await submitReview(formData)
+    toast.add({
+      title: 'Success!',
+      description: 'Your review has been submitted and is pending approval',
+      color: 'success'
+    })
+    showEditForm.value = false
+  } catch (error: any) {
+    toast.add({
+      title: 'Error',
+      description: error.message || 'Failed to submit review',
+      color: 'danger'
+    })
+  }
+}
+
+const handleSort = async (sortBy: string) => {
+  await fetchReviews(sortBy as any)
+}
+
+const handleMarkHelpful = async (reviewId: string, helpful: boolean) => {
+  if (!user.value) {
+    toast.add({
+      title: 'Sign in required',
+      description: 'Please sign in to vote on reviews',
+      color: 'orange'
+    })
+    return
+  }
+
+  try {
+    await markHelpful(reviewId, helpful)
+    toast.add({
+      title: 'Thank you!',
+      description: 'Your feedback has been recorded',
+      color: 'green'
+    })
+  } catch (error) {
+    toast.add({
+      title: 'Error',
+      description: 'Failed to submit feedback',
+      color: 'red'
+    })
+  }
+}
+
+const handleDeleteReview = async (reviewId: string) => {
+  if (!confirm('Are you sure you want to delete your review?')) {
+    return
+  }
+
+  try {
+    await deleteReview(reviewId)
+    toast.add({
+      title: 'Deleted',
+      description: 'Your review has been deleted',
+      color: 'green'
+    })
+  } catch (error: any) {
+    toast.add({
+      title: 'Error',
+      description: error.message || 'Failed to delete review',
+      color: 'red'
+    })
   }
 }
 

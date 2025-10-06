@@ -1,168 +1,239 @@
-<!-- components/ReviewForm.vue -->
+<template>
+  <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
+    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">
+      {{ userReview ? 'Edit Your Review' : 'Write a Review' }}
+    </h3>
+
+    <div v-if="userPurchase?.is_verified_purchase" class="flex items-center gap-2 text-green-600 dark:text-green-400 text-sm mb-4">
+      <UIcon name="i-heroicons-shield-check" />
+      <span>Verified Purchase</span>
+    </div>
+
+    <UForm :state="form" @submit="handleSubmit" class="space-y-4">
+      <!-- Rating -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          Rating <span class="text-red-500">*</span>
+        </label>
+        <div class="flex gap-2">
+          <button
+              v-for="star in 5"
+              :key="star"
+              type="button"
+              @click="form.rating = star"
+              @mouseenter="hoverRating = star"
+              @mouseleave="hoverRating = 0"
+              class="transition-transform hover:scale-110"
+          >
+            <UIcon
+                name="i-heroicons-star-solid"
+                :class="star <= (hoverRating || form.rating) ? 'text-yellow-400' : 'text-gray-300'"
+                class="w-8 h-8"
+            />
+          </button>
+        </div>
+        <p v-if="errors.rating" class="text-red-500 text-sm mt-1">{{ errors.rating }}</p>
+      </div>
+
+      <!-- Title -->
+      <UFormGroup label="Title" required>
+        <UInput
+            v-model="form.title"
+            placeholder="Sum up your experience"
+            :error="!!errors.title"
+        />
+        <template v-if="errors.title" #error>
+          <span>{{ errors.title }}</span>
+        </template>
+      </UFormGroup>
+
+      <!-- Comment -->
+      <UFormGroup label="Review" required>
+        <UTextarea
+            v-model="form.comment"
+            placeholder="Share your thoughts about this product (minimum 20 characters)"
+            :rows="5"
+            :error="!!errors.comment"
+        />
+        <template #hint>
+          <span class="text-xs">{{ form.comment.length }} / 2000 characters</span>
+        </template>
+        <template v-if="errors.comment" #error>
+          <span>{{ errors.comment }}</span>
+        </template>
+      </UFormGroup>
+
+      <!-- Images -->
+      <UFormGroup label="Photos (Optional)" hint="Add up to 5 photos">
+        <div class="space-y-3">
+          <input
+              ref="fileInput"
+              type="file"
+              accept="image/jpeg,image/jpg,image/png,image/webp"
+              multiple
+              @change="handleFileChange"
+              class="hidden"
+          />
+
+          <UButton
+              @click="fileInput?.click()"
+              color="gray"
+              variant="outline"
+              icon="i-heroicons-photo"
+              :disabled="imagePreviews.length >= 5"
+          >
+            Upload Photos
+          </UButton>
+
+          <div v-if="imagePreviews.length > 0" class="grid grid-cols-5 gap-2">
+            <div
+                v-for="(preview, index) in imagePreviews"
+                :key="index"
+                class="relative aspect-square rounded-lg overflow-hidden border-2 border-gray-200 dark:border-gray-700"
+            >
+              <img :src="preview" alt="Preview" class="w-full h-full object-cover" />
+              <button
+                  type="button"
+                  @click="removeImage(index)"
+                  class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+              >
+                <UIcon name="i-heroicons-x-mark" class="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+        <template v-if="errors.images" #error>
+          <span>{{ errors.images }}</span>
+        </template>
+      </UFormGroup>
+
+      <!-- Actions -->
+      <div class="flex gap-3 pt-4">
+        <UButton type="submit" :loading="submitting" size="lg">
+          {{ userReview ? 'Update Review' : 'Submit Review' }}
+        </UButton>
+        <UButton
+            v-if="userReview"
+            @click="$emit('cancel')"
+            color="gray"
+            variant="outline"
+            size="lg"
+        >
+          Cancel
+        </UButton>
+      </div>
+    </UForm>
+  </div>
+</template>
+
 <script setup lang="ts">
-import type { ReviewForm } from '../../../types/review';
+import type { Review, Purchase } from '~/types/review'
 
 const props = defineProps<{
-  productId: string
-  isVerifiedPurchase?: boolean
+  userReview?: Review | null
+  userPurchase?: Purchase | null
 }>()
 
 const emit = defineEmits<{
-  submit: [review: ReviewForm]
+  submit: [formData: FormData]
   cancel: []
 }>()
 
-const form = ref<ReviewForm>({
-  rating: 0,
-  title: '',
-  comment: ''
+const toast = useToast()
+const fileInput = ref<HTMLInputElement>()
+const hoverRating = ref(0)
+const submitting = ref(false)
+
+const form = reactive({
+  rating: props.userReview?.rating || 0,
+  title: props.userReview?.title || '',
+  comment: props.userReview?.comment || '',
+  images: [] as File[]
 })
 
-const hoveredRating = ref(0)
-const loading = ref(false)
+const imagePreviews = ref<string[]>([])
 const errors = ref<Record<string, string>>({})
+
+const handleFileChange = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  const files = Array.from(target.files || [])
+
+  if (files.length + form.images.length > 5) {
+    toast.add({
+      title: 'Too many images',
+      description: 'You can upload up to 5 images',
+      color: 'red'
+    })
+    return
+  }
+
+  files.forEach(file => {
+    if (file.size > 5 * 1024 * 1024) {
+      toast.add({
+        title: 'File too large',
+        description: `${file.name} exceeds 5MB`,
+        color: 'red'
+      })
+      return
+    }
+
+    form.images.push(file)
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      imagePreviews.value.push(e.target?.result as string)
+    }
+    reader.readAsDataURL(file)
+  })
+
+  if (fileInput.value) {
+    fileInput.value.value = ''
+  }
+}
+
+const removeImage = (index: number) => {
+  form.images.splice(index, 1)
+  imagePreviews.value.splice(index, 1)
+}
 
 const validate = () => {
   errors.value = {}
 
-  if (form.value.rating === 0) {
+  if (!form.rating) {
     errors.value.rating = 'Please select a rating'
   }
-
-  if (!form.value.title.trim()) {
-    errors.value.title = 'Title is required'
-  } else if (form.value.title.length < 10) {
-    errors.value.title = 'Title must be at least 10 characters'
+  if (!form.title || form.title.length < 5) {
+    errors.value.title = 'Title must be at least 5 characters'
   }
-
-  if (!form.value.comment.trim()) {
-    errors.value.comment = 'Review comment is required'
-  } else if (form.value.comment.length < 50) {
-    errors.value.comment = 'Review must be at least 50 characters'
+  if (!form.comment || form.comment.length < 20) {
+    errors.value.comment = 'Review must be at least 20 characters'
+  }
+  if (form.comment.length > 2000) {
+    errors.value.comment = 'Review must not exceed 2000 characters'
   }
 
   return Object.keys(errors.value).length === 0
 }
 
 const handleSubmit = async () => {
-  if (!validate()) return
+  if (!validate()) {
+    return
+  }
 
-  loading.value = true
+  submitting.value = true
+
   try {
-    emit('submit', form.value)
+    const formData = new FormData()
+    formData.append('rating', form.rating.toString())
+    formData.append('title', form.title)
+    formData.append('comment', form.comment)
+
+    form.images.forEach((image, index) => {
+      formData.append(`images[${index}]`, image)
+    })
+
+    emit('submit', formData)
   } finally {
-    loading.value = false
+    submitting.value = false
   }
 }
-
-const setRating = (rating: number) => {
-  form.value.rating = rating
-  errors.value.rating = ''
-}
 </script>
-
-<template>
-  <UCard>
-    <template #header>
-      <div class="flex items-center justify-between">
-        <h3 class="text-xl font-semibold">Write a Review</h3>
-        <UBadge v-if="isVerifiedPurchase" color="green" variant="subtle">
-          <UIcon name="i-heroicons-check-badge" class="w-4 h-4 mr-1" />
-          Verified Purchase
-        </UBadge>
-      </div>
-    </template>
-
-    <form @submit.prevent="handleSubmit" class="space-y-6">
-      <!-- Rating -->
-      <div>
-        <label class="block text-sm font-medium mb-2">
-          Rating <span class="text-red-500">*</span>
-        </label>
-        <div class="flex items-center gap-1">
-          <button
-              v-for="star in 5"
-              :key="star"
-              type="button"
-              @click="setRating(star)"
-              @mouseenter="hoveredRating = star"
-              @mouseleave="hoveredRating = 0"
-              class="text-2xl transition-colors"
-          >
-            <UIcon
-                name="i-heroicons-star-solid"
-                :class="[
-                star <= (hoveredRating || form.rating)
-                  ? 'text-yellow-400'
-                  : 'text-gray-300'
-              ]"
-            />
-          </button>
-          <span v-if="form.rating > 0" class="ml-2 text-sm text-gray-600">
-            {{ form.rating }} out of 5 stars
-          </span>
-        </div>
-        <p v-if="errors.rating" class="text-sm text-red-500 mt-1">
-          {{ errors.rating }}
-        </p>
-      </div>
-
-      <!-- Title -->
-      <UFormGroup
-          label="Review Title"
-          :error="errors.title"
-          required
-      >
-        <UInput
-            v-model="form.title"
-            placeholder="Summarize your experience"
-            :maxlength="100"
-        />
-        <template #hint>
-          <span class="text-xs text-gray-500">
-            {{ form.title.length }}/100
-          </span>
-        </template>
-      </UFormGroup>
-
-      <!-- Comment -->
-      <UFormGroup
-          label="Your Review"
-          :error="errors.comment"
-          required
-      >
-        <UTextarea
-            v-model="form.comment"
-            :rows="6"
-            placeholder="Share your experience with this product (minimum 50 characters)"
-            :maxlength="2000"
-        />
-        <template #hint>
-          <span class="text-xs text-gray-500">
-            {{ form.comment.length }}/2000
-          </span>
-        </template>
-      </UFormGroup>
-
-      <!-- Actions -->
-      <div class="flex gap-3 justify-end">
-        <UButton
-            type="button"
-            color="gray"
-            variant="ghost"
-            @click="emit('cancel')"
-            :disabled="loading"
-        >
-          Cancel
-        </UButton>
-        <UButton
-            type="submit"
-            :loading="loading"
-            :disabled="loading"
-        >
-          Submit Review
-        </UButton>
-      </div>
-    </form>
-  </UCard>
-</template>
