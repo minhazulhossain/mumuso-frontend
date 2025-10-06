@@ -171,7 +171,7 @@
 </template>
 
 <script setup lang="ts">
-const { products, categories } = useProducts()
+const { products } = useProducts()
 const { addToCart } = useCart()
 // Filters
 const selectedCategory = ref('all')
