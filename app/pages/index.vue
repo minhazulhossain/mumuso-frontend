@@ -2,55 +2,9 @@
   <div>
     <!-- Hero Section -->
     <section class="relative overflow-hidden bg-gradient-to-br from-white via-primary-50 to-primary-100 dark:from-gray-950 dark:via-primary-950 dark:to-gray-900">
-      <UContainer>
-        <div class="py-24 sm:py-32 lg:py-40">
-          <div class="text-center">
-            <UBadge color="primary" variant="subtle" class="mb-6">
-              <UIcon name="i-heroicons-sparkles" class="w-4 h-4 mr-1" />
-              Built with Nuxt 4 + UI
-            </UBadge>
-            
-            <h1 class="text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-6xl lg:text-7xl">
-              Build Amazing Apps with
-              <span class="bg-gradient-to-r from-primary-600 via-primary-500 to-primary-400 bg-clip-text text-transparent">
-                Nuxt UI
-              </span>
-            </h1>
-            
-            <p class="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              Create beautiful, responsive web applications using the power of Nuxt 4 and the elegant components of Nuxt UI. 
-              Fast, accessible, and modern by default.
-            </p>
-            
-            <div class="mt-10 flex items-center justify-center gap-x-6 flex-wrap">
-              <UButton size="xl" to="/">
-                Get Started
-                <template #trailing>
-                  <UIcon name="i-heroicons-arrow-right" />
-                </template>
-              </UButton>
-              <UButton variant="outline" size="xl" to="/" color="gray">
-                View Demo
-                <template #trailing>
-                  <UIcon name="i-heroicons-play" />
-                </template>
-              </UButton>
-            </div>
 
-            <!-- Stats -->
-            <div class="mt-16 grid grid-cols-2 lg:grid-cols-4 gap-8">
-              <div v-for="stat in heroStats" :key="stat.label" class="text-center">
-                <div class="text-2xl sm:text-3xl font-bold text-primary-600 dark:text-primary-400">
-                  {{ stat.value }}
-                </div>
-                <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                  {{ stat.label }}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </UContainer>
+        <HeroCarousel />
+
     </section>
 
     <!-- Features Section -->
@@ -141,6 +95,8 @@
 
 <script setup>
 // Page-specific head configuration
+import HeroCarousel from "../components/HeroCarousel.vue";
+
 useHead({
   title: 'Home',
 })

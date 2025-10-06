@@ -34,15 +34,15 @@
         <!-- Right side actions -->
         <div class="flex items-center space-x-3">
           <!-- Search Button -->
-          <UButton
-              icon="i-heroicons-magnifying-glass"
-              color="gray"
-              variant="ghost"
-              size="sm"
-              class="hidden sm:inline-flex"
-              @click="openSearch"
-          />
-
+<!--          <UButton-->
+<!--              icon="i-heroicons-magnifying-glass"-->
+<!--              color="gray"-->
+<!--              variant="ghost"-->
+<!--              size="sm"-->
+<!--              class="hidden sm:inline-flex"-->
+<!--              @click="openSearch"-->
+<!--          />-->
+        <GlobalSearch />
           <!-- Theme toggle -->
           <UButton
               :icon="isDark ? 'i-heroicons-sun' : 'i-heroicons-moon'"
@@ -70,6 +70,7 @@
 
 <script setup>
 import {useCart} from "~/composables/useCart.js";
+import GlobalSearch from "./GlobalSearch.vue";
 
 const colorMode = useColorMode()
 const route = useRoute()
@@ -82,13 +83,7 @@ const toggleColorMode = () => {
 }
 
 const openSearch = () => {
-  // You can implement search functionality here
-  const toast = useToast()
-  toast.add({
-    title: 'Search',
-    description: 'Search functionality coming soon!',
-    icon: 'i-heroicons-magnifying-glass'
-  })
+
 }
 
 const isActiveRoute = (path) => {
