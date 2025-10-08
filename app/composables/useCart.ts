@@ -55,6 +55,23 @@ export const useCart = () => {
         }
     }
 
+    // Helper function to get CSRF token from cookie
+    const getCsrfToken = () => {
+        const cookie = useCookie('XSRF-TOKEN')
+        return cookie.value ? decodeURIComponent(cookie.value) : null
+    }
+
+    // Initialize CSRF cookie
+    const initCsrf = async () => {
+        try {
+            await $fetch(`${config.public.cartBase}sanctum/csrf-cookie`, {
+                credentials: 'include'
+            })
+        } catch (error) {
+            console.error('Failed to initialize CSRF token:', error)
+        }
+    }
+
     // Add item to cart
     const addToCart = async (slug: string, quantity: number = 1) => {
         try {
@@ -64,9 +81,16 @@ export const useCart = () => {
             //     credentials: 'include'
             // })
 
+            await initCsrf()
+            const csrfToken = getCsrfToken()
+
             const response = await $fetch(`${config.public.apiBase}cart/add`, {
                 method: 'POST',
                 credentials: 'include',
+                headers: {
+                    'X-XSRF-TOKEN': csrfToken || '',
+                    'Accept': 'application/json'
+                },
                 body: { slug, quantity }
             })
 
