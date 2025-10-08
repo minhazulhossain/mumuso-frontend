@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
         const response = await $fetch<{
             user: any
             access_token: string
-        }>(`${config.public.apiBase}/v1/register`, {
+        }>(`${config.public.apiBase}register`, {
             method: 'POST',
             body
         })

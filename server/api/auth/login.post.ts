@@ -9,16 +9,13 @@ export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig()
     const { email, password } = await readValidatedBody(event, bodySchema.parse)
 
-    console.log(`${config.public.apiBase}/v1/login`)
-
-
     try {
         // Call Laravel API
         const response = await $fetch<{
             user: any
             access_token: string
             token_type: string
-        }>(`${config.public.apiBase}/v1/login`, {
+        }>(`${config.public.apiBase}login`, {
             method: 'POST',
             body: { email, password }
         })

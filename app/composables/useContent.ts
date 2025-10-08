@@ -7,7 +7,7 @@ export const useContent = () => {
     const config = useRuntimeConfig()
 
     const fetchHeroBanners = async () => {
-        let response = await $fetch<ApiResponse<HeroBanner[]>>(`${config.public.apiBase}/v1/content/hero-banners`)
+        let response = await $fetch<ApiResponse<HeroBanner[]>>(`${config.public.apiBase}content/hero-banners`)
 
         if (!response.status) {
             throw new Error(response.message)
@@ -18,7 +18,7 @@ export const useContent = () => {
     }
 
     const fetchCategories = async () => {
-        let response = await $fetch<ApiResponse<Category[]>>(`${config.public.apiBase}/v1/content/navigation-items`)
+        let response = await $fetch<ApiResponse<Category[]>>(`${config.public.apiBase}content/navigation-items`)
 
         if (!response?.status) {
             throw new Error(response.message)

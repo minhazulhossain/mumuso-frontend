@@ -107,7 +107,7 @@ useHead({
   title: 'Home',
 })
 
-const [heroBanners  ] = await Promise.all([
+const [heroBanners ] = await Promise.all([
   fetchHeroBanners(),
 ])
 

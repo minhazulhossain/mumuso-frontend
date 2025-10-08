@@ -1,19 +1,20 @@
 export interface CartItem {
+    slug: string
     productId: number
     quantity: number
     addedAt: Date
 }
 
 export const useCart = () => {
-    const { getProduct, updateStock } = useProducts()
+    const {fetchProduct, updateStock} = useProducts()
     const toast = useToast()
 
     const cartItems = useState<CartItem[]>('cart', () => [])
     const isCartOpen = useState('isCartOpen', () => false)
 
     const cartItemsWithDetails = computed(() => {
-        return cartItems.value.map(item => {
-            const product = getProduct(item.productId)
+        return cartItems.value.map(async (item) => {
+            const product = await fetchProduct(item.slug)
             return {
                 ...item,
                 product
@@ -23,7 +24,7 @@ export const useCart = () => {
 
     const cartTotal = computed(() => {
         return cartItemsWithDetails.value.reduce((total, item) => {
-            return total + (item.product!.price * item.quantity)
+            return total + (item?.product!.price * item.quantity)
         }, 0)
     })
 
@@ -31,10 +32,12 @@ export const useCart = () => {
         return cartItems.value.reduce((total, item) => total + item.quantity, 0)
     })
 
-    const addToCart = (productId: number, quantity: number = 1) => {
-        const product = getProduct(productId)
+    const addToCart = async (slug: string, quantity: number = 1) => {
+        const product = await fetchProduct(slug)
+
+
         if (!product) {
-            toast.add({ title: 'Error', description: 'Product not found', color: 'error' })
+            toast.add({title: 'Error', description: 'Product not found', color: 'error'})
             return false
         }
 
@@ -70,8 +73,8 @@ export const useCart = () => {
         return true
     }
 
-    const updateCartItemQuantity = (productId: number, quantity: number) => {
-        const product = getProduct(productId)
+    const updateCartItemQuantity = async (productId: number, quantity: number) => {
+        const product = await fetchProduct(productId)
         if (!product) return false
 
         if (quantity > product.stock) {
@@ -94,10 +97,10 @@ export const useCart = () => {
         return true
     }
 
-    const removeFromCart = (productId: number) => {
+    const removeFromCart = async (productId: number) => {
         const index = cartItems.value.findIndex(item => item.productId === productId)
         if (index > -1) {
-            const product = getProduct(productId)
+            const product = await fetchProduct(productId)
             cartItems.value.splice(index, 1)
             toast.add({
                 title: 'Removed',

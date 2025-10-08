@@ -39,6 +39,7 @@
         </div>
 
         <div v-else class="space-y-4">
+          {{ cartItems }}
           <div
               v-for="item in cartItems"
               :key="item.productId"
@@ -61,7 +62,7 @@
                 {{ item.product.name }}
               </NuxtLink>
               <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">
-                ${{ item.product.price.toFixed(2) }}
+                ${{ item.product?.price?.toFixed(2) }}
               </p>
 
               <div class="flex items-center gap-2">
