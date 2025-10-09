@@ -24,39 +24,61 @@
         <USelectMenu
             v-model="selectedCategory"
             :items="categoryOptions"
-            option-attribute="label"
+            value-attribute="value"
+            option-attribute="name"
             placeholder="All categories"
             class="w-full"
         >
           <template #label>
-            {{ getCategoryLabel(localFilters.category as string) }}
+            {{ getCategoryLabel(localFilters.category) }}
+          </template>
+          <template #option="{ option }">
+            <div class="flex items-center gap-2">
+              <UIcon
+                  :name="option.icon"
+                  class="text-gray-400 flex-shrink-0"
+              />
+              <span>{{ option.label }}</span>
+            </div>
           </template>
         </USelectMenu>
       </div>
 
       <!-- Featured Filter -->
-<!--      <div class="mb-6">-->
-<!--        <label class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">-->
-<!--          Product Type-->
-<!--        </label>-->
-<!--        <div class="space-y-2">-->
-<!--          <URadioGroup-->
-<!--              v-model="localFilters.featured"-->
-<!--              :value="undefined"-->
-<!--              label="All Products"-->
-<!--          />-->
-<!--          <URadioGroup-->
-<!--              v-model="localFilters.featured"-->
-<!--              :value="true"-->
-<!--              label="Featured Only"-->
-<!--          />-->
-<!--          <URadioGroup-->
-<!--              v-model="localFilters.featured"-->
-<!--              :value="false"-->
-<!--              label="Regular Products"-->
-<!--          />-->
-<!--        </div>-->
-<!--      </div>-->
+      <div class="mb-6">
+        <label class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+          Product Type
+        </label>
+        <div class="space-y-2">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input
+                type="radio"
+                :value="undefined"
+                v-model="localFilters.featured"
+                class="form-radio text-primary-500"
+            />
+            <span class="text-sm text-gray-700 dark:text-gray-300">All Products</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input
+                type="radio"
+                :value="true"
+                v-model="localFilters.featured"
+                class="form-radio text-primary-500"
+            />
+            <span class="text-sm text-gray-700 dark:text-gray-300">Featured Only</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input
+                type="radio"
+                :value="false"
+                v-model="localFilters.featured"
+                class="form-radio text-primary-500"
+            />
+            <span class="text-sm text-gray-700 dark:text-gray-300">Regular Products</span>
+          </label>
+        </div>
+      </div>
 
       <!-- Price Range -->
       <div class="mb-6">
@@ -64,58 +86,36 @@
           Price Range
         </label>
 
-        <!-- Price Range Slider -->
-        <div class="mb-3">
-          <div class="flex justify-between text-xs text-gray-500 mb-1">
-            <span>${{ localFilters.min_price || 0 }}</span>
-            <span>${{ localFilters.max_price || maxPriceLimit }}</span>
-          </div>
-          <div class="relative">
-            <!-- Min slider -->
-            <input
-                :value="localFilters.min_price || 0"
-                type="range"
-                min="0"
-                :max="maxPriceLimit"
-                step="10"
-                class="w-full absolute"
-                @input="updateMinPrice"
-            />
-            <!-- Max slider -->
-            <input
-                :value="localFilters.max_price || maxPriceLimit"
-                type="range"
-                min="0"
-                :max="maxPriceLimit"
-                step="10"
-                class="w-full"
-                @input="updateMaxPrice"
-            />
-          </div>
+        <!-- Price Display -->
+        <div class="flex justify-between text-xs text-gray-500 mb-2">
+          <span>${{ displayMinPrice }}</span>
+          <span>${{ displayMaxPrice }}</span>
         </div>
 
         <!-- Manual Price Inputs -->
-        <div class="flex gap-2">
+        <div class="flex gap-2 mb-3">
           <UInput
-              v-model="localFilters.min_price"
+              v-model="tempMinPrice"
               type="number"
               placeholder="Min"
               min="0"
-              :max="localFilters.max_price || maxPriceLimit"
+              :max="tempMaxPrice || maxPriceLimit"
               icon="i-heroicons-currency-dollar"
+              @blur="updatePriceFilters"
           />
           <UInput
-              v-model="localFilters.max_price"
+              v-model="tempMaxPrice"
               type="number"
               placeholder="Max"
-              :min="localFilters.min_price || 0"
+              :min="tempMinPrice || 0"
               :max="maxPriceLimit"
               icon="i-heroicons-currency-dollar"
+              @blur="updatePriceFilters"
           />
         </div>
 
         <!-- Quick Price Filters -->
-        <div class="flex flex-wrap gap-2 mt-3">
+        <div class="flex flex-wrap gap-2">
           <UButton
               v-for="range in quickPriceRanges"
               :key="range.label"
@@ -135,46 +135,54 @@
           Availability
         </label>
         <div class="space-y-2">
-          <URadioGroup
-              v-model="localFilters.in_stock"
-              :value="undefined"
-              label="All Products"
-          />
-          <URadioGroup
-              v-model="localFilters.in_stock"
-              :value="true"
-              label="In Stock"
-          >
-            <template #label>
-              <div class="flex items-center gap-2">
-                <span>In Stock</span>
-                <UBadge color="success" variant="soft" size="xs">
-                  {{ inStockCount }}
-                </UBadge>
-              </div>
-            </template>
-          </URadioGroup>
-          <URadioGroup
-              v-model="localFilters.in_stock"
-              :value="false"
-              label="Out of Stock"
-          />
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input
+                type="radio"
+                :value="undefined"
+                v-model="localFilters.in_stock"
+                class="form-radio text-primary-500"
+            />
+            <span class="text-sm text-gray-700 dark:text-gray-300">All Products</span>
+          </label>
+          <label class="flex items-center justify-between cursor-pointer">
+            <span class="flex items-center gap-2">
+              <input
+                  type="radio"
+                  :value="true"
+                  v-model="localFilters.in_stock"
+                  class="form-radio text-primary-500"
+              />
+              <span class="text-sm text-gray-700 dark:text-gray-300">In Stock</span>
+            </span>
+            <UBadge v-if="inStockCount > 0" color="success" variant="soft" size="xs">
+              {{ inStockCount }}
+            </UBadge>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input
+                type="radio"
+                :value="false"
+                v-model="localFilters.in_stock"
+                class="form-radio text-primary-500"
+            />
+            <span class="text-sm text-gray-700 dark:text-gray-300">Out of Stock</span>
+          </label>
         </div>
       </div>
 
       <!-- Discount Filter -->
       <div class="mb-6">
-        <UCheckbox
-            v-model="localFilters.on_sale"
-            label="On Sale / Discounted"
-        >
-          <template #label>
-            <div class="flex items-center gap-2">
-              <span class="text-sm">On Sale / Discounted</span>
-              <UIcon name="i-heroicons-tag" class="text-red-500" />
-            </div>
-          </template>
-        </UCheckbox>
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input
+              type="checkbox"
+              v-model="localFilters.on_sale"
+              class="form-checkbox text-primary-500 rounded"
+          />
+          <span class="flex items-center gap-2">
+            <span class="text-sm text-gray-700 dark:text-gray-300">On Sale / Discounted</span>
+            <UIcon name="i-heroicons-tag" class="text-red-500 w-4 h-4" />
+          </span>
+        </label>
       </div>
 
       <!-- Action Buttons -->
@@ -228,13 +236,16 @@
 </template>
 
 <script setup lang="ts">
-
-import type {Category} from "../../../types/product";
+interface Category {
+  id: number
+  name: string
+  slug: string
+}
 
 interface Filters {
   category?: string
-  featured?: boolean
-  in_stock?: boolean
+  featured?: boolean | undefined
+  in_stock?: boolean | undefined
   min_price?: string | number
   max_price?: string | number
   on_sale?: boolean
@@ -262,22 +273,15 @@ const localFilters = ref<Filters>({
   on_sale: false,
 })
 
+// Temporary price values for input fields
+const tempMinPrice = ref<string | number>('')
+const tempMaxPrice = ref<string | number>('')
+
 // Track if we're updating from props to prevent circular updates
 const isUpdatingFromProps = ref(false)
 
 const maxPriceLimit = 10000
-const inStockCount = ref(0) // This should come from API
-
-// Computed property for category selection
-const selectedCategory = computed({
-  get: () => {
-    const slug = localFilters.value.category as string || 'all'
-    return categoryOptions.value.find(cat => cat.value === slug) || categoryOptions.value[0]
-  },
-  set: (option: { value: string; label: string }) => {
-    localFilters.value.category = option.value
-  }
-})
+const inStockCount = ref(0) // This should come from API or computed
 
 // Quick price ranges
 const quickPriceRanges = [
@@ -289,15 +293,35 @@ const quickPriceRanges = [
 
 // Category options
 const categoryOptions = computed(() => {
-  const categories = getAllCategories.value.map(cat => ({
+  const categories = getAllCategories.value.map((cat: Category) => ({
     value: cat.slug,
-    label: cat.label,
+    label: cat.name,
     icon: 'i-heroicons-tag'
   }))
   return [
     { value: 'all', label: 'All Categories', icon: 'i-heroicons-squares-2x2' },
     ...categories
   ]
+})
+
+// Computed property for category selection
+const selectedCategory = computed({
+  get: () => {
+    const slug = localFilters.value.category || 'all'
+    return categoryOptions.value.find(cat => cat.value === slug) || categoryOptions.value[0]
+  },
+  set: (option: { value: string; label: string }) => {
+    localFilters.value.category = option.value
+  }
+})
+
+// Display prices
+const displayMinPrice = computed(() => {
+  return localFilters.value.min_price || 0
+})
+
+const displayMaxPrice = computed(() => {
+  return localFilters.value.max_price || maxPriceLimit
 })
 
 // Computed
@@ -308,7 +332,7 @@ const hasActiveFilters = computed(() => {
       localFilters.value.in_stock !== undefined ||
       localFilters.value.min_price ||
       localFilters.value.max_price ||
-      localFilters.value.on_sale
+      localFilters.value.on_sale === true
   )
 })
 
@@ -318,16 +342,15 @@ const activeFilterCount = computed(() => {
   if (localFilters.value.featured !== undefined) count++
   if (localFilters.value.in_stock !== undefined) count++
   if (localFilters.value.min_price || localFilters.value.max_price) count++
-  if (localFilters.value.on_sale) count++
+  if (localFilters.value.on_sale === true) count++
   return count
 })
 
 // Methods
-const getCategoryLabel = (slug: string | Category | undefined) => {
-  if (!slug) return 'All Categories'
-  const slugStr = typeof slug === 'string' ? slug : (slug as Category).slug
-  const category = categoryOptions.value.find(c => c.value === slugStr)
-  return category?.label || slugStr
+const getCategoryLabel = (slug: string | undefined) => {
+  if (!slug || slug === 'all') return 'All Categories'
+  const category = categoryOptions.value.find(c => c.value === slug)
+  return category?.label || slug
 }
 
 const isActivePriceRange = (range: typeof quickPriceRanges[0]) => {
@@ -344,29 +367,55 @@ const isActivePriceRange = (range: typeof quickPriceRanges[0]) => {
 const setQuickPrice = (range: typeof quickPriceRanges[0]) => {
   localFilters.value.min_price = range.min
   localFilters.value.max_price = range.max || maxPriceLimit
+  tempMinPrice.value = range.min
+  tempMaxPrice.value = range.max || maxPriceLimit
 }
 
-const updateMinPrice = (e: Event) => {
-  const value = Number((e.target as HTMLInputElement).value)
-  const maxPrice = Number(localFilters.value.max_price) || maxPriceLimit
+const updatePriceFilters = () => {
+  const minVal = Number(tempMinPrice.value)
+  const maxVal = Number(tempMaxPrice.value)
 
-  if (value <= maxPrice) {
-    localFilters.value.min_price = value
+  // Validate min price
+  if (tempMinPrice.value !== '' && !isNaN(minVal) && minVal >= 0) {
+    localFilters.value.min_price = minVal
+  } else if (tempMinPrice.value === '') {
+    localFilters.value.min_price = undefined
   }
-}
 
-const updateMaxPrice = (e: Event) => {
-  const value = Number((e.target as HTMLInputElement).value)
-  const minPrice = Number(localFilters.value.min_price) || 0
+  // Validate max price
+  if (tempMaxPrice.value !== '' && !isNaN(maxVal) && maxVal >= 0) {
+    localFilters.value.max_price = maxVal
+  } else if (tempMaxPrice.value === '') {
+    localFilters.value.max_price = undefined
+  }
 
-  if (value >= minPrice) {
-    localFilters.value.max_price = value
+  // Ensure min is not greater than max
+  if (
+      localFilters.value.min_price !== undefined &&
+      localFilters.value.max_price !== undefined &&
+      Number(localFilters.value.min_price) > Number(localFilters.value.max_price)
+  ) {
+    const temp = localFilters.value.min_price
+    localFilters.value.min_price = localFilters.value.max_price
+    localFilters.value.max_price = temp
+    tempMinPrice.value = localFilters.value.min_price
+    tempMaxPrice.value = localFilters.value.max_price
   }
 }
 
 const handleApplyFilters = () => {
-  emit('apply-filters', { ...localFilters.value })
-  emit('update:filters', { ...localFilters.value })
+  const filtersToApply = { ...localFilters.value }
+
+  // Clean up undefined/empty values
+  if (filtersToApply.category === 'all') {
+    filtersToApply.category = undefined
+  }
+  if (filtersToApply.on_sale === false) {
+    filtersToApply.on_sale = undefined
+  }
+
+  emit('apply-filters', filtersToApply)
+  emit('update:filters', filtersToApply)
 }
 
 const handleClearFilters = () => {
@@ -379,39 +428,111 @@ const handleClearFilters = () => {
     on_sale: false,
   }
 
+  tempMinPrice.value = ''
+  tempMaxPrice.value = ''
+
   emit('clear-filters')
   emit('update:filters', { ...localFilters.value })
 }
 
-// Watch for external filter changes (from props)
-watch(() => props.filters, (newFilters) => {
-  if (newFilters && !isUpdatingFromProps.value) {
-    isUpdatingFromProps.value = true
-    localFilters.value = { ...newFilters }
+// Sync temp prices with filter values
+watch(
+    () => localFilters.value.min_price,
+    (newVal) => {
+      if (newVal !== undefined && newVal !== tempMinPrice.value) {
+        tempMinPrice.value = newVal
+      }
+    }
+)
 
-    // Small delay to ensure the flag works correctly
-    nextTick(() => {
-      isUpdatingFromProps.value = false
-    })
-  }
-}, { deep: true, immediate: true })
+watch(
+    () => localFilters.value.max_price,
+    (newVal) => {
+      if (newVal !== undefined && newVal !== tempMaxPrice.value) {
+        tempMaxPrice.value = newVal
+      }
+    }
+)
+
+// Watch for external filter changes (from props)
+watch(
+    () => props.filters,
+    (newFilters) => {
+      if (newFilters && !isUpdatingFromProps.value) {
+        isUpdatingFromProps.value = true
+
+        // Merge with defaults to avoid undefined issues
+        localFilters.value = {
+          category: newFilters.category || 'all',
+          featured: newFilters.featured,
+          in_stock: newFilters.in_stock,
+          min_price: newFilters.min_price,
+          max_price: newFilters.max_price,
+          on_sale: newFilters.on_sale || false,
+        }
+
+        // Update temp prices
+        tempMinPrice.value = newFilters.min_price || ''
+        tempMaxPrice.value = newFilters.max_price || ''
+
+        nextTick(() => {
+          isUpdatingFromProps.value = false
+        })
+      }
+    },
+    { deep: true, immediate: true }
+)
 
 // Auto-apply filters on change with debounce
-// Only apply if not updating from props to prevent loop
 let applyTimeout: ReturnType<typeof setTimeout> | null = null
 
-watch(localFilters, () => {
-  // Don't auto-apply if we're updating from props
-  if (isUpdatingFromProps.value) return
+watch(
+    localFilters,
+    () => {
+      // Don't auto-apply if we're updating from props
+      if (isUpdatingFromProps.value) return
 
-  // Clear existing timeout
-  if (applyTimeout) {
-    clearTimeout(applyTimeout)
-  }
+      // Clear existing timeout
+      if (applyTimeout) {
+        clearTimeout(applyTimeout)
+      }
 
-  // Debounce the apply
-  applyTimeout = setTimeout(() => {
-    handleApplyFilters()
-  }, 800)
-}, { deep: true })
+      // Debounce the apply
+      applyTimeout = setTimeout(() => {
+        handleApplyFilters()
+      }, 800)
+    },
+    { deep: true }
+)
 </script>
+
+<style scoped>
+/* Custom radio and checkbox styles */
+.form-radio:checked {
+  background-color: rgb(var(--color-primary-500));
+  border-color: rgb(var(--color-primary-500));
+}
+
+.form-checkbox:checked {
+  background-color: rgb(var(--color-primary-500));
+  border-color: rgb(var(--color-primary-500));
+}
+
+.form-radio,
+.form-checkbox {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 0.25rem;
+  border: 1px solid rgb(var(--color-gray-300));
+  transition: all 0.2s;
+}
+
+.form-radio {
+  border-radius: 9999px;
+}
+
+.dark .form-radio,
+.dark .form-checkbox {
+  border-color: rgb(var(--color-gray-600));
+}
+</style>

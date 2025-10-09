@@ -138,6 +138,6 @@ defineEmits<{
 
 const handleImageError = (event: Event) => {
   const target = event.target as HTMLImageElement
-  target.src = ''
+  target.src = 'https://placehold.co/600x600'
 }
 </script>

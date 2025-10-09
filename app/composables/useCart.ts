@@ -1,3 +1,5 @@
+import type {ApiResponse} from "../../types/api";
+
 export interface CartItem {
     slug: string
     product_id: number
@@ -58,6 +60,9 @@ export const useCart = () => {
     // Helper function to get CSRF token from cookie
     const getCsrfToken = () => {
         const cookie = useCookie('XSRF-TOKEN')
+
+        console.log(cookie.value);
+
         return cookie.value ? decodeURIComponent(cookie.value) : null
     }
 
@@ -76,22 +81,13 @@ export const useCart = () => {
     const addToCart = async (slug: string, quantity: number = 1) => {
         try {
             isLoading.value = true
+            // await initCsrf()
 
-            // await $fetch(`${config.public.apiBase}/sanctum/csrf-cookie`, {
-            //     credentials: 'include'
-            // })
-
-            await initCsrf()
-            const csrfToken = getCsrfToken()
-
-            const response = await $fetch(`${config.public.apiBase}cart/add`, {
+            const response = await $fetch<ApiResponse>(`${config.public.apiBase}cart/add`, {
                 method: 'POST',
                 credentials: 'include',
-                headers: {
-                    'X-XSRF-TOKEN': csrfToken || '',
-                    'Accept': 'application/json'
-                },
-                body: { slug, quantity }
+
+                body: {slug, quantity}
             })
 
             await fetchCart()
@@ -123,7 +119,7 @@ export const useCart = () => {
             await $fetch(`${config.public.apiBase}cart/update/${slug}`, {
                 method: 'PUT',
                 credentials: 'include',
-                body: { quantity }
+                body: {quantity}
             })
 
             await fetchCart()
@@ -145,7 +141,7 @@ export const useCart = () => {
     const removeFromCart = async (slug: string) => {
         try {
             isLoading.value = true
-            const response = await $fetch(`${config.public.apiBase}cart/remove/${slug}`, {
+            const response = await $fetch<ApiResponse>(`${config.public.apiBase}cart/remove/${slug}`, {
                 method: 'DELETE',
                 credentials: 'include'
             })
@@ -205,7 +201,7 @@ export const useCart = () => {
     const checkout = async () => {
         try {
             isLoading.value = true
-            const response = await $fetch(`${config.public.apiBase}cart/checkout`, {
+            const response = await $fetch<ApiResponse>(`${config.public.apiBase}cart/checkout`, {
                 method: 'POST',
                 credentials: 'include'
             })

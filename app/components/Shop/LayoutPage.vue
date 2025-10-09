@@ -44,7 +44,7 @@
                   class="cursor-pointer"
               >
                 {{ getCategoryName(activeFilters.category) }}
-                <UIcon name="i-heroicons-x-mark" class="ml-1 w-3 h-3" />
+                <UIcon name="i-heroicons-x-mark" class="ml-1 w-3 h-3"/>
               </UBadge>
 
               <UBadge
@@ -55,7 +55,7 @@
                   class="cursor-pointer"
               >
                 Featured
-                <UIcon name="i-heroicons-x-mark" class="ml-1 w-3 h-3" />
+                <UIcon name="i-heroicons-x-mark" class="ml-1 w-3 h-3"/>
               </UBadge>
 
               <UBadge
@@ -66,7 +66,7 @@
                   class="cursor-pointer"
               >
                 {{ activeFilters.in_stock ? 'In Stock' : 'Out of Stock' }}
-                <UIcon name="i-heroicons-x-mark" class="ml-1 w-3 h-3" />
+                <UIcon name="i-heroicons-x-mark" class="ml-1 w-3 h-3"/>
               </UBadge>
 
               <UBadge
@@ -77,7 +77,7 @@
                   class="cursor-pointer"
               >
                 Min: ${{ activeFilters.min_price }}
-                <UIcon name="i-heroicons-x-mark" class="ml-1 w-3 h-3" />
+                <UIcon name="i-heroicons-x-mark" class="ml-1 w-3 h-3"/>
               </UBadge>
 
               <UBadge
@@ -88,7 +88,7 @@
                   class="cursor-pointer"
               >
                 Max: ${{ activeFilters.max_price }}
-                <UIcon name="i-heroicons-x-mark" class="ml-1 w-3 h-3" />
+                <UIcon name="i-heroicons-x-mark" class="ml-1 w-3 h-3"/>
               </UBadge>
 
               <UButton
@@ -104,7 +104,7 @@
 
           <!-- Loading State -->
           <div v-if="loading" class="text-center py-16">
-            <ShopSkeleton :count="9" />
+            <ShopSkeleton :count="9"/>
           </div>
 
           <!-- Error State -->
@@ -146,7 +146,7 @@
             <!-- Products Grid View -->
             <div
                 v-if="products.length > 0 && viewMode === 'grid'"
-                class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
+                class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3"
             >
               <ShopProductCard
                   v-for="product in products"
@@ -241,13 +241,16 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
   title?: string
-  subTitle?: string
+  subTitle?: string,
 }>()
 
-const { products, pagination, loading, error, fetchProducts, changePage: apiChangePage, getAllCategories } = useProducts()
-const { addToCart } = useCart()
+const {
+  products, pagination, loading, error, fetchProducts,
+  changePage: apiChangePage, getAllCategories
+} = useProducts()
+const {addToCart} = useCart()
 const toast = useToast()
 const route = useRoute()
 const router = useRouter()
@@ -264,14 +267,15 @@ const activeFilters = ref<any>({
   max_price: undefined,
 })
 
+
 // Options
 const sortOptions = [
-  { value: 'newest', label: 'Newest First' },
-  { value: 'featured', label: 'Featured First' },
-  { value: 'price-asc', label: 'Price: Low to High' },
-  { value: 'price-desc', label: 'Price: High to Low' },
-  { value: 'name-asc', label: 'Name: A-Z' },
-  { value: 'name-desc', label: 'Name: Z-A' },
+  {value: 'newest', label: 'Newest First'},
+  {value: 'featured', label: 'Featured First'},
+  {value: 'price-asc', label: 'Price: Low to High'},
+  {value: 'price-desc', label: 'Price: High to Low'},
+  {value: 'name-asc', label: 'Name: A-Z'},
+  {value: 'name-desc', label: 'Name: Z-A'},
 ]
 
 // Computed
@@ -345,7 +349,7 @@ const loadProducts = async () => {
 }
 
 const applyFilters = async (filters: any) => {
-  activeFilters.value = { ...filters }
+  activeFilters.value = {...filters}
   await loadProducts()
 }
 
@@ -360,7 +364,7 @@ const clearAllFilters = async () => {
   searchQuery.value = ''
   sortBy.value = 'featured'
 
-  await router.push({ query: {} })
+  await router.push({query: {}})
   await loadProducts()
 }
 
@@ -375,7 +379,7 @@ const removeFilter = async (filterKey: string) => {
 
 const changePage = async (page: number) => {
   await apiChangePage(page, buildFiltersObject())
-  window.scrollTo({ top: 0, behavior: 'smooth' })
+  window.scrollTo({top: 0, behavior: 'smooth'})
 }
 
 const handleAddToCart = async (productId: number, quantity: number) => {
@@ -429,7 +433,9 @@ onMounted(async () => {
 useHead({
   title: 'Shop - Premium Products',
   meta: [
-    { name: 'description', content: 'Browse our collection of premium products' }
+    {name: 'description', content: 'Browse our collection of premium products'}
   ]
 })
+
+
 </script>

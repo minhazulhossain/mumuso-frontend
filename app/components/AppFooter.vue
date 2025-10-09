@@ -112,32 +112,32 @@
       </div>
 
       <!-- Newsletter Section (Optional) -->
-      <div class="py-8 border-t border-gray-200 dark:border-gray-800">
-        <div class="max-w-md mx-auto text-center">
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-            Stay Updated
-          </h3>
-          <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
-            Get the latest updates about our products and services.
-          </p>
-          <div class="flex space-x-2">
-            <UInput 
-              v-model="newsletterEmail"
-              placeholder="Enter your email"
-              class="flex-1"
-              size="sm"
-            />
-            <UButton 
-              color="primary" 
-              size="sm"
-              @click="subscribeNewsletter"
-              :loading="isSubscribing"
-            >
-              Subscribe
-            </UButton>
-          </div>
-        </div>
-      </div>
+<!--      <div class="py-8 border-t border-gray-200 dark:border-gray-800">-->
+<!--        <div class="max-w-md mx-auto text-center">-->
+<!--          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">-->
+<!--            Stay Updated-->
+<!--          </h3>-->
+<!--          <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">-->
+<!--            Get the latest updates about our products and services.-->
+<!--          </p>-->
+<!--          <div class="flex space-x-2">-->
+<!--            <UInput -->
+<!--              v-model="newsletterEmail"-->
+<!--              placeholder="Enter your email"-->
+<!--              class="flex-1"-->
+<!--              size="sm"-->
+<!--            />-->
+<!--            <UButton -->
+<!--              color="primary" -->
+<!--              size="sm"-->
+<!--              @click="subscribeNewsletter"-->
+<!--              :loading="isSubscribing"-->
+<!--            >-->
+<!--              Subscribe-->
+<!--            </UButton>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
     </UContainer>
   </footer>
 </template>

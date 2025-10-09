@@ -1,3 +1,8 @@
 <template>
-  This is category Page
+  <ShopLayoutPage />
 </template>
+<script setup lang="ts">
+
+  const route = useRoute()
+
+</script>
