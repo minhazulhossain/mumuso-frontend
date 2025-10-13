@@ -1,5 +1,6 @@
-import type { Ref } from 'vue'
-import type { Product, Category, Pagination, ProductFilters } from '../../types/product';
+import type {Ref} from 'vue'
+import type {Product, Category, Pagination, ProductFilters} from '../../types/product';
+
 export const useProducts = () => {
     const config = useRuntimeConfig()
     const apiUrl = config.public.apiBase
@@ -82,7 +83,7 @@ export const useProducts = () => {
             // Cache filters
             cachedFilters.value = filters
 
-            return { products: products.value, pagination: pagination.value }
+            return {products: products.value, pagination: pagination.value}
         } catch (err: any) {
             error.value = err.message || 'Failed to fetch products'
             console.error('Error fetching products:', err)
@@ -105,7 +106,6 @@ export const useProducts = () => {
             return response.data
         } catch (err: any) {
             error.value = err.message || 'Failed to fetch product'
-            console.error('Error fetching product:', err)
             throw err
         } finally {
             loading.value = false
@@ -129,22 +129,22 @@ export const useProducts = () => {
 
     // Change page
     const changePage = async (page: number, filters: ProductFilters = {}) => {
-        await fetchProducts({ ...filters, page })
+        await fetchProducts({...filters, page})
     }
 
     // Get featured products
     const getFeaturedProducts = async (limit: number = 8) => {
-        return await fetchProducts({ featured: true, page: 1 })
+        return await fetchProducts({featured: true, page: 1})
     }
 
     // Get products by category
     const getProductsByCategory = async (categorySlug: string, limit?: number) => {
-        return await fetchProducts({ category: categorySlug })
+        return await fetchProducts({category: categorySlug})
     }
 
     // Search products
     const searchProducts = async (query: string) => {
-        return await fetchProducts({ search: query })
+        return await fetchProducts({search: query})
     }
 
     // Get related products (by category)
@@ -154,7 +154,7 @@ export const useProducts = () => {
         }
 
         const categorySlug = product?.categories[0]?.slug
-        const response = await fetchProducts({ category: categorySlug })
+        const response = await fetchProducts({category: categorySlug})
 
         // Filter out current product and limit results
         return response.products
@@ -202,7 +202,7 @@ export const useProducts = () => {
         getFeaturedProducts,
         getProductsByCategory,
         searchProducts,
-        getRelatedProducts,
+        // getRelatedProducts,
         refresh,
         clear,
 

@@ -44,9 +44,8 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   hasTitleBar: true,
   title: 'Products',
-  viewAllUrl: '/shop'
+  viewAllUrl: '/shop',
 })
-
 
 defineEmits<{
   'add-to-cart': [productId: number, quantity: number]

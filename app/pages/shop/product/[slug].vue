@@ -1,21 +1,14 @@
 <template>
   <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
     <UContainer class="py-8">
-      <UButton
-          to="/shop"
-          icon="i-heroicons-arrow-left"
-          color="secondary"
-          variant="ghost"
+      <!-- Breadcrumb -->
+      <UBreadcrumb
+          :links="breadcrumbLinks"
           class="mb-6"
-      >
-        Back to Shop
-      </UButton>
+      />
 
-      <!-- Loading State -->
-      <div v-if="loading" class="text-center py-16">
-        <UIcon name="i-heroicons-arrow-path" class="text-4xl text-primary-500 animate-spin"/>
-        <p class="text-gray-600 dark:text-gray-400 mt-4">Loading product...</p>
-      </div>
+      <!-- Loading State - Skeleton -->
+      <SingleProductSkeleton v-if="loading" />
 
       <!-- Error State -->
       <div v-else-if="error" class="text-center py-16">
@@ -28,22 +21,33 @@
       <div v-else-if="product" class="grid grid-cols-1 lg:grid-cols-2 gap-12">
         <!-- Product Image Gallery -->
         <div class="space-y-4">
-          <div class="aspect-square overflow-hidden rounded-lg bg-gray-100 relative">
+          <div class="aspect-square overflow-hidden rounded-lg bg-gray-100 relative group cursor-zoom-in">
             <img
                 :src="selectedImage"
                 :alt="product.name"
-                class="w-full h-full object-cover"
+                class="w-full h-full object-cover transition-transform duration-300"
+                :class="{ 'scale-150': isZoomed }"
+                :style="zoomStyle"
                 @error="handleImageError"
+                @click="toggleZoom"
+                @mousemove="handleMouseMove"
+                @mouseleave="isZoomed = false"
             />
+            <!-- Zoom Hint -->
+            <div v-if="!isZoomed" class="absolute inset-0 bg-opacity-0 group-hover:bg-opacity-10 transition-all flex items-center justify-center pointer-events-none">
+              <div class="bg-white dark:bg-gray-800 rounded-full p-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                <UIcon name="i-lucide-lightbulb" class="text-2xl text-gray-700 dark:text-gray-300" />
+              </div>
+            </div>
             <!-- Discount Badge -->
             <div v-if="product.has_discount" class="absolute top-4 right-4">
-              <UBadge color="red" variant="solid" size="lg">
+              <UBadge color="error" variant="solid" size="lg">
                 -{{ product.discount_percentage }}% OFF
               </UBadge>
             </div>
             <!-- Stock Badge -->
             <div v-if="!product.in_stock" class="absolute top-4 left-4">
-              <UBadge color="gray" variant="solid" size="lg">
+              <UBadge color="secondary" variant="solid" size="lg">
                 Out of Stock
               </UBadge>
             </div>
@@ -79,10 +83,10 @@
             >
               {{ category.name }}
             </UBadge>
-            <UBadge v-if="product.is_featured" color="yellow" variant="soft">
+            <UBadge v-if="product.is_featured" color="warning" variant="soft">
               Featured
             </UBadge>
-            <UBadge :color="product.in_stock ? 'green' : 'red'" variant="soft">
+            <UBadge :color="product.in_stock ? 'success' : 'error'" variant="soft">
               {{ product.stock_status }}
             </UBadge>
           </div>
@@ -109,7 +113,7 @@
           <div class="flex items-center gap-4">
             <div class="flex items-center gap-2">
               <UIcon
-                  :name="product.in_stock ? 'i-heroicons-check-circle' : 'i-heroicons-x-circle'"
+                  :name="product.in_stock ? 'i-check-circle' : 'i-x-circle'"
                   :class="product.in_stock ? 'text-green-500' : 'text-red-500'"
               />
               <span class="text-gray-700 dark:text-gray-300">
@@ -118,7 +122,7 @@
             </div>
             <UBadge
                 v-if="product.stock_quantity < 10 && product.in_stock"
-                color="orange"
+                color="warning"
                 variant="soft"
             >
               Low Stock
@@ -236,6 +240,14 @@
         <p class="text-gray-600 dark:text-gray-400 mb-4">The product you're looking for doesn't exist</p>
         <UButton to="/shop" color="primary">Browse Products</UButton>
       </div>
+
+      <!-- Related Products Section -->
+
+
+      <div v-if="product && relatedProducts.length > 0" class="mt-16">
+
+        <ProductCarousel title="Related Products"/>
+      </div>
     </UContainer>
   </div>
 </template>
@@ -245,13 +257,41 @@ import type { Product } from '~/composables/useProducts'
 
 const route = useRoute()
 const toast = useToast()
-const { fetchProduct, loading, error } = useProducts()
+const { fetchProduct, fetchProducts, loading, error } = useProducts()
 const { addToCart, toggleCart } = useCart()
 
 // State
 const product = ref<Product | null>(null)
 const quantity = ref(1)
 const selectedImage = ref('')
+const isZoomed = ref(false)
+const zoomStyle = ref({})
+const relatedProducts = ref<Product[]>([])
+
+// Breadcrumb links
+const breadcrumbLinks = computed(() => {
+  const links = [
+    { label: 'Home', to: '/' },
+    { label: 'Shop', to: '/shop' }
+  ]
+
+  if (product.value) {
+    // Add category if available
+    if (product.value.categories.length > 0) {
+      links.push({
+        label: product.value.categories[0].name,
+        to: `/shop?category=${product.value.categories[0].slug}`
+      })
+    }
+    // Add current product
+    links.push({
+      label: product.value.name,
+      to: `/shop/${product.value.slug}`
+    })
+  }
+
+  return links
+})
 
 // Load product
 const loadProduct = async () => {
@@ -260,8 +300,31 @@ const loadProduct = async () => {
 
   if (productData) {
     product.value = productData
+    relatedProducts.value = productData?.related_products
     // Set initial selected image
     selectedImage.value = productData.images.featured.medium || productData.images.featured.original
+
+  }
+}
+
+// Image zoom handlers
+const toggleZoom = () => {
+  isZoomed.value = !isZoomed.value
+  if (!isZoomed.value) {
+    zoomStyle.value = {}
+  }
+}
+
+const handleMouseMove = (event: MouseEvent) => {
+  if (!isZoomed.value) return
+
+  const target = event.currentTarget as HTMLElement
+  const rect = target.getBoundingClientRect()
+  const x = ((event.clientX - rect.left) / rect.width) * 100
+  const y = ((event.clientY - rect.top) / rect.height) * 100
+
+  zoomStyle.value = {
+    transformOrigin: `${x}% ${y}%`
   }
 }
 
