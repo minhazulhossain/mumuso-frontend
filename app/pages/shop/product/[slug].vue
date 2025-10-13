@@ -242,11 +242,8 @@
       </div>
 
       <!-- Related Products Section -->
-
-
       <div v-if="product && relatedProducts.length > 0" class="mt-16">
-
-        <ProductCarousel title="Related Products"/>
+        <ProductCarousel :items="relatedProducts" title="Related Products"/>
       </div>
     </UContainer>
   </div>
@@ -276,14 +273,12 @@ const breadcrumbLinks = computed(() => {
   ]
 
   if (product.value) {
-    // Add category if available
     if (product.value.categories.length > 0) {
       links.push({
         label: product.value.categories[0].name,
         to: `/shop?category=${product.value.categories[0].slug}`
       })
     }
-    // Add current product
     links.push({
       label: product.value.name,
       to: `/shop/${product.value.slug}`
@@ -295,15 +290,14 @@ const breadcrumbLinks = computed(() => {
 
 // Load product
 const loadProduct = async () => {
+  product.value = null // Reset product state before fetching
   const slug = route.params.slug as string
   const productData = await fetchProduct(slug)
 
   if (productData) {
     product.value = productData
     relatedProducts.value = productData?.related_products
-    // Set initial selected image
     selectedImage.value = productData.images.featured.medium || productData.images.featured.original
-
   }
 }
 

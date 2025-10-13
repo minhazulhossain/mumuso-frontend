@@ -103,8 +103,20 @@
           </div>
 
           <!-- Loading State -->
-          <div v-if="loading" class="text-center py-16">
-            <ShopSkeleton :count="9"/>
+          <!-- Loading State -->
+          <div v-if="loading">
+            <!-- Grid Skeleton -->
+            <template v-if="viewMode === 'grid'">
+              <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+                <ShopProductCardSkeleton v-for="i in 9" :key="i" />
+              </div>
+            </template>
+            <!-- List Skeleton -->
+            <template v-else>
+              <div class="space-y-4">
+                <ShopProductListSkeleton v-for="i in 6" :key="i" />
+              </div>
+            </template>
           </div>
 
           <!-- Error State -->
@@ -335,6 +347,9 @@ const buildFiltersObject = () => {
 }
 
 const loadProducts = async () => {
+
+  loading.value = true
+
   const filters = buildFiltersObject()
 
   // Update URL query params

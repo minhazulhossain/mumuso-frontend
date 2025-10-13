@@ -15,6 +15,7 @@ export const useProducts = () => {
 
     // Fetch products with filters
     const fetchProducts = async (filters: ProductFilters = {}) => {
+
         loading.value = true
         error.value = null
 

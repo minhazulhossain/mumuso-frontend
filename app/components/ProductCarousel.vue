@@ -38,7 +38,8 @@ interface Props {
   hasTitleBar?: boolean
   title?: string
   viewAllUrl?: string,
-  sectionBg?: string
+  sectionBg?: string,
+  items ?: Array
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -52,7 +53,7 @@ defineEmits<{
   'add-to-wishlist': [productId: number]
 }>()
 
-const items = ref([])
+// const items = ref([])
 
 const {
   products,
@@ -65,7 +66,6 @@ onMounted(async () => {
   await fetchProducts()
 
   // assign fetched products as carousel items
-  items.value = products.value ?? []
-
+  // items.value = products.value ?? []
 })
 </script>
