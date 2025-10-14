@@ -10,10 +10,10 @@
               <div class="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center">
                 <UIcon name="i-heroicons-cube" class="w-5 h-5 text-white" />
               </div>
-              <span class="text-xl font-bold text-gray-900 dark:text-white">NuxtUI</span>
+              <span class="text-xl font-bold text-gray-900 dark:text-white">Herlan</span>
             </div>
             <p class="text-gray-600 dark:text-gray-400 text-sm max-w-xs">
-              Building modern web applications with Nuxt 4 and Nuxt UI. Fast, beautiful, and accessible by default.
+              At Herlan Store, we are dedicated to providing a premium selection of skincare and makeup brands that stand out in both quality and authenticity. Every brand we carry is carefully chosen through a rigorous selection process.
             </p>
             <div class="flex space-x-3">
               <UButton
@@ -85,7 +85,7 @@
       <div class="py-6 border-t border-gray-200 dark:border-gray-800">
         <div class="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
           <p class="text-gray-600 dark:text-gray-400 text-sm">
-            © {{ currentYear }} NuxtUI App. All rights reserved.
+            © {{ currentYear }} Herlan. All rights reserved.
           </p>
           
           <div class="flex items-center space-x-6">
@@ -171,7 +171,7 @@ const footerSections = [
   {
     title: 'Product',
     links: [
-      { name: 'Features', to: '/' },
+      { name: 'Shop', to: '/shop' },
       { name: 'Pricing', to: '/' },
       { name: 'Documentation', to: '/' },
       { name: 'API Reference', to: '/' },

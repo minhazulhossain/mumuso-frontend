@@ -17,7 +17,6 @@
     <div v-else-if="error" class="text-center py-16">
       <UIcon name="i-heroicons-exclamation-triangle" class="text-4xl text-red-500 mb-4"/>
       <p class="text-red-600 dark:text-red-400">{{ error }}</p>
-      <UButton @click="async () => await fetchProducts()" color="primary" class="mt-4">Try Again</UButton>
     </div>
 
     <!-- Show products when loaded -->
@@ -39,13 +38,17 @@ interface Props {
   title?: string
   viewAllUrl?: string,
   sectionBg?: string,
-  items ?: Array
+  items?: Array<T>,
+  error?: boolean,
+  loading?: boolean,
 }
 
 const props = withDefaults(defineProps<Props>(), {
   hasTitleBar: true,
   title: 'Products',
   viewAllUrl: '/shop',
+  error: false,
+  loading: false,
 })
 
 defineEmits<{
@@ -53,19 +56,5 @@ defineEmits<{
   'add-to-wishlist': [productId: number]
 }>()
 
-// const items = ref([])
 
-const {
-  products,
-  error,
-  loading,
-  fetchProducts,
-} = useProducts()
-
-onMounted(async () => {
-  await fetchProducts()
-
-  // assign fetched products as carousel items
-  // items.value = products.value ?? []
-})
 </script>

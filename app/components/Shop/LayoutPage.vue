@@ -348,8 +348,6 @@ const buildFiltersObject = () => {
 
 const loadProducts = async () => {
 
-  loading.value = true
-
   const filters = buildFiltersObject()
 
   // Update URL query params
