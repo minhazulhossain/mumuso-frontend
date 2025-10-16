@@ -1,4 +1,4 @@
-import type {ApiResponse} from "../../types/api";
+import type { ApiResponse } from "../../types/api"
 
 export interface CartItem {
     slug: string
@@ -23,6 +23,48 @@ export const useCart = () => {
     const isCartOpen = useState('isCartOpen', () => false)
     const isLoading = useState('cartLoading', () => false)
     const reservationTimer = useState<NodeJS.Timeout | null>('reservationTimer', () => null)
+
+    // Get CSRF token from cookie
+    const getCsrfToken = () => {
+        const cookies = document.cookie.split(';')
+        const csrfCookie = cookies.find(c => c.trim().startsWith('XSRF-TOKEN='))
+        if (csrfCookie) {
+            return decodeURIComponent(csrfCookie.split('=')[1])
+        }
+        return null
+    }
+
+    // Initialize CSRF token
+    const initCsrf = async () => {
+        try {
+            await $fetch(`${config.public.cartBase}sanctum/csrf-cookie`, {
+                credentials: 'include'
+            })
+        } catch (error) {
+            console.error('Failed to initialize CSRF token:', error)
+        }
+    }
+
+    // Make authenticated request with CSRF token
+    const authenticatedFetch = async (url: string, options: any = {}) => {
+        // Ensure we have CSRF token
+        let csrfToken = getCsrfToken()
+
+        if (!csrfToken) {
+            await initCsrf()
+            csrfToken = getCsrfToken()
+        }
+
+        return $fetch(url, {
+            ...options,
+            credentials: 'include',
+            headers: {
+                ...options.headers,
+                'X-XSRF-TOKEN': csrfToken || '',
+                'Accept': 'application/json'
+            }
+        })
+    }
 
     // Computed values
     const cartTotal = computed(() => {
@@ -49,7 +91,7 @@ export const useCart = () => {
             toast.add({
                 title: 'Error',
                 description: 'Failed to load cart',
-                color: 'error'
+                color: 'red'
             })
             return null
         } finally {
@@ -57,54 +99,36 @@ export const useCart = () => {
         }
     }
 
-    // Helper function to get CSRF token from cookie
-    const getCsrfToken = () => {
-        const cookie = useCookie('XSRF-TOKEN')
-
-        console.log(cookie.value);
-
-        return cookie.value ? decodeURIComponent(cookie.value) : null
-    }
-
-    // Initialize CSRF cookie
-    const initCsrf = async () => {
-        try {
-            await $fetch(`${config.public.cartBase}sanctum/csrf-cookie`, {
-                credentials: 'include'
-            })
-        } catch (error) {
-            console.error('Failed to initialize CSRF token:', error)
-        }
-    }
-
     // Add item to cart
     const addToCart = async (slug: string, quantity: number = 1) => {
         try {
             isLoading.value = true
-            // await initCsrf()
 
-            const response = await $fetch<ApiResponse>(`${config.public.apiBase}cart/add`, {
+            const response = await authenticatedFetch(`${config.public.apiBase}cart/add`, {
                 method: 'POST',
-                credentials: 'include',
-
-                body: {slug, quantity}
+                body: { slug, quantity }
             })
 
+            // Fetch updated cart from server
             await fetchCart()
 
             toast.add({
-                title: 'Added to Cart',
-                description: response.message,
-                color: 'success'
+                title: 'Success',
+                description: response.message || 'Added to cart',
+                color: 'green'
             })
 
             return true
         } catch (error: any) {
             const message = error.data?.message || 'Failed to add item to cart'
+            const availableStock = error.data?.available_stock
+
             toast.add({
                 title: 'Error',
-                description: message,
-                color: 'error'
+                description: availableStock !== undefined
+                    ? `${message}. Only ${availableStock} available.`
+                    : message,
+                color: 'red'
             })
             return false
         } finally {
@@ -116,21 +140,35 @@ export const useCart = () => {
     const updateCartItemQuantity = async (slug: string, quantity: number) => {
         try {
             isLoading.value = true
-            await $fetch(`${config.public.apiBase}cart/update/${slug}`, {
+
+            const response = await authenticatedFetch(`${config.public.apiBase}cart/update/${slug}`, {
                 method: 'PUT',
-                credentials: 'include',
-                body: {quantity}
+                body: { quantity }
             })
 
             await fetchCart()
+
+            toast.add({
+                title: 'Success',
+                description: response.message || 'Cart updated',
+                color: 'green'
+            })
+
             return true
         } catch (error: any) {
             const message = error.data?.message || 'Failed to update cart'
+            const availableStock = error.data?.available_stock
+
             toast.add({
                 title: 'Error',
-                description: message,
-                color: 'error'
+                description: availableStock !== undefined
+                    ? `${message}. Only ${availableStock} available.`
+                    : message,
+                color: 'red'
             })
+
+            // Refresh cart to show correct quantities
+            await fetchCart()
             return false
         } finally {
             isLoading.value = false
@@ -141,25 +179,25 @@ export const useCart = () => {
     const removeFromCart = async (slug: string) => {
         try {
             isLoading.value = true
-            const response = await $fetch<ApiResponse>(`${config.public.apiBase}cart/remove/${slug}`, {
-                method: 'DELETE',
-                credentials: 'include'
+
+            const response = await authenticatedFetch(`${config.public.apiBase}cart/remove/${slug}`, {
+                method: 'DELETE'
             })
 
             await fetchCart()
 
             toast.add({
                 title: 'Removed',
-                description: response.message,
-                color: 'secondary'
+                description: response.message || 'Item removed from cart',
+                color: 'orange'
             })
 
             return true
-        } catch (error) {
+        } catch (error: any) {
             toast.add({
                 title: 'Error',
-                description: 'Failed to remove item',
-                color: 'error'
+                description: error.data?.message || 'Failed to remove item',
+                color: 'red'
             })
             return false
         } finally {
@@ -171,25 +209,25 @@ export const useCart = () => {
     const clearCart = async () => {
         try {
             isLoading.value = true
-            await $fetch(`${config.public.apiBase}cart/clear`, {
-                method: 'DELETE',
-                credentials: 'include'
+
+            const response = await authenticatedFetch(`${config.public.apiBase}cart/clear`, {
+                method: 'DELETE'
             })
 
             cartItems.value = []
 
             toast.add({
                 title: 'Cart Cleared',
-                description: 'All items removed from cart',
-                color: 'secondary'
+                description: response.message || 'All items removed from cart',
+                color: 'orange'
             })
 
             return true
-        } catch (error) {
+        } catch (error: any) {
             toast.add({
                 title: 'Error',
-                description: 'Failed to clear cart',
-                color: 'error'
+                description: error.data?.message || 'Failed to clear cart',
+                color: 'red'
             })
             return false
         } finally {
@@ -201,9 +239,9 @@ export const useCart = () => {
     const checkout = async () => {
         try {
             isLoading.value = true
-            const response = await $fetch<ApiResponse>(`${config.public.apiBase}cart/checkout`, {
-                method: 'POST',
-                credentials: 'include'
+
+            const response = await authenticatedFetch(`${config.public.apiBase}cart/checkout`, {
+                method: 'POST'
             })
 
             cartItems.value = []
@@ -217,18 +255,23 @@ export const useCart = () => {
 
             toast.add({
                 title: 'Order Placed!',
-                description: response.message,
-                color: 'success',
+                description: response.message || 'Your order has been placed successfully',
+                color: 'green'
             })
 
             return true
         } catch (error: any) {
             const message = error.data?.message || 'Failed to complete checkout'
+            const productSlug = error.data?.product_slug
+
             toast.add({
                 title: 'Checkout Failed',
                 description: message,
-                color: 'error'
+                color: 'red'
             })
+
+            // Refresh cart to show updated stock
+            await fetchCart()
             return false
         } finally {
             isLoading.value = false
@@ -237,10 +280,13 @@ export const useCart = () => {
 
     // Extend reservation (keep stock reserved while user is active)
     const extendReservation = async () => {
+        if (cartItemsCount.value === 0) {
+            return
+        }
+
         try {
-            await $fetch(`${config.public.apiBase}cart/extend-reservation`, {
-                method: 'POST',
-                credentials: 'include'
+            await authenticatedFetch(`${config.public.apiBase}cart/extend-reservation`, {
+                method: 'POST'
             })
         } catch (error) {
             console.error('Failed to extend reservation:', error)
@@ -253,12 +299,18 @@ export const useCart = () => {
             clearInterval(reservationTimer.value)
         }
 
-        // Extend reservation every 10 minutes
+        // Extend reservation every 10 minutes (before 15min TTL expires)
         reservationTimer.value = setInterval(() => {
-            if (cartItemsCount.value > 0) {
-                extendReservation()
-            }
-        }, 10 * 60 * 1000)
+            extendReservation()
+        }, 10 * 60 * 1000) // 10 minutes
+    }
+
+    // Stop reservation timer
+    const stopReservationTimer = () => {
+        if (reservationTimer.value) {
+            clearInterval(reservationTimer.value)
+            reservationTimer.value = null
+        }
     }
 
     // Toggle cart sidebar
@@ -266,25 +318,43 @@ export const useCart = () => {
         isCartOpen.value = !isCartOpen.value
     }
 
+    // Get item by slug
+    const getItemBySlug = (slug: string) => {
+        return cartItems.value.find(item => item.slug === slug)
+    }
+
+    // Check if item is in cart
+    const isInCart = (slug: string) => {
+        return cartItems.value.some(item => item.slug === slug)
+    }
+
+    // Get item quantity by slug
+    const getItemQuantity = (slug: string) => {
+        return getItemBySlug(slug)?.quantity || 0
+    }
+
     // Initialize cart on mount
-    onMounted(() => {
-        fetchCart()
+    onMounted(async () => {
+        // Initialize CSRF token first
+        await initCsrf()
+        await fetchCart()
         startReservationTimer()
     })
 
     // Cleanup on unmount
     onUnmounted(() => {
-        if (reservationTimer.value) {
-            clearInterval(reservationTimer.value)
-        }
+        stopReservationTimer()
     })
 
     return {
+        // State
         cartItems: readonly(cartItems),
         cartTotal,
         cartItemsCount,
         isCartOpen,
         isLoading: readonly(isLoading),
+
+        // Actions
         addToCart,
         updateCartItemQuantity,
         removeFromCart,
@@ -292,6 +362,11 @@ export const useCart = () => {
         checkout,
         toggleCart,
         fetchCart,
-        extendReservation
+        extendReservation,
+
+        // Helpers
+        getItemBySlug,
+        isInCart,
+        getItemQuantity
     }
 }
