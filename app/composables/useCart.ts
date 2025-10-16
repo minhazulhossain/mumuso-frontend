@@ -37,11 +37,29 @@ export const useCart = () => {
     // Initialize CSRF token
     const initCsrf = async () => {
         try {
+            console.log('🔄 Initializing CSRF token...')
+
             await $fetch(`${config.public.cartBase}sanctum/csrf-cookie`, {
-                credentials: 'include'
+                credentials: 'include',
+                headers: {
+                    'Accept': 'application/json',
+                    'Referer': typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000',
+                    'Origin': typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'
+                }
             })
+
+            // Wait a bit for cookie to be set
+            await new Promise(resolve => setTimeout(resolve, 100))
+
+            const token = getCsrfToken()
+            if (token) {
+                console.log('✅ CSRF token retrieved:', token.substring(0, 30) + '...')
+            } else {
+                console.warn('⚠️  CSRF token not found after initialization')
+                console.log('All cookies:', document.cookie)
+            }
         } catch (error) {
-            console.error('Failed to initialize CSRF token:', error)
+            console.error('❌ Failed to initialize CSRF token:', error)
         }
     }
 
