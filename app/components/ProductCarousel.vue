@@ -4,12 +4,30 @@
       <h2 class="text-2xl font-bold">{{ title }}</h2>
       <NuxtLink :to="viewAllUrl" class="underline">View All</NuxtLink>
     </div>
+
     <!-- Show skeleton while loading -->
-    <div v-if="loading" class="text-center py-16">
-      <UCarousel :items="[1, 2, 3, 4, 5, 6, 7, 8, 9]">
-        <template #default>
-          <ShopSkeleton :count="10" :ui="{ item: 'basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5' }" type="flex"/>
-        </template>
+    <div v-if="loading">
+      <UCarousel
+          v-slot="{ item }"
+          :items="Array(10).fill(null)"
+          :ui="{
+          item: 'basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5'
+        }"
+          :loop="false"
+          :breakpoints="{
+          '(min-width: 640px)': { slidesToScroll: 2 },
+          '(min-width: 768px)': { slidesToScroll: 2 },
+          '(min-width: 1024px)': { slidesToScroll: 3 },
+          '(min-width: 1280px)': { slidesToScroll: 3 }
+        }"
+          :slidesToScroll="1"
+      >
+        <div class="border border-gray-200 rounded-lg overflow-hidden p-2">
+          <USkeleton class="h-64 w-full mb-3" />
+          <USkeleton class="h-4 w-3/4 mb-2" />
+          <USkeleton class="h-5 w-20 mb-2" />
+          <USkeleton class="h-10 w-full" />
+        </div>
       </UCarousel>
     </div>
 
@@ -21,10 +39,23 @@
 
     <!-- Show products when loaded -->
     <div v-else>
-      <UCarousel v-slot="{ item }" :items="items" :ui="{ item: 'basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5' }"
-                 prev-icon=""
-                 next-icon=""
-                 arrows>
+      <UCarousel
+          v-slot="{ item }"
+          :items="items"
+          :ui="{
+          item: 'basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5',
+          dot: 'w-10 h-2 data-[state=active]:bg-success-600 data-[state=active]:w-20'
+        }"
+          dots
+          :loop="true"
+          :breakpoints="{
+          '(min-width: 640px)': { slidesToScroll: 2 },
+          '(min-width: 768px)': { slidesToScroll: 2 },
+          '(min-width: 1024px)': { slidesToScroll: 3 },
+          '(min-width: 1280px)': { slidesToScroll: 3 }
+        }"
+          :slidesToScroll="1"
+      >
         <ShopProductCard :product="item" class="border border-gray-200"/>
       </UCarousel>
     </div>
@@ -48,7 +79,7 @@ const props = withDefaults(defineProps<Props>(), {
   title: 'Products',
   viewAllUrl: '/shop',
   error: false,
-  loading: false,
+  loading: true,
 })
 
 defineEmits<{

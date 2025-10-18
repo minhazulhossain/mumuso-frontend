@@ -3,12 +3,11 @@
   <div>
     <UButton v-if="!user"
              to="/auth/login"
-             color="primary"
              size="sm"
-             class="hidden sm:inline-flex"
+             class="hidden sm:inline-flex uppercase"
              icon="i-heroicons-user"
              variant="ghost"
-    />
+    >My Account</UButton>
 
 
     <UDropdownMenu v-else

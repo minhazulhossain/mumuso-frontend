@@ -1,19 +1,5 @@
-import type { ApiResponse } from "../../types/api"
 
-export interface CartItem {
-    slug: string
-    product_id: number
-    quantity: number
-    added_at: string
-    product?: any
-    reserved_until?: number | null
-}
-
-export interface CartResponse {
-    items: CartItem[]
-    count: number
-    total: number
-}
+import type { ApiResponse, CartResponse, CartItem } from "../../types/api"
 
 export const useCart = () => {
     const toast = useToast()
@@ -26,6 +12,8 @@ export const useCart = () => {
 
     // Get CSRF token from cookie
     const getCsrfToken = () => {
+        if (process.server) return null
+
         const cookies = document.cookie.split(';')
         const csrfCookie = cookies.find(c => c.trim().startsWith('XSRF-TOKEN='))
         if (csrfCookie) {
@@ -37,26 +25,21 @@ export const useCart = () => {
     // Initialize CSRF token
     const initCsrf = async () => {
         try {
-            console.log('🔄 Initializing CSRF token...')
+            console.log('🔄 Initializing CSRF token via proxy...')
 
-            await $fetch(`${config.public.cartBase}sanctum/csrf-cookie`, {
-                credentials: 'include',
-                headers: {
-                    'Accept': 'application/json',
-                    'Referer': typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000',
-                    'Origin': typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'
-                }
+            // Using proxy - no need for full URL
+            await $fetch('/sanctum/csrf-cookie', {
+                credentials: 'include'
             })
 
-            // Wait a bit for cookie to be set
+            // Wait for cookie to be set
             await new Promise(resolve => setTimeout(resolve, 100))
 
             const token = getCsrfToken()
             if (token) {
-                console.log('✅ CSRF token retrieved:', token.substring(0, 30) + '...')
+                console.log('✅ CSRF token retrieved')
             } else {
-                console.warn('⚠️  CSRF token not found after initialization')
-                console.log('All cookies:', document.cookie)
+                console.warn('⚠️ CSRF token not found')
             }
         } catch (error) {
             console.error('❌ Failed to initialize CSRF token:', error)
@@ -65,7 +48,6 @@ export const useCart = () => {
 
     // Make authenticated request with CSRF token
     const authenticatedFetch = async (url: string, options: any = {}) => {
-        // Ensure we have CSRF token
         let csrfToken = getCsrfToken()
 
         if (!csrfToken) {
@@ -79,7 +61,8 @@ export const useCart = () => {
             headers: {
                 ...options.headers,
                 'X-XSRF-TOKEN': csrfToken || '',
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
             }
         })
     }
@@ -99,7 +82,7 @@ export const useCart = () => {
     const fetchCart = async () => {
         try {
             isLoading.value = true
-            const response = await $fetch<CartResponse>(`${config.public.apiBase}cart`, {
+            const response = await $fetch<CartResponse>(`${config.public.cartApiBase}cart`, {
                 credentials: 'include'
             })
             cartItems.value = response.items
@@ -109,7 +92,7 @@ export const useCart = () => {
             toast.add({
                 title: 'Error',
                 description: 'Failed to load cart',
-                color: 'red'
+                color: 'error'
             })
             return null
         } finally {
@@ -122,18 +105,17 @@ export const useCart = () => {
         try {
             isLoading.value = true
 
-            const response = await authenticatedFetch(`${config.public.apiBase}cart/add`, {
+            const response = await authenticatedFetch(`${config.public.cartApiBase}cart/add`, {
                 method: 'POST',
                 body: { slug, quantity }
             })
 
-            // Fetch updated cart from server
             await fetchCart()
 
             toast.add({
                 title: 'Success',
-                description: response.message || 'Added to cart',
-                color: 'green'
+                description: response?.message || 'Added to cart',
+                color: 'success'
             })
 
             return true
@@ -146,7 +128,7 @@ export const useCart = () => {
                 description: availableStock !== undefined
                     ? `${message}. Only ${availableStock} available.`
                     : message,
-                color: 'red'
+                color: 'error'
             })
             return false
         } finally {
@@ -159,7 +141,7 @@ export const useCart = () => {
         try {
             isLoading.value = true
 
-            const response = await authenticatedFetch(`${config.public.apiBase}cart/update/${slug}`, {
+            const response = await authenticatedFetch(`${config.public.cartApiBase}cart/update/${slug}`, {
                 method: 'PUT',
                 body: { quantity }
             })
@@ -185,7 +167,6 @@ export const useCart = () => {
                 color: 'red'
             })
 
-            // Refresh cart to show correct quantities
             await fetchCart()
             return false
         } finally {
@@ -198,7 +179,7 @@ export const useCart = () => {
         try {
             isLoading.value = true
 
-            const response = await authenticatedFetch(`${config.public.apiBase}cart/remove/${slug}`, {
+            const response = await authenticatedFetch<ApiResponse>(`${config.public.cartApiBase}cart/remove/${slug}`, {
                 method: 'DELETE'
             })
 
@@ -207,7 +188,7 @@ export const useCart = () => {
             toast.add({
                 title: 'Removed',
                 description: response.message || 'Item removed from cart',
-                color: 'orange'
+                color: 'warning'
             })
 
             return true
@@ -236,8 +217,8 @@ export const useCart = () => {
 
             toast.add({
                 title: 'Cart Cleared',
-                description: response.message || 'All items removed from cart',
-                color: 'orange'
+                description: response?.message || 'All items removed from cart',
+                color: 'warning'
             })
 
             return true
@@ -245,7 +226,7 @@ export const useCart = () => {
             toast.add({
                 title: 'Error',
                 description: error.data?.message || 'Failed to clear cart',
-                color: 'red'
+                color: 'error'
             })
             return false
         } finally {
@@ -265,7 +246,6 @@ export const useCart = () => {
             cartItems.value = []
             isCartOpen.value = false
 
-            // Stop reservation timer
             if (reservationTimer.value) {
                 clearInterval(reservationTimer.value)
                 reservationTimer.value = null
@@ -280,7 +260,6 @@ export const useCart = () => {
             return true
         } catch (error: any) {
             const message = error.data?.message || 'Failed to complete checkout'
-            const productSlug = error.data?.product_slug
 
             toast.add({
                 title: 'Checkout Failed',
@@ -288,7 +267,6 @@ export const useCart = () => {
                 color: 'red'
             })
 
-            // Refresh cart to show updated stock
             await fetchCart()
             return false
         } finally {
@@ -296,11 +274,9 @@ export const useCart = () => {
         }
     }
 
-    // Extend reservation (keep stock reserved while user is active)
+    // Extend reservation
     const extendReservation = async () => {
-        if (cartItemsCount.value === 0) {
-            return
-        }
+        if (cartItemsCount.value === 0) return
 
         try {
             await authenticatedFetch(`${config.public.apiBase}cart/extend-reservation`, {
@@ -311,16 +287,15 @@ export const useCart = () => {
         }
     }
 
-    // Start reservation timer (extend every 10 minutes)
+    // Start reservation timer
     const startReservationTimer = () => {
         if (reservationTimer.value) {
             clearInterval(reservationTimer.value)
         }
 
-        // Extend reservation every 10 minutes (before 15min TTL expires)
         reservationTimer.value = setInterval(() => {
             extendReservation()
-        }, 10 * 60 * 1000) // 10 minutes
+        }, 10 * 60 * 1000)
     }
 
     // Stop reservation timer
@@ -353,7 +328,6 @@ export const useCart = () => {
 
     // Initialize cart on mount
     onMounted(async () => {
-        // Initialize CSRF token first
         await initCsrf()
         await fetchCart()
         startReservationTimer()

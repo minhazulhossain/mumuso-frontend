@@ -1,21 +1,16 @@
+// plugins/cart.client.ts - UPDATED
 export default defineNuxtPlugin(async () => {
-    const config = useRuntimeConfig()
-
-    // Initialize CSRF cookie and session on app load
+    // Initialize CSRF via proxy
     try {
-        // CRITICAL: Include Referer and Origin headers
-        await $fetch(`${config.public.cartBase}sanctum/csrf-cookie`, {
-            credentials: 'include',
-            headers: {
-                'Accept': 'application/json',
-                'Referer': window.location.origin,
-                'Origin': window.location.origin
-            }
+        console.log('🔄 Initializing CSRF via Nuxt proxy...')
+
+        await $fetch('/sanctum/csrf-cookie', {
+            credentials: 'include'
         })
 
-        console.log('✅ CSRF cookie initialized')
+        console.log('✅ CSRF initialized')
         console.log('Cookies:', document.cookie)
     } catch (error) {
-        console.error('❌ Failed to initialize CSRF token:', error)
+        console.error('❌ Failed to initialize CSRF:', error)
     }
 })

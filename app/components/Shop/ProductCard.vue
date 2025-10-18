@@ -257,7 +257,7 @@ const handleImageError = (event: Event) => {
               class=""
               :disabled="!product.in_stock"
               :loading="addingToCart"
-              variant="outline"
+              variant="ghost"
           />
 
         </div>

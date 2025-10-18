@@ -6,11 +6,7 @@
         <!-- Logo/Brand -->
         <div class="flex items-center space-x-4">
           <NuxtLink to="/" class="flex items-center space-x-3 hover:opacity-80 transition-opacity">
-            <div
-                class="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center">
-              <UIcon name="i-heroicons-cube" class="w-5 h-5 text-white"/>
-            </div>
-            <span class="text-xl font-bold text-gray-900 dark:text-white">Herlan</span>
+            <span class="text-xl font-bold text-gray-900 dark:text-white">Herlan Ecommerce</span>
           </NuxtLink>
         </div>
 
@@ -30,6 +26,12 @@
               class="w-full"
               :content="{ align: 'start', side: 'bottom', sideOffset: 8 }"
               @update:model-value="handleProductSelect"
+
+              :ui="{
+                wrapper: 'rounded-full',
+                base: 'rounded-full',
+                input: 'rounded-full'
+              }"
           >
             <template #option="{ option }">
               <div class="flex items-center gap-3 w-full">
@@ -98,14 +100,12 @@
           <!-- CTA Button -->
           <UserMenu/>
 
-          <CartSidebar/>
-
           <!-- Mobile menu button -->
-          <LazyMobileMenu/>
+<!--          <LazyMobileMenu/>-->
         </div>
       </div>
-      <HeaderDesktop />
     </UContainer>
+    <HeaderDesktop />
 
     <!-- Mobile Search Modal -->
 <!--    <UModal v-model="showMobileSearch">-->

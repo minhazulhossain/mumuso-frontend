@@ -3,12 +3,11 @@
   <USlideover v-model="localCartOpen">
     <UButton
         icon="i-heroicons-shopping-cart"
-        color="primary"
         variant="ghost"
         @click="toggleCart"
     >
       <template #trailing>
-        <UBadge v-if="cartItemsCount > 0" color="primary" variant="solid">
+        <UBadge v-if="cartItemsCount > 0" variant="solid">
           {{ cartItemsCount }}
         </UBadge>
       </template>
@@ -39,7 +38,6 @@
         </div>
 
         <div v-else class="space-y-4">
-          {{ cartItems }}
           <div
               v-for="item in cartItems"
               :key="item.productId"
@@ -47,7 +45,7 @@
           >
             <NuxtLink :to="`/shop/product/${item.product.slug}`" @click="toggleCart">
               <img
-                  :src="item.product.image"
+                  :src="item.product.image ?? 'https://placehold.co/60x60'"
                   :alt="item.product.name"
                   class="w-20 h-20 object-cover rounded-lg"
               />
@@ -62,27 +60,27 @@
                 {{ item.product.name }}
               </NuxtLink>
               <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">
-                ${{ item.product?.price?.toFixed(2) }}
+                ${{ item.product?.price }}
               </p>
 
               <div class="flex items-center gap-2">
                 <UButton
-                    @click="updateCartItemQuantity(item.productId, item.quantity - 1)"
-                    icon="i-heroicons-minus"
+                    @click="updateCartItemQuantity(item.product?.slug, item.quantity - 1)"
+                    icon="i-lucide-minus"
                     size="xs"
                     color="secondary"
                     :disabled="item.quantity <= 1"
                 />
                 <span class="text-sm font-medium w-8 text-center">{{ item.quantity }}</span>
                 <UButton
-                    @click="updateCartItemQuantity(item.productId, item.quantity + 1)"
-                    icon="i-heroicons-plus"
+                    @click="updateCartItemQuantity(item.product?.slug, item.quantity + 1)"
+                    icon="i-lucide-plus"
                     size="xs"
                     color="secondary"
                     :disabled="item.quantity >= item.product.stock"
                 />
                 <UButton
-                    @click="removeFromCart(item.productId)"
+                    @click="removeFromCart(item.product?.slug)"
                     icon="i-heroicons-trash"
                     size="xs"
                     color="error"
@@ -98,7 +96,7 @@
 
             <div class="text-right">
               <p class="font-semibold text-gray-900 dark:text-white">
-                ${{ (item.product.price * item.quantity).toFixed(2) }}
+                ${{ (item.product.price * item.quantity) }}
               </p>
             </div>
           </div>
@@ -108,7 +106,7 @@
           <div v-if="cartItems.length > 0" class="space-y-4">
             <div class="flex justify-between items-center text-lg font-semibold">
               <span class="text-gray-900 dark:text-white">Total:</span>
-              <span class="text-primary-500">${{ cartTotal.toFixed(2) }}</span>
+              <span class="text-primary-500">${{ cartTotal }}</span>
             </div>
 
             <div class="flex gap-2">

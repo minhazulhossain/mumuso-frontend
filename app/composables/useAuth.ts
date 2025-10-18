@@ -2,7 +2,7 @@ export const useAuth = () => {
     const user = useUserSession()
 
     const login = async (email: string, password: string) => {
-        const { data, error } = await useFetch('/api/auth/login', {
+        const { data, error } = await useFetch('/api/login', {
             method: 'POST',
             body: { email, password }
         })
