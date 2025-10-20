@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
     <!-- Hero Section -->
-    <div class="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-20">
+    <div class="bg-gradient-to-r from-success-600 to-primary-800 text-white py-20">
       <div class="container mx-auto px-4">
         <h1 class="text-5xl font-bold mb-4"> Blog</h1>
         <p class="text-xl opacity-90">Exploring the latest in web development and technology</p>

@@ -3,7 +3,7 @@ export default defineEventHandler(async (event) => {
   const query = getQuery(event)
 
   try {
-    const response = await $fetch(`${config.public.apiBase}/v1/blog`, {
+    const response = await $fetch(`${config.public.apiBase}blog`, {
       query: {
         per_page: query._limit || 9,
         page: query._page || 1,

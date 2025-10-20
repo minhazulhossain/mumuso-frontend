@@ -1,11 +1,10 @@
 export default defineNuxtRouteMiddleware(async (to, from) => {
     const { loggedIn, fetch } = useAuth()
 
-    if (!loggedIn.value) {
-        await fetch()
-    }
+    // Refresh session
+    await fetch()
 
-    // Redirect to home if already authenticated
+    // If logged in and trying to access guest route (login/register)
     if (loggedIn.value) {
         return navigateTo('/')
     }

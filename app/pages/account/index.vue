@@ -150,10 +150,10 @@
 
           <template #footer>
             <div class="flex justify-end gap-2">
-              <UButton color="gray" variant="ghost" @click="isDeleteModalOpen = false">
+              <UButton color="secondary" variant="ghost" @click="isDeleteModalOpen = false">
                 Cancel
               </UButton>
-              <UButton color="red" @click="confirmDelete" :loading="loading">
+              <UButton color="error" @click="confirmDelete" :loading="loading">
                 Delete
               </UButton>
             </div>
@@ -170,7 +170,7 @@ definePageMeta({
 })
 
 const {user} = useUserSession()
-const {fetchAddresses, createAddress, updateAddress, deleteAddress, setDefaultAddress} = useUser()
+const {fetchAddresses} = useUser()
 const toast = useToast()
 
 const {data: addresses, pending, error, refresh} = await useAsyncData(

@@ -1,0 +1,18 @@
+export default defineEventHandler(async (event) => {
+    const config = useRuntimeConfig()
+    const token = getRouterParam(event, 'token')
+
+    try {
+        return await $fetch(`${config.public.apiBase}newsletter/unsubscribe/${token}`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json'
+            }
+        })
+    } catch (error: any) {
+        throw createError({
+            statusCode: error.statusCode || 500,
+            message: error.data?.message || 'Unsubscribe failed'
+        })
+    }
+})

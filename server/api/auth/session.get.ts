@@ -1,31 +1,15 @@
+// server/api/auth/session.get.ts
 export default defineEventHandler(async (event) => {
-    const config = useRuntimeConfig()
     const session = await getUserSession(event)
 
-    if (!session?.token) {
+    if (!session?.user?.token) {
         return { user: null }
     }
 
-    try {
-        // Verify token with Laravel API
-        const response = await $fetch<{ user: any }>(`${config.public.apiBase}/user`, {
-            headers: {
-                Authorization: `Bearer ${session.token}`
-            }
-        })
+    // Refresh user data from backend
+    const user = await refreshUserSession(event)
 
-        // Update session with fresh user data
-        await setUserSession(event, {
-            user: response.user,
-            token: session.token
-        })
-
-        return {
-            user: response.user
-        }
-    } catch (error) {
-        // Token is invalid, clear session
-        await clearUserSession(event)
-        return { user: null }
+    return {
+        user
     }
 })

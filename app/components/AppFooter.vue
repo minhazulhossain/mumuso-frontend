@@ -78,6 +78,13 @@
               </li>
             </ul>
           </div>
+
+          <div class="space-y-4">
+            <h3 class="font-semibold text-gray-900 dark:text-white text-sm uppercase tracking-wider">
+              Get Something Beautiful
+            </h3>
+            <NewsletterForm @success="handleNewsLetterSuccess"/>
+          </div>
         </div>
       </div>
 
@@ -147,6 +154,8 @@ const currentYear = new Date().getFullYear()
 const newsletterEmail = ref('')
 const isSubscribing = ref(false)
 
+const toast = useToast()
+
 const subscribeNewsletter = async () => {
   if (!newsletterEmail.value) return
   
@@ -165,6 +174,14 @@ const subscribeNewsletter = async () => {
   
   newsletterEmail.value = ''
   isSubscribing.value = false
+}
+
+const handleNewsLetterSuccess = () => {
+  toast.add({
+    title: 'Subscribed!',
+    description: 'Please check your email to confirm.',
+    color: 'success',
+  })
 }
 
 const footerSections = [
@@ -188,15 +205,5 @@ const footerSections = [
       { name: 'Contact', to: '/' }
     ]
   },
-  {
-    title: 'Resources',
-    links: [
-      { name: 'Community', to: 'https://discord.gg/nuxt', external: true },
-      { name: 'Help Center', to: '/' },
-      { name: 'Status Page', to: '/' },
-      { name: 'GitHub', to: 'https://github.com', external: true },
-      { name: 'npm Package', to: 'https://npmjs.com', external: true }
-    ]
-  }
 ]
 </script>

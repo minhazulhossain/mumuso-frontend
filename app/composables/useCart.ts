@@ -1,5 +1,4 @@
-
-import type { ApiResponse, CartResponse, CartItem } from "../../types/api"
+import type {CartItem} from "../../types/cart"
 
 export const useCart = () => {
     const toast = useToast()
@@ -9,63 +8,6 @@ export const useCart = () => {
     const isCartOpen = useState('isCartOpen', () => false)
     const isLoading = useState('cartLoading', () => false)
     const reservationTimer = useState<NodeJS.Timeout | null>('reservationTimer', () => null)
-
-    // Get CSRF token from cookie
-    const getCsrfToken = () => {
-        if (process.server) return null
-
-        const cookies = document.cookie.split(';')
-        const csrfCookie = cookies.find(c => c.trim().startsWith('XSRF-TOKEN='))
-        if (csrfCookie) {
-            return decodeURIComponent(csrfCookie.split('=')[1])
-        }
-        return null
-    }
-
-    // Initialize CSRF token
-    const initCsrf = async () => {
-        try {
-            console.log('🔄 Initializing CSRF token via proxy...')
-
-            // Using proxy - no need for full URL
-            await $fetch('/sanctum/csrf-cookie', {
-                credentials: 'include'
-            })
-
-            // Wait for cookie to be set
-            await new Promise(resolve => setTimeout(resolve, 100))
-
-            const token = getCsrfToken()
-            if (token) {
-                console.log('✅ CSRF token retrieved')
-            } else {
-                console.warn('⚠️ CSRF token not found')
-            }
-        } catch (error) {
-            console.error('❌ Failed to initialize CSRF token:', error)
-        }
-    }
-
-    // Make authenticated request with CSRF token
-    const authenticatedFetch = async (url: string, options: any = {}) => {
-        let csrfToken = getCsrfToken()
-
-        if (!csrfToken) {
-            await initCsrf()
-            csrfToken = getCsrfToken()
-        }
-
-        return $fetch(url, {
-            ...options,
-            credentials: 'include',
-            headers: {
-                ...options.headers,
-                'X-XSRF-TOKEN': csrfToken || '',
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-        })
-    }
 
     // Computed values
     const cartTotal = computed(() => {
@@ -82,10 +24,33 @@ export const useCart = () => {
     const fetchCart = async () => {
         try {
             isLoading.value = true
-            const response = await $fetch<CartResponse>(`${config.public.cartApiBase}cart`, {
-                credentials: 'include'
+            const response = await $fetch('/api/cart', {
+                method: 'GET'
             })
-            cartItems.value = response.items
+
+            // If response has items without product details (guest cart)
+            // Fetch product details for each item
+            if (response.items && response.items.length > 0) {
+                cartItems.value = await Promise.all(
+                    response.items.map(async (item: any) => {
+                        if (!item.product && item.slug) {
+                            try {
+                                // Fetch product details from public API
+                                const baseUrl = config.public.apiBase.replace(/\/$/, '')
+                                const product = await $fetch(`${baseUrl}/products/${item.slug}`)
+                                return {...item, product}
+                            } catch (error) {
+                                console.error(`Failed to fetch product ${item.slug}:`, error)
+                                return item
+                            }
+                        }
+                        return item
+                    })
+                )
+            } else {
+                cartItems.value = response.items || []
+            }
+
             return response
         } catch (error) {
             console.error('Failed to fetch cart:', error)
@@ -105,7 +70,7 @@ export const useCart = () => {
         try {
             isLoading.value = true
 
-            const response = await authenticatedFetch(`${config.public.cartApiBase}cart/add`, {
+            const response = await $fetch('/api/cart/add', {
                 method: 'POST',
                 body: { slug, quantity }
             })
@@ -141,7 +106,7 @@ export const useCart = () => {
         try {
             isLoading.value = true
 
-            const response = await authenticatedFetch(`${config.public.cartApiBase}cart/update/${slug}`, {
+            const response = await $fetch(`/api/cart/update/${slug}`, {
                 method: 'PUT',
                 body: { quantity }
             })
@@ -150,8 +115,8 @@ export const useCart = () => {
 
             toast.add({
                 title: 'Success',
-                description: response.message || 'Cart updated',
-                color: 'green'
+                description: response?.message || 'Cart updated',
+                color: 'success'
             })
 
             return true
@@ -164,7 +129,7 @@ export const useCart = () => {
                 description: availableStock !== undefined
                     ? `${message}. Only ${availableStock} available.`
                     : message,
-                color: 'red'
+                color: 'error'
             })
 
             await fetchCart()
@@ -179,7 +144,7 @@ export const useCart = () => {
         try {
             isLoading.value = true
 
-            const response = await authenticatedFetch<ApiResponse>(`${config.public.cartApiBase}cart/remove/${slug}`, {
+            const response = await $fetch(`/api/cart/remove/${slug}`, {
                 method: 'DELETE'
             })
 
@@ -196,7 +161,7 @@ export const useCart = () => {
             toast.add({
                 title: 'Error',
                 description: error.data?.message || 'Failed to remove item',
-                color: 'red'
+                color: 'error'
             })
             return false
         } finally {
@@ -209,7 +174,7 @@ export const useCart = () => {
         try {
             isLoading.value = true
 
-            const response = await authenticatedFetch(`${config.public.apiBase}cart/clear`, {
+            const response = await $fetch('/api/cart/clear', {
                 method: 'DELETE'
             })
 
@@ -239,7 +204,7 @@ export const useCart = () => {
         try {
             isLoading.value = true
 
-            const response = await authenticatedFetch(`${config.public.apiBase}cart/checkout`, {
+            const response = await $fetch('/api/cart/checkout', {
                 method: 'POST'
             })
 
@@ -254,7 +219,7 @@ export const useCart = () => {
             toast.add({
                 title: 'Order Placed!',
                 description: response.message || 'Your order has been placed successfully',
-                color: 'green'
+                color: 'success'
             })
 
             return true
@@ -264,7 +229,7 @@ export const useCart = () => {
             toast.add({
                 title: 'Checkout Failed',
                 description: message,
-                color: 'red'
+                color: 'error'
             })
 
             await fetchCart()
@@ -279,7 +244,7 @@ export const useCart = () => {
         if (cartItemsCount.value === 0) return
 
         try {
-            await authenticatedFetch(`${config.public.apiBase}cart/extend-reservation`, {
+            await $fetch('/api/cart/extend-reservation', {
                 method: 'POST'
             })
         } catch (error) {
@@ -328,7 +293,6 @@ export const useCart = () => {
 
     // Initialize cart on mount
     onMounted(async () => {
-        await initCsrf()
         await fetchCart()
         startReservationTimer()
     })

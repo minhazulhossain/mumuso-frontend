@@ -3,8 +3,6 @@ export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig()
     const session = await getUserSession(event)
 
-    console.log(session)
-
     if (!session?.user?.token) {
         throw createError({
             statusCode: 405,

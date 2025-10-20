@@ -28,17 +28,18 @@
 
     <section class="py-24">
       <UContainer>
-        <BannersGrid />
+        <BannersGrid/>
       </UContainer>
     </section>
+
   </div>
 </template>
 
 <script setup>
 
 const {fetchHeroBanners} = useContent();
-
-const { fetchProducts, products, loading } = useProducts()
+const {fetchProducts, products, loading} = useProducts()
+const toast = useToast()
 
 useHead({
   title: 'Home',

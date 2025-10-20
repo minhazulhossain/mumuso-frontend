@@ -2,23 +2,24 @@ export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig()
     const session = await getUserSession(event)
 
-    if (session?.token) {
+    // Attempt to logout on backend if token exists
+    if (session?.user?.token) {
         try {
-            // Call Laravel logout endpoint
-            await $fetch(`${config.public.apiBase}/logout`, {
+            await $fetch(`${config.public.apiBase}logout`, {
                 method: 'POST',
                 headers: {
-                    Authorization: `Bearer ${session.token}`
+                    'Authorization': `Bearer ${session.user.token}`,
+                    'Accept': 'application/json'
                 }
             })
         } catch (error) {
-            // Continue with session clearing even if API call fails
-            console.error('Logout API error:', error)
+            console.error('Backend logout failed:', error)
+            // Continue with local logout even if backend fails
         }
     }
 
-    // Clear the user session
+    // Clear session
     await clearUserSession(event)
 
-    return {}
+    return { success: true }
 })

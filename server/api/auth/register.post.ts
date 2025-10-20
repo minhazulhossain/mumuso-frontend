@@ -1,3 +1,4 @@
+// server/api/auth/register.post.ts
 import { z } from 'zod'
 
 const bodySchema = z.object({
@@ -12,6 +13,9 @@ export default defineEventHandler(async (event) => {
     const body = await readValidatedBody(event, bodySchema.parse)
 
     try {
+        // Get guest cart before registration
+        const guestCart = await getGuestCart(event)
+
         const response = await $fetch<{
             user: any
             access_token: string
@@ -21,9 +25,18 @@ export default defineEventHandler(async (event) => {
         })
 
         await setUserSession(event, {
-            user: response.user,
-            token: response.access_token
+            user: {
+                id: response.user.id,
+                name: response.user.name,
+                email: response.user.email,
+                token: response.access_token
+            }
         })
+
+        // Sync guest cart to backend if it has items
+        if (guestCart.items.length > 0) {
+            await syncGuestCartToBackend(event, guestCart.items)
+        }
 
         return {
             user: response.user
