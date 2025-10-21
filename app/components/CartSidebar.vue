@@ -41,6 +41,7 @@
           <UButton @click="toggleCart" to="/shop">Continue Shopping</UButton>
         </div>
 
+
         <!-- Cart Items -->
         <div v-else class="space-y-4">
           <div
@@ -132,6 +133,7 @@
               <span class="text-gray-900 dark:text-white">Total:</span>
               <span class="text-primary-500">${{ cartTotal.toFixed(2) }}</span>
             </div>
+            <UButton class="w-full" color="success" variant="soft" block as="a" href="/cart">View Cart</UButton>
 
             <div class="flex gap-2">
               <UButton

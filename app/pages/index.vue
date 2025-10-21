@@ -1,9 +1,7 @@
 <template>
   <div>
-    <!-- Hero Section -->
     <section
         class="relative overflow-hidden bg-gradient-to-br from-white via-primary-50 to-primary-100 dark:from-gray-950 dark:via-primary-950 dark:to-gray-900">
-
       <HeroSlider
           v-if="heroBanners"
           :banners="heroBanners"
@@ -11,10 +9,20 @@
           :interval="10000000"
           height="600px"
       />
-
+    </section>
+    <section class="py-10 bg-white">
+      <UContainer>
+        <CategoriesGrid />
+      </UContainer>
     </section>
 
     <section class="py-24">
+      <UContainer>
+        <PromotionGrid/>
+      </UContainer>
+    </section>
+
+    <section class="py-24 pt-0">
       <UContainer>
         <ProductCarousel title="Best Selling" :items="products" :loading="loading"/>
       </UContainer>
@@ -29,6 +37,12 @@
     <section class="py-24">
       <UContainer>
         <BannersGrid/>
+      </UContainer>
+    </section>
+
+    <section class="py-24 pt-0">
+      <UContainer>
+        <ProductCarousel title="Trending" :items="products" :loading="loading"/>
       </UContainer>
     </section>
 

@@ -56,7 +56,7 @@
         }"
           :slidesToScroll="1"
       >
-        <ShopProductCard :product="item" class="border border-gray-200"/>
+        <ShopProductCard :product="item" class=""/>
       </UCarousel>
     </div>
   </div>

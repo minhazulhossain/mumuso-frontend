@@ -1,6 +1,6 @@
 <template>
   <header
-      class="sticky top-0 z-50 bg-white/75 dark:bg-gray-950/75 backdrop-blur-md border-b border-gray-200 dark:border-gray-800">
+      class=" bg-white dark:bg-gray-950/75 backdrop-blur-md border-b border-gray-200 dark:border-gray-800">
     <UContainer>
       <div class="flex items-center justify-between h-16">
         <!-- Logo/Brand -->

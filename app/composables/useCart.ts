@@ -37,7 +37,7 @@ export const useCart = () => {
                             try {
                                 // Fetch product details from public API
                                 const baseUrl = config.public.apiBase.replace(/\/$/, '')
-                                const product = await $fetch(`${baseUrl}/products/${item.slug}`)
+                                const product = await $fetch(`${baseUrl}/products/${item.slug}`).then((res: any) => res.data)
                                 return {...item, product}
                             } catch (error) {
                                 console.error(`Failed to fetch product ${item.slug}:`, error)
@@ -47,6 +47,7 @@ export const useCart = () => {
                         return item
                     })
                 )
+
             } else {
                 cartItems.value = response.items || []
             }
@@ -72,7 +73,7 @@ export const useCart = () => {
 
             const response = await $fetch('/api/cart/add', {
                 method: 'POST',
-                body: { slug, quantity }
+                body: {slug, quantity}
             })
 
             await fetchCart()
@@ -108,7 +109,7 @@ export const useCart = () => {
 
             const response = await $fetch(`/api/cart/update/${slug}`, {
                 method: 'PUT',
-                body: { quantity }
+                body: {quantity}
             })
 
             await fetchCart()

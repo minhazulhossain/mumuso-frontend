@@ -1,5 +1,5 @@
 <template>
-  <footer class="bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
+  <footer class="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
     <UContainer>
       <!-- Main Footer Content -->
       <div class="py-16">
