@@ -15,44 +15,50 @@
             <p class="text-gray-600 dark:text-gray-400 text-sm max-w-xs">
               At Herlan Store, we are dedicated to providing a premium selection of skincare and makeup brands that stand out in both quality and authenticity. Every brand we carry is carefully chosen through a rigorous selection process.
             </p>
-            <div class="flex space-x-3">
-              <UButton
-                icon="i-lucide-github"
-                color="gray"
-                variant="ghost"
-                size="sm"
-                to="https://github.com"
-                target="_blank"
-                aria-label="GitHub"
-              />
-              <UButton
-                icon="i-lucide-twitter"
-                color="gray"
-                variant="ghost"
-                size="sm"
-                to="https://twitter.com"
-                target="_blank"
-                aria-label="Twitter"
-              />
-              <UButton
-                icon="i-lucide-linkedin"
-                color="gray"
-                variant="ghost"
-                size="sm"
-                to="https://linkedin.com"
-                target="_blank"
-                aria-label="LinkedIn"
-              />
-              <UButton
-                icon="i-lucide-youtube"
-                color="gray"
-                variant="ghost"
-                size="sm"
-                to="https://youtube.com"
-                target="_blank"
-                aria-label="YouTube"
-              />
+            <div v-if="footer?.show_social" class="space-y-4">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                Follow Us
+              </h3>
+              <SocialMediaLinks icon-size="w-5 h-5" />
             </div>
+<!--            <div class="flex space-x-3">-->
+<!--              <UButton-->
+<!--                icon="i-lucide-github"-->
+<!--                color="gray"-->
+<!--                variant="ghost"-->
+<!--                size="sm"-->
+<!--                to="https://github.com"-->
+<!--                target="_blank"-->
+<!--                aria-label="GitHub"-->
+<!--              />-->
+<!--              <UButton-->
+<!--                icon="i-lucide-twitter"-->
+<!--                color="gray"-->
+<!--                variant="ghost"-->
+<!--                size="sm"-->
+<!--                to="https://twitter.com"-->
+<!--                target="_blank"-->
+<!--                aria-label="Twitter"-->
+<!--              />-->
+<!--              <UButton-->
+<!--                icon="i-lucide-linkedin"-->
+<!--                color="gray"-->
+<!--                variant="ghost"-->
+<!--                size="sm"-->
+<!--                to="https://linkedin.com"-->
+<!--                target="_blank"-->
+<!--                aria-label="LinkedIn"-->
+<!--              />-->
+<!--              <UButton-->
+<!--                icon="i-lucide-youtube"-->
+<!--                color="gray"-->
+<!--                variant="ghost"-->
+<!--                size="sm"-->
+<!--                to="https://youtube.com"-->
+<!--                target="_blank"-->
+<!--                aria-label="YouTube"-->
+<!--              />-->
+<!--            </div>-->
           </div>
 
           <!-- Footer Navigation Sections -->
@@ -92,7 +98,7 @@
       <div class="py-6 border-t border-gray-200 dark:border-gray-800">
         <div class="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
           <p class="text-gray-600 dark:text-gray-400 text-sm">
-            © {{ currentYear }} Herlan. All rights reserved.
+            {{ footer?.copyright || `© ${currentYear} All rights reserved.` }}
           </p>
           
           <div class="flex items-center space-x-6">
@@ -150,6 +156,10 @@
 </template>
 
 <script setup>
+
+const { fetchFooterSettings } = useSettings()
+const { data: footer } = await fetchFooterSettings()
+
 const currentYear = new Date().getFullYear()
 const newsletterEmail = ref('')
 const isSubscribing = ref(false)
@@ -202,7 +212,7 @@ const footerSections = [
       { name: 'Blog', to: '/blog' },
       { name: 'Careers', to: '/' },
       { name: 'Press Kit', to: '/' },
-      { name: 'Contact', to: '/' }
+      { name: 'Contact', to: '/contact' }
     ]
   },
 ]

@@ -6,7 +6,7 @@
         <!-- Logo/Brand -->
         <div class="flex items-center space-x-4">
           <NuxtLink to="/" class="flex items-center space-x-3 hover:opacity-80 transition-opacity">
-            <span class="text-xl font-bold text-gray-900 dark:text-white">Herlan Ecommerce</span>
+            <AppLogo />
           </NuxtLink>
         </div>
 
@@ -185,6 +185,8 @@
 </template>
 
 <script setup>
+const settings = inject('settings')
+
 const colorMode = useColorMode()
 const route = useRoute()
 const router = useRouter()

@@ -9,15 +9,15 @@ export const useBlogAPI = () => {
     if (category) params.category = category
     if (search) params.search = search
 
-    return await $fetch('/api/blog', { params })
+    return await $fetch('blog', { params })
   }
 
   const fetchCategories = async () => {
-    return await $fetch('/api/blog/categories')
+    return await $fetch('blog/categories')
   }
 
   const fetchPost = async (slug: string) => {
-    return await $fetch(`/api/blog/posts/${slug}`)
+    return await $fetch(`blog/posts/${slug}`)
   }
 
   return {
