@@ -20,11 +20,12 @@
 const {fetchSettings} = useSettings()
 
 // Fetch all settings on app initialization
-const {data: settings} = await fetchSettings()
+const { data: settings } = await fetchSettings()
 
 useHead({
 
   title: settings.value?.site_name || 'Default Site Title',
+
   titleTemplate: (title) => {
     const siteName = settings.value?.site.name || 'My Website'
     return title === siteName ? title : `${title} - ${siteName}`
@@ -123,12 +124,4 @@ watch(() => settings.value?.site.active, (isActive) => {
   }
 }, { immediate: true })
 
-// Global SEO configuration
-useSeoMeta({
-  titleTemplate: '%s - NuxtUI App',
-  description: 'Modern web application built with Nuxt 4 and Nuxt UI',
-  ogDescription: 'Modern web application built with Nuxt 4 and Nuxt UI',
-  ogImage: '/og-image.jpg',
-  twitterCard: 'summary_large_image'
-})
 </script>

@@ -191,7 +191,7 @@ const handleCheckout = async () => {
   if (!loggedIn.value) {
     // Close cart and redirect to login
     toggleCart()
-    await navigateTo('/auth/login?redirect=/checkout')
+    await navigateTo('/checkout')
     return
   }
 

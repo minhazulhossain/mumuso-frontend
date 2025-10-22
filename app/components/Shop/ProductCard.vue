@@ -168,100 +168,155 @@
 <!--  </NuxtLink>-->
 <!--</template>-->
 
-<script setup lang="ts">
-defineProps<{
-  product: any
-}>()
+<!--<script setup lang="ts">-->
+<!--defineProps<{-->
+<!--  product: any-->
+<!--}>()-->
 
-const ui = {
-  root: 'rounded-none ring-0',
-  header: 'sm:px-0 p-0 ring-0 border-0',
-  body: 'sm:p-3 border-0',
-  footer: 'sm:p-3',
-}
+<!--const ui = {-->
+<!--  root: 'rounded-none ring-0',-->
+<!--  header: 'sm:px-0 p-0 ring-0 border-0',-->
+<!--  body: 'sm:p-3 border-0',-->
+<!--  footer: 'sm:p-3',-->
+<!--}-->
 
-defineEmits<{
-  'add-to-cart': [productId: number, quantity: number]
-  'add-to-wishlist': [productId: number]
-  'quick-view': [product: any]
-}>()
+<!--defineEmits<{-->
+<!--  'add-to-cart': [productId: number, quantity: number]-->
+<!--  'add-to-wishlist': [productId: number]-->
+<!--  'quick-view': [product: any]-->
+<!--}>()-->
 
-const addingToCart = ref(false)
+<!--const addingToCart = ref(false)-->
 
-const handleImageError = (event: Event) => {
-  const target = event.target as HTMLImageElement
-  target.src = 'https://placehold.co/600x600'
-}
-</script>
+<!--const handleImageError = (event: Event) => {-->
+<!--  const target = event.target as HTMLImageElement-->
+<!--  target.src = 'https://placehold.co/600x600'-->
+<!--}-->
+<!--</script>-->
 
+<!--<template>-->
+<!--  <NuxtLink :to="`/shop/product/${product.slug}`" class="block relative">-->
+<!--    <UCard :ui="ui">-->
+<!--      <template #header>-->
+<!--        <picture>-->
+<!--          <source-->
+<!--              v-if="product.image_webp"-->
+<!--              :srcset="product.image_webp"-->
+<!--              type="image/webp"-->
+<!--          />-->
+<!--          <img-->
+<!--              :src="product.image || product.image_thumb"-->
+<!--              :alt="product.name"-->
+<!--              class="aspect-1/1 object-cover group-hover:scale-110 transition-transform duration-500"-->
+<!--              loading="lazy"-->
+<!--              @error="handleImageError"-->
+<!--          />-->
+<!--        </picture>-->
+
+<!--        <div class="flex align-center absolute top-3 px-3 justify-between w-full">-->
+
+<!--          <UBadge v-if="product?.has_discount" color="error" class="rounded-none">-{{ product?.discount_percentage }}%</UBadge>-->
+
+<!--          <UButton-->
+<!--              icon="i-heroicons-heart"-->
+<!--              color="primary"-->
+<!--              variant="ghost"-->
+<!--              size="md"-->
+<!--              @click.prevent="$emit('add-to-wishlist', product.id)"-->
+<!--          />-->
+<!--        </div>-->
+
+<!--      </template>-->
+
+<!--      &lt;!&ndash; Product Name &ndash;&gt;-->
+<!--      <h3 class="font-semibold text-gray-900 dark:text-white group-hover:text-primary-500 transition-colors line-clamp-2 text-base h-13">-->
+<!--        {{ product.name }}-->
+<!--      </h3>-->
+
+
+<!--      <template #footer>-->
+<!--        <div class="flex items-center justify-between w-full">-->
+
+<!--          &lt;!&ndash; Price &ndash;&gt;-->
+<!--          <div class="flex items-center justify-between">-->
+<!--            <div class="flex items-baseline gap-2">-->
+<!--            <span v-if="product.compare_price" class="text-sm text-gray-400 line-through">-->
+<!--                      ${{ parseFloat(product.compare_price).toFixed(2) }}-->
+<!--                    </span>-->
+<!--              <span class="text-xl font-bold dark:text-white">-->
+<!--                      ${{ parseFloat(product.price).toFixed(2) }}-->
+<!--                    </span>-->
+
+<!--            </div>-->
+<!--          </div>-->
+
+<!--          <UButton-->
+<!--              @click.prevent="$emit('add-to-cart', product.id, 1)"-->
+<!--              :icon="product.in_stock ? 'i-heroicons-shopping-cart' : ''"-->
+<!--              color="primary"-->
+<!--              class=""-->
+<!--              :disabled="!product.in_stock"-->
+<!--              :loading="addingToCart"-->
+<!--              variant="ghost"-->
+<!--          />-->
+
+<!--        </div>-->
+<!--      </template>-->
+<!--    </UCard>-->
+<!--  </NuxtLink>-->
+<!--</template>-->
+
+<!-- ShopProductCard.vue -->
 <template>
-  <NuxtLink :to="`/shop/product/${product.slug}`" class="block relative">
-    <UCard :ui="ui">
-      <template #header>
-        <picture>
-          <source
-              v-if="product.image_webp"
-              :srcset="product.image_webp"
-              type="image/webp"
-          />
-          <img
-              :src="product.image || product.image_thumb"
-              :alt="product.name"
-              class="aspect-1/1 object-cover group-hover:scale-110 transition-transform duration-500"
-              loading="lazy"
-              @error="handleImageError"
-          />
-        </picture>
+  <NuxtLink :to="`/shop/product/${product.slug}`"
+      class="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-gray-800 h-full flex flex-col">
+    <!-- Image with fixed aspect ratio -->
+    <div class="relative w-full aspect-square bg-gray-100 dark:bg-gray-900">
+      <USkeleton
+          v-if="!imageLoaded"
+          class="w-full h-full absolute inset-0"
+      />
+      <img
+          :src="product.image"
+          :alt="product.name"
+          :class="[
+          'w-full h-full object-cover transition-opacity duration-300',
+          imageLoaded ? 'opacity-100' : 'opacity-0'
+        ]"
+          @load="imageLoaded = true"
+      >
+    </div>
 
-        <div class="flex align-center absolute top-3 px-3 justify-between w-full">
+    <!-- Content -->
+    <div class="p-4 space-y-3 flex-1 flex flex-col">
+      <h3 class="text-sm font-medium line-clamp-2">{{ product.name }}</h3>
+      <p class="text-lg font-bold text-primary">${{ product.price }}</p>
 
-          <UBadge v-if="product?.has_discount" color="error" class="rounded-none">-{{ product?.discount_percentage }}%</UBadge>
-
-          <UButton
-              icon="i-heroicons-heart"
-              color="primary"
-              variant="ghost"
-              size="md"
-              @click.prevent="$emit('add-to-wishlist', product.id)"
-          />
-        </div>
-
-      </template>
-
-      <!-- Product Name -->
-      <h3 class="font-semibold text-gray-900 dark:text-white group-hover:text-primary-500 transition-colors line-clamp-2 text-base h-13">
-        {{ product.name }}
-      </h3>
-
-
-      <template #footer>
-        <div class="flex items-center justify-between w-full">
-
-          <!-- Price -->
-          <div class="flex items-center justify-between">
-            <div class="flex items-baseline gap-2">
-            <span v-if="product.compare_price" class="text-sm text-gray-400 line-through">
-                      ${{ parseFloat(product.compare_price).toFixed(2) }}
-                    </span>
-              <span class="text-xl font-bold dark:text-white">
-                      ${{ parseFloat(product.price).toFixed(2) }}
-                    </span>
-
-            </div>
-          </div>
-
-          <UButton
-              @click.prevent="$emit('add-to-cart', product.id, 1)"
-              :icon="product.in_stock ? 'i-heroicons-shopping-cart' : ''"
-              color="primary"
-              class=""
-              :disabled="!product.in_stock"
-              :loading="addingToCart"
-              variant="ghost"
-          />
-
-        </div>
-      </template>
-    </UCard>
+      <div class="mt-auto">
+        <UButton block @click="$emit('add-to-cart', 1)">
+          Add to Cart
+        </UButton>
+      </div>
+    </div>
   </NuxtLink>
 </template>
+
+<script setup lang="ts">
+interface Props {
+  product: {
+    id: number
+    name: string
+    price: number
+    image: string
+    [key: string]: any
+  }
+}
+
+defineProps<Props>()
+defineEmits<{
+  'add-to-cart': [quantity: number]
+  'add-to-wishlist': []
+}>()
+
+const imageLoaded = ref(false)
+</script>

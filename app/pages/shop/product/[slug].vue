@@ -3,7 +3,7 @@
     <UContainer class="py-8">
       <!-- Breadcrumb -->
       <UBreadcrumb
-          :links="breadcrumbLinks"
+          :items="breadcrumbLinks"
           class="mb-6"
       />
 
@@ -250,7 +250,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Product } from '~/composables/useProducts'
+import type {Product} from '@/types/product';
 
 const route = useRoute()
 const toast = useToast()
@@ -369,14 +369,13 @@ onMounted(async () => {
   }
 })
 
-// Meta tags
-useHead(() => ({
-  title: product.value ? `${product.value.name} - Shop` : 'Product Not Found',
-  meta: [
-    {
-      name: 'description',
-      content: product.value?.short_description || product.value?.description || 'Product details'
-    }
-  ]
-}))
+watchEffect(() => {
+  if (product.value) {
+    useSEO({
+      title: product.value.name,
+      description: product.value.short_description || product.value.description || `Buy ${product.value.name} - ${product.value.categories.map((c:any) => c.name).join(', ')}`,
+      keywords: `${product.value.name}, ${product.value.categories.map((c:any) => c.name).join(', ')}, ${product.value.sku}`,
+    })
+  }
+})
 </script>

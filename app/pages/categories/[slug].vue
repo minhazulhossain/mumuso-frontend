@@ -1,5 +1,5 @@
 <template>
-  <ShopLayoutPage />
+  <ShopLayoutPage title="Shop" sub-title="Discover our amazing products" />
 </template>
 <script setup lang="ts">
 

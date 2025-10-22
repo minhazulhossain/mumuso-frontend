@@ -7,7 +7,7 @@ interface User {
     updated_at: string
 }
 
-export const useUserSession = () => {
+export const useAppUserSession = () => {
     const user = useState<User | null>('user', () => null)
     const loggedIn = computed(() => !!user.value)
 

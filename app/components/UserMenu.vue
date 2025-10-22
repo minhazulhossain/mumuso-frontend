@@ -105,7 +105,7 @@ const items = ref<DropdownMenuItem[][]>([
     {
       label: 'Support',
       icon: 'i-lucide-life-buoy',
-      to: '/components/dropdown-menu'
+      to: '/'
     },
     {
       label: 'API',

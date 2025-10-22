@@ -50,7 +50,7 @@
               <p class="text-sm text-gray-500 dark:text-gray-400">{{ product.brand }}</p>
               <div class="flex items-center justify-between pt-2">
                 <span class="text-xl font-bold text-primary-500">${{ product.price }}</span>
-                <UBadge :color="product.stock > 10 ? 'green' : 'orange'" variant="soft">
+                <UBadge :color="product.stock > 10 ? 'success' : 'warning'" variant="soft">
                   {{ product.stock }} in stock
                 </UBadge>
               </div>

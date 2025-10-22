@@ -7,7 +7,6 @@
           :banners="heroBanners"
           :autoplay="true"
           :interval="10000000"
-          height="600px"
       />
     </section>
     <section class="py-10 bg-white">
@@ -69,13 +68,6 @@ onMounted(async () => {
   } catch (err) {
     console.error('Failed to load product:', err)
   }
-})
-
-// Page-specific SEO
-useSeoMeta({
-  title: 'Home - Build Amazing Apps with Nuxt UI',
-  description: 'Create beautiful, responsive web applications using Nuxt 4 and Nuxt UI. Fast, accessible, and modern by default.',
-  ogTitle: 'Build Amazing Apps with Nuxt UI',
 })
 
 
