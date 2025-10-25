@@ -2,7 +2,12 @@
   <header
       class=" bg-white dark:bg-gray-950/75 backdrop-blur-md border-b border-gray-200 dark:border-gray-800">
     <UContainer>
-      <div class="flex items-center justify-between h-16">
+      <div class="flex items-center justify-between h-13 md:h-16">
+
+        <div class="md:hidden">
+          <MobileGlobalCategoryMenu :items="categoryItems" />
+        </div>
+
         <!-- Logo/Brand -->
         <div class="flex items-center space-x-4">
           <NuxtLink to="/" class="flex items-center space-x-3 hover:opacity-80 transition-opacity">
@@ -77,7 +82,7 @@
         </div>
 
         <!-- Right side actions -->
-        <div class="flex items-center space-x-3">
+        <div class="flex items-center">
           <!-- Search button (Mobile) -->
           <UButton
               icon="i-heroicons-magnifying-glass"
@@ -105,7 +110,7 @@
         </div>
       </div>
     </UContainer>
-    <HeaderDesktop />
+    <HeaderDesktop :items="categoryItems" />
 
     <!-- Mobile Search Modal -->
 <!--    <UModal v-model="showMobileSearch">-->
@@ -185,6 +190,7 @@
 </template>
 
 <script setup>
+
 const settings = inject('settings')
 
 const colorMode = useColorMode()
@@ -192,6 +198,8 @@ const route = useRoute()
 const router = useRouter()
 const { cartItemsCount, toggleCart } = useCart()
 const {searchProducts: searchProductsAPI} = useProducts()
+
+const { fetchCategories } = useContent()
 
 // Search state
 const searchQuery = ref('')
@@ -271,6 +279,11 @@ const isActiveRoute = (path) => {
   }
   return route.path.startsWith(path)
 }
+
+const [ categoryItems ] = await Promise.all([
+  fetchCategories(),
+])
+
 
 // Handle escape key
 onMounted(() => {

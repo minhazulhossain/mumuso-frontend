@@ -13,10 +13,10 @@
         wheel-gestures
         :items="products"
         :ui="{
-        item: 'basis-[40%]'
+        item: 'basis-[60%] md:basis-[40%] ps-2'
       }"
     >
-      <UCard :ui="{ root: '', header: 'p-0 sm:px-0' }">
+      <UCard :ui="{ root: 'rounded-none mb-2', header: 'p-0 sm:px-0' }">
         <template #header>
           <div class="relative w-full aspect-[380/288] bg-gray-100">
             <!-- Skeleton loader -->

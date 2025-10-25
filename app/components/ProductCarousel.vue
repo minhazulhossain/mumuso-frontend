@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Title Bar -->
-    <div v-if="hasTitleBar" class="flex justify-between items-center mb-4">
+    <div v-if="hasTitleBar" class="flex justify-between items-center mb-2 md:mb-4 px-4 md:px-0">
       <h2 class="text-2xl font-bold">{{ title }}</h2>
       <NuxtLink :to="viewAllUrl" class="text-sm font-medium text-primary hover:underline">
         View All
@@ -29,9 +29,12 @@
         v-slot="{ item }"
         :items="loading ? skeletonItems : items"
         :ui="{
-        item: 'basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5',
-        dot: 'w-10 h-2 data-[state=active]:bg-success-600 data-[state=active]:w-20'
+        item: 'basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5 ps-2',
+        dot: 'w-10 h-2 data-[state=active]:bg-success-600 data-[state=active]:w-20',
+        dots: '-bottom-3 md:-bottom-7'
+
       }"
+
         :dots="!loading"
         :loop="!loading && items.length > 5"
         :breakpoints="{
@@ -40,7 +43,7 @@
         '(min-width: 1024px)': { slidesToScroll: 3 },
         '(min-width: 1280px)': { slidesToScroll: 3 }
       }"
-        :slidesToScroll="1"
+        :slidesToScroll="3"
     >
       <!-- Skeleton State -->
       <div v-if="loading" class="p-2">
@@ -63,7 +66,6 @@
       <ShopProductCard
           v-else
           :product="item"
-          class="p-2"
           @add-to-cart="(qty) => $emit('add-to-cart', item.string, qty)"
           @add-to-wishlist="() => $emit('add-to-wishlist', item.string)"
       />

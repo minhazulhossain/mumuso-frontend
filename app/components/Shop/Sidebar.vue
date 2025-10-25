@@ -1,4 +1,3 @@
-<!-- components/ShopSidebar.vue -->
 <template>
   <aside class="lg:w-64 flex-shrink-0">
     <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm lg:sticky lg:top-4">

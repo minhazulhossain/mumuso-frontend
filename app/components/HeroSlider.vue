@@ -65,57 +65,57 @@
         />
 
         <!-- Content -->
-        <UContainer class="absolute inset-0 flex items-center pointer-events-none">
-          <div
-              class="w-full max-w-2xl pointer-events-auto px-4 md:px-0"
-              :class="{
-              'mx-auto text-center': banner.text_position === 'center',
-              'ml-auto text-right': banner.text_position === 'right',
-              'text-left': banner.text_position === 'left'
-            }"
-          >
-            <!-- Title -->
-            <h1
-                class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 md:mb-4 animate-fade-in-up"
-                :style="{ color: banner.text_color || '#ffffff' }"
-            >
-              {{ banner.title }}
-            </h1>
+<!--        <UContainer class="absolute inset-0 flex items-center pointer-events-none">-->
+<!--          <div-->
+<!--              class="w-full max-w-2xl pointer-events-auto px-4 md:px-0"-->
+<!--              :class="{-->
+<!--              'mx-auto text-center': banner.text_position === 'center',-->
+<!--              'ml-auto text-right': banner.text_position === 'right',-->
+<!--              'text-left': banner.text_position === 'left'-->
+<!--            }"-->
+<!--          >-->
+<!--            &lt;!&ndash; Title &ndash;&gt;-->
+<!--            <h1-->
+<!--                class="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-0 md:mb-4 animate-fade-in-up"-->
+<!--                :style="{ color: banner.text_color || '#ffffff' }"-->
+<!--            >-->
+<!--              {{ banner.title }}-->
+<!--            </h1>-->
 
-            <!-- Subtitle -->
-            <p
-                v-if="banner.subtitle"
-                class="text-lg sm:text-xl md:text-2xl mb-3 md:mb-4 animate-fade-in-up animation-delay-100"
-                :style="{ color: banner.text_color || '#ffffff' }"
-            >
-              {{ banner.subtitle }}
-            </p>
+<!--            &lt;!&ndash; Subtitle &ndash;&gt;-->
+<!--            <p-->
+<!--                v-if="banner.subtitle"-->
+<!--                class="text-s, sm:text-xl md:text-2xl mb-3 md:mb-4 animate-fade-in-up animation-delay-100"-->
+<!--                :style="{ color: banner.text_color || '#ffffff' }"-->
+<!--            >-->
+<!--              {{ banner.subtitle }}-->
+<!--            </p>-->
 
-            <!-- Description -->
-            <p
-                v-if="banner.description"
-                class="text-sm sm:text-base md:text-lg mb-6 md:mb-8 opacity-90 animate-fade-in-up animation-delay-200"
-                :style="{ color: banner.text_color || '#ffffff' }"
-            >
-              {{ banner.description }}
-            </p>
+<!--            &lt;!&ndash; Description &ndash;&gt;-->
+<!--            <p-->
+<!--                v-if="banner.description"-->
+<!--                class="text-sm sm:text-base md:text-lg mb-6 md:mb-8 opacity-90 animate-fade-in-up animation-delay-200"-->
+<!--                :style="{ color: banner.text_color || '#ffffff' }"-->
+<!--            >-->
+<!--              {{ banner.description }}-->
+<!--            </p>-->
 
-            <!-- CTA Button -->
-            <NuxtLink
-                v-if="banner.button_text && banner.button_link"
-                :to="banner.button_link"
-                class="inline-block animate-fade-in-up animation-delay-300"
-            >
-              <UButton
-                  :color="banner.button_style === 'primary' ? 'primary' : 'secondary'"
-                  :variant="banner.button_style === 'outline' ? 'outline' : 'solid'"
-                  :size="isMobile ? 'lg' : 'xl'"
-              >
-                {{ banner.button_text }}
-              </UButton>
-            </NuxtLink>
-          </div>
-        </UContainer>
+<!--            &lt;!&ndash; CTA Button &ndash;&gt;-->
+<!--            <NuxtLink-->
+<!--                v-if="banner.button_text && banner.button_link"-->
+<!--                :to="banner.button_link"-->
+<!--                class="inline-block animate-fade-in-up animation-delay-300"-->
+<!--            >-->
+<!--              <UButton-->
+<!--                  :color="banner.button_style === 'primary' ? 'primary' : 'secondary'"-->
+<!--                  :variant="banner.button_style === 'outline' ? 'outline' : 'solid'"-->
+<!--                  :size="isMobile ? 'lg' : 'xl'"-->
+<!--              >-->
+<!--                {{ banner.button_text }}-->
+<!--              </UButton>-->
+<!--            </NuxtLink>-->
+<!--          </div>-->
+<!--        </UContainer>-->
       </div>
     </UCarousel>
   </div>

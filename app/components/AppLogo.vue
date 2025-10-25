@@ -14,7 +14,7 @@ const settings = inject('settings')
 const sizeClasses = computed(() => {
   const sizes = {
     sm: 'h-8',
-    md: 'h-10',
+    md: 'h-8',
     lg: 'h-12',
     xl: 'h-16',
   }

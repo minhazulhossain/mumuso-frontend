@@ -101,13 +101,11 @@
               </UButton>
             </div>
           </div>
-
-          <!-- Loading State -->
           <!-- Loading State -->
           <div v-if="loading">
             <!-- Grid Skeleton -->
             <template v-if="viewMode === 'grid'">
-              <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+              <div class="grid grid-cols-2 md:grid-cols-2 xl:grid-cols-3 gap-3">
                 <ShopProductCardSkeleton v-for="i in 9" :key="i" />
               </div>
             </template>

@@ -1,7 +1,7 @@
 <template>
-  <div class="grid grid-cols-4 grid-rows-3 gap-4 p-4">
+  <div class="grid grid-cols-4 grid-rows-3 gap-2 md:gap-4">
     <!-- First item spans full width (4 columns) -->
-    <div class="col-span-4 bg-gray-200 dark:bg-gray-800 rounded-lg overflow-hidden relative aspect-[16/9]">
+    <div class="col-span-4 bg-gray-200 dark:bg-gray-800 rounded-none overflow-hidden relative aspect-[16/9]">
       <!-- Skeleton Loader -->
       <USkeleton
           v-if="!imageLoaded[0]"
@@ -26,7 +26,7 @@
     <div
         v-for="(item, index) in items.slice(1)"
         :key="index"
-        class="col-span-2 bg-gray-200 dark:bg-gray-800 rounded-lg overflow-hidden relative aspect-[4/3]"
+        class="col-span-2 bg-gray-200 dark:bg-gray-800 rounded-none overflow-hidden relative"
     >
       <!-- Skeleton Loader -->
       <USkeleton
@@ -51,6 +51,7 @@
 </template>
 
 <script setup lang="ts">
+
 const items = [
   'https://picsum.photos/1200/675?random=1',
   'https://picsum.photos/1200/675?random=2',

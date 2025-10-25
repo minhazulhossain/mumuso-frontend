@@ -10,36 +10,36 @@
       />
     </section>
     <section class="py-10 bg-white">
-      <UContainer>
+      <UContainer class="px-0">
         <CategoriesGrid />
       </UContainer>
     </section>
 
-    <section class="py-24">
-      <UContainer>
+    <section class="py-6 md:py-24">
+      <UContainer class="px-0">
         <PromotionGrid/>
       </UContainer>
     </section>
 
-    <section class="py-24 pt-0">
-      <UContainer>
+    <section class="py-6 md:py-24 pt-0">
+      <UContainer class="px-0">
         <ProductCarousel title="Best Selling" :items="products" :loading="loading"/>
       </UContainer>
     </section>
 
-    <section class="py-24 bg-[#17AE6F]">
-      <UContainer>
+    <section class="py-6 md:py-24 bg-[#17AE6F]">
+      <UContainer class="px-0">
         <ProductCarousel title="New Arrivals" :items="products" :loading="loading"/>
       </UContainer>
     </section>
 
-    <section class="py-24">
+    <section class="py-6 md:py-24">
       <UContainer>
         <BannersGrid/>
       </UContainer>
     </section>
 
-    <section class="py-24 pt-0">
+    <section class="py-6 md:py-24 pt-0">
       <UContainer>
         <ProductCarousel title="Trending" :items="products" :loading="loading"/>
       </UContainer>
