@@ -10,10 +10,14 @@
           class="flex gap-3 pb-4 border-b border-gray-200 dark:border-gray-700 last:border-0"
       >
         <div class="relative">
-          <img
+          <NuxtImg
               :src="item.product.image ?? 'https://placehold.co/80x80'"
               :alt="item.product.name"
               class="w-16 h-16 object-cover rounded-lg"
+              width="64"
+              height="64"
+              loading="lazy"
+              format="webp"
           />
           <UBadge
               color="primary"

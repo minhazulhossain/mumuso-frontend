@@ -2,14 +2,16 @@
   <div class="grid grid-cols-4 grid-rows-3 gap-2 md:gap-4">
     <!-- First item spans full width (4 columns) -->
     <div class="col-span-4 bg-gray-200 dark:bg-gray-800 rounded-none overflow-hidden relative aspect-[16/9]">
-
       <!-- Actual Image -->
-      <img
+      <NuxtImg
           :src="items[0]"
           alt="Item 1"
           class="w-full h-full object-cover transition-opacity duration-300"
           loading="eager"
           width="1200"
+          height="675"
+          sizes="100vw"
+          format="webp"
       />
     </div>
 
@@ -19,16 +21,16 @@
         :key="index"
         class="col-span-2 bg-gray-200 dark:bg-gray-800 rounded-none overflow-hidden relative"
     >
-
-
       <!-- Actual Image -->
-      <img
+      <NuxtImg
           :src="item"
           :alt="`Item ${index + 2}`"
           class="w-full h-full object-cover transition-opacity duration-300"
           loading="lazy"
           width="600"
           height="450"
+          sizes="xs:50vw sm:50vw md:50vw"
+          format="webp"
       />
     </div>
   </div>

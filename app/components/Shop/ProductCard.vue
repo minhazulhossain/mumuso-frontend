@@ -7,15 +7,18 @@
           v-if="!imageLoaded"
           class="w-full h-full absolute inset-0"
       />
-      <img
+      <NuxtImg
           :src="product.image"
           :alt="product.name"
           :class="[
           'w-full h-full object-cover transition-opacity duration-300',
           imageLoaded ? 'opacity-100' : 'opacity-0'
         ]"
+          sizes="xs:100vw sm:50vw md:33vw lg:25vw"
+          loading="lazy"
+          format="webp"
           @load="imageLoaded = true"
-      >
+      />
     </div>
 
     <!-- Content -->

@@ -3,7 +3,6 @@
     <UButton
         icon="i-heroicons-shopping-cart"
         variant="ghost"
-        @click="toggleCart"
     >
       <template #trailing>
         <UBadge v-if="cartItemsCount > 0" variant="solid">
@@ -22,7 +21,7 @@
                 color="secondary"
                 variant="ghost"
                 icon="i-heroicons-x-mark"
-                @click="toggleCart"
+                @click="localCartOpen = false"
             />
           </div>
         </template>
@@ -38,7 +37,7 @@
           <UIcon name="i-heroicons-shopping-cart" class="text-6xl text-gray-300 mb-4"/>
           <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Your cart is empty</h3>
           <p class="text-gray-500 dark:text-gray-400 mb-6">Add some products to get started</p>
-          <UButton @click="toggleCart" to="/shop">Continue Shopping</UButton>
+          <UButton @click="localCartOpen = false" to="/shop">Continue Shopping</UButton>
         </div>
 
 
@@ -52,12 +51,16 @@
             <!-- Product Image -->
             <NuxtLink
                 :to="`/shop/product/${item.product?.slug || item.slug}`"
-                @click="toggleCart"
+                @click="localCartOpen = false"
             >
-              <img
+              <NuxtImg
                   :src="item.product?.image ?? 'https://placehold.co/60x60'"
                   :alt="item.product?.name || 'Product'"
                   class="w-20 h-20 object-cover rounded-lg"
+                  width="80"
+                  height="80"
+                  loading="lazy"
+                  format="webp"
               />
             </NuxtLink>
 
@@ -65,7 +68,7 @@
             <div class="flex-1 min-w-0">
               <NuxtLink
                   :to="`/shop/product/${item.product?.slug || item.slug}`"
-                  @click="toggleCart"
+                  @click="localCartOpen = false"
                   class="font-semibold text-gray-900 dark:text-white hover:text-primary-500 block truncate"
               >
                 {{ item.product?.name || item.slug }}
@@ -172,8 +175,7 @@ const {
   updateCartItemQuantity,
   removeFromCart,
   clearCart,
-  checkout,
-  toggleCart
+  checkout
 } = useCart()
 
 const { loggedIn } = useAuth()
@@ -190,7 +192,7 @@ const handleCheckout = async () => {
   // Check if user is logged in
   if (!loggedIn.value) {
     // Close cart and redirect to login
-    toggleCart()
+    localCartOpen.value = false
     await navigateTo('/checkout')
     return
   }

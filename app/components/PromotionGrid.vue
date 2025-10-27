@@ -19,16 +19,19 @@
       <UCard :ui="{ root: 'rounded-none mb-2', header: 'p-0 sm:px-0' }">
         <template #header>
           <div class="relative w-full aspect-[380/288] bg-gray-100">
-
             <!-- Actual image -->
-            <img
+            <NuxtImg
                 :src="item.img"
                 :class="[
                 'w-full h-full object-cover transition-opacity duration-300',
-
               ]"
                 :alt="item.name"
-            >
+                width="380"
+                height="288"
+                sizes="xs:60vw sm:40vw md:40vw"
+                loading="lazy"
+                format="webp"
+            />
           </div>
         </template>
 

@@ -30,19 +30,18 @@
         <!-- Background Image -->
         <div class="relative w-full h-full bg-gray-100">
           <!-- Responsive Images -->
-          <picture>
-            <source
-                :srcset="banner.image.mobile"
-                media="(max-width: 768px)"
-            />
-            <img
-                :src="banner.image.desktop"
-                :alt="banner.title"
-                class="w-full h-full object-cover"
-                @load="handleImageLoad(banner.id)"
-                @error="handleImageError(banner.id)"
-            />
-          </picture>
+          <NuxtPicture
+              :src="banner.image.desktop"
+              :alt="banner.title"
+              :img-attrs="{
+                class: 'w-full h-full object-cover',
+                onLoad: () => handleImageLoad(banner.id),
+                onError: () => handleImageError(banner.id)
+              }"
+              sizes="xs:100vw sm:100vw md:100vw lg:100vw"
+              loading="eager"
+              format="webp"
+          />
         </div>
 
         <!-- Overlay -->

@@ -22,14 +22,18 @@
         <template #header>
           <div class="relative w-full aspect-[300/300] rounded-full bg-gray-100">
             <!-- Actual image -->
-            <img
+            <NuxtImg
                 :src="item.img"
                 :class="[
                 'transition-opacity w-12 md:w-16 duration-300 absolute top-[50%] left-[50%] translate-[-50%]',
               ]"
                 @load="handleImageLoad(item.img)"
                 :alt="item.name"
-            >
+                width="64"
+                height="64"
+                loading="lazy"
+                format="webp"
+            />
           </div>
         </template>
         <p class="mb-0 text-sm">{{ item.name }}</p>

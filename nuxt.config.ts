@@ -1,5 +1,5 @@
 export default defineNuxtConfig({
-    modules: ['@nuxt/ui', 'nuxt-auth-utils'],
+    modules: ['@nuxt/ui', '@nuxt/image', 'nuxt-auth-utils'],
     css: ['~/assets/css/main.css'],
 
     ui: {
@@ -8,6 +8,19 @@ export default defineNuxtConfig({
                 color: 'neutral',
                 size: 'sm'
             }
+        }
+    },
+
+    image: {
+        quality: 80,
+        format: ['webp', 'avif', 'jpeg'],
+        screens: {
+            xs: 320,
+            sm: 640,
+            md: 768,
+            lg: 1024,
+            xl: 1280,
+            xxl: 1536
         }
     },
 

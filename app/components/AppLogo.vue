@@ -26,23 +26,29 @@ const sizeClasses = computed(() => {
   <div class="flex items-center gap-3">
     <!-- Logo Images -->
     <template v-if="settings?.branding.logo">
-      <img
+      <NuxtImg
           :src="settings.branding.logo"
           :alt="settings.site.name"
           :class="[sizeClasses, 'w-auto dark:hidden']"
-      >
-      <img
+          loading="eager"
+          format="webp"
+      />
+      <NuxtImg
           v-if="settings.branding.logo_dark"
           :src="settings.branding.logo_dark"
           :alt="settings.site.name"
           :class="[sizeClasses, 'w-auto hidden dark:block']"
-      >
-      <img
+          loading="eager"
+          format="webp"
+      />
+      <NuxtImg
           v-else
           :src="settings.branding.logo"
           :alt="settings.site.name"
           :class="[sizeClasses, 'w-auto hidden dark:block']"
-      >
+          loading="eager"
+          format="webp"
+      />
     </template>
 
     <!-- Text Fallback -->

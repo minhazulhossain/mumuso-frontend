@@ -25,6 +25,8 @@ npm run preview
 npm run postinstall
 ```
 
+**Note:** After pulling changes, always run `npm install` to ensure all dependencies (including @nuxt/image) are up to date.
+
 ## Architecture
 
 ### Backend Integration
@@ -137,10 +139,18 @@ See `types/README.md` for detailed documentation on each type.
 ## Configuration
 
 **Nuxt Config** (nuxt.config.ts):
-- Modules: `@nuxt/ui`, `nuxt-auth-utils`
+- Modules: `@nuxt/ui`, `@nuxt/image`, `nuxt-auth-utils`
 - Runtime config: `apiBase` for backend URL
 - UI theme: Default variants set to neutral/sm
 - Devtools enabled
+- Image optimization: WebP/AVIF formats, responsive sizes, custom provider
+
+**Image Optimization (@nuxt/image):**
+- Automatic format conversion (WebP, AVIF)
+- Responsive image sizing with configurable breakpoints
+- Lazy loading by default
+- Quality set to 80 for optimal file size/quality balance
+- Supports external URLs (from Laravel backend) without modification
 
 **Environment Variables:**
 - `NUXT_PUBLIC_API_BASE`: Backend API URL
@@ -168,9 +178,46 @@ const body = await readValidatedBody(event, bodySchema.parse)
 - Ensures items remain reserved during checkout process
 - Timer started on mount, cleared on unmount in useCart composable
 
+## Image Optimization Best Practices
+
+**Using NuxtImg for standard images:**
+```vue
+<NuxtImg
+  src="/path/to/image.jpg"
+  alt="Description"
+  width="400"
+  height="300"
+  sizes="xs:100vw sm:50vw md:33vw lg:25vw"
+  loading="lazy"
+  format="webp"
+/>
+```
+
+**Using NuxtPicture for responsive/art-directed images:**
+```vue
+<NuxtPicture
+  src="/path/to/image.jpg"
+  alt="Description"
+  :img-attrs="{ class: 'w-full h-full object-cover' }"
+  sizes="xs:100vw sm:100vw md:100vw"
+  loading="eager"
+  format="webp"
+/>
+```
+
+**Guidelines:**
+- Use `loading="eager"` for above-the-fold images (hero banners, logos)
+- Use `loading="lazy"` for below-the-fold images (product cards, thumbnails)
+- Always specify `width` and `height` to prevent layout shift
+- Use `sizes` attribute for responsive images to optimize bandwidth
+- Format automatically converts to WebP/AVIF when supported
+- External URLs (from Laravel backend) work seamlessly
+- Images are automatically optimized based on screen size and format support
+
 ## File References
 
 When working with authentication: server/utils/api.ts, app/composables/useAuth.ts, server/api/auth/login.post.ts
 When working with cart: server/utils/guestCart.ts, app/composables/useCart.ts, server/api/cart/
 When working with settings: app/composables/useSettings.ts, app/app.vue
+When working with images: Use NuxtImg/NuxtPicture components for automatic optimization
 When adding new API routes: Follow pattern in server/api/ with proper HTTP method suffix (.get.ts, .post.ts, etc.)
