@@ -14,26 +14,18 @@
         :slides-to-scroll="3"
         :items="categories"
         :ui="{
-        item: 'basis-[21%] md:basis-1/6 lg:basis-1/6',
+        item: 'basis-[21%] md:basis-1/8 lg:basis-1/8',
         dot: 'w-10 h-2 data-[state=active]:bg-success-600 data-[state=active]:w-20'
       }"
     >
       <UCard variant="soft" :ui="{ root: 'bg-transparent ring-0', header: 'p-0 sm:px-0 border-0', body:'p-0 text-center' }" >
         <template #header>
           <div class="relative w-full aspect-[300/300] rounded-full bg-gray-100">
-            <!-- Skeleton loader for individual images -->
-            <USkeleton
-                v-if="!loadedImages[item.img]"
-                class="w-full h-full absolute inset-0"
-                :ui="{ background: 'bg-gray-200' }"
-            />
-
             <!-- Actual image -->
             <img
                 :src="item.img"
                 :class="[
-                'transition-opacity w-12 duration-300 absolute top-[50%] left-[50%] translate-[-50%]',
-                loadedImages[item.img] ? 'opacity-100' : 'opacity-0'
+                'transition-opacity w-12 md:w-16 duration-300 absolute top-[50%] left-[50%] translate-[-50%]',
               ]"
                 @load="handleImageLoad(item.img)"
                 :alt="item.name"
@@ -82,6 +74,42 @@ const fallbackCategories: Category[] = [
   },
   {
     id: 5,
+    slug:'beauty',
+    img: '/icons/1.png',
+    name: 'Craft '
+  },
+  {
+    id: 6,
+    slug:'beauty',
+    img: '/icons/1.png',
+    name: 'Eye Care'
+  },
+  {
+    id: 7,
+    slug:'beauty',
+    img: '/icons/2.png',
+    name: 'Hair Care'
+  },
+  {
+    id: 8,
+    slug:'beauty',
+    img: '/icons/1.png',
+    name: 'Craft '
+  },
+  {
+    id: 9,
+    slug:'beauty',
+    img: '/icons/1.png',
+    name: 'Eye Care'
+  },
+  {
+    id: 10,
+    slug:'beauty',
+    img: '/icons/2.png',
+    name: 'Hair Care'
+  },
+  {
+    id: 11,
     slug:'beauty',
     img: '/icons/1.png',
     name: 'Craft '

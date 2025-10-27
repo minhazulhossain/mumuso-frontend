@@ -1,6 +1,6 @@
 <script setup lang="ts">
-const { fetchSettings } = useSettings()
-const { data: settings } = await fetchSettings()
+
+const { data: settings } = useNuxtData('settings')
 
 // SEO for contact page using the helper composable
 useSEO({

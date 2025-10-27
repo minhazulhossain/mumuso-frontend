@@ -66,9 +66,9 @@ export const useSettings = () => {
 
     // Fetch all settings
     const fetchSettings = () => {
-        return useFetch<Settings>(`${apiBase}settings`, {
-            key: 'settings',
-            lazy: true,
+        return useAsyncData<Settings>('settings', async () => {
+            return await $fetch<Settings>(`${apiBase}settings`)
+        }, {
             server: true,
             getCachedData: (key) => useNuxtApp().static.data[key] ?? useNuxtApp().payload.data[key],
         })
@@ -100,9 +100,11 @@ export const useSettings = () => {
 
     // Fetch only social media links
     const fetchSocialMedia = () => {
-        return useFetch<SocialMediaLink[]>(`${apiBase}settings/social-media`, {
-            key: 'social-media',
-            lazy: true,
+        return useAsyncData<Settings>('social-media', async () => {
+            return await $fetch<Settings>(`${apiBase}settings/social-media`)
+        }, {
+            server: true,
+            getCachedData: (key) => useNuxtApp().static.data[key] ?? useNuxtApp().payload.data[key],
         })
     }
 
