@@ -1,3 +1,8 @@
+/**
+ * Review sort options
+ */
+export type ReviewSortBy = 'recent' | 'helpful' | 'rating'
+
 export interface User {
     id: string
     name: string

@@ -13,46 +13,47 @@ export const useProducts = () => {
     const error: Ref<string | null> = useState('products-error', () => null)
     const cachedFilters: Ref<ProductFilters> = useState('cached-filters', () => ({}))
 
+    /**
+     * Build query parameters from filters
+     */
+    const buildQueryParams = (filters: ProductFilters): Record<string, string> => {
+        const params: Record<string, string> = {}
+
+        if (filters.category && filters.category !== 'all') {
+            params.category = filters.category
+        }
+        if (filters.featured !== undefined) {
+            params.featured = filters.featured ? '1' : '0'
+        }
+        if (filters.in_stock !== undefined) {
+            params.in_stock = filters.in_stock ? '1' : '0'
+        }
+        if (filters.min_price) {
+            params.min_price = filters.min_price.toString()
+        }
+        if (filters.max_price) {
+            params.max_price = filters.max_price.toString()
+        }
+        if (filters.search) {
+            params.search = filters.search
+        }
+        if (filters.on_sale) {
+            params.on_sale = '1'
+        }
+        if (filters.page) {
+            params.page = filters.page.toString()
+        }
+
+        return params
+    }
+
     // Fetch products with filters
     const fetchProducts = async (filters: ProductFilters = {}) => {
-
         loading.value = true
         error.value = null
 
         try {
-            const params = new URLSearchParams()
-
-            // Build query params
-            if (filters.category && filters.category !== 'all') {
-                params.append('category', filters.category)
-            }
-            if (filters.featured !== undefined) {
-                params.append('featured', filters.featured ? '1' : '0')
-            }
-            if (filters.in_stock !== undefined) {
-                params.append('in_stock', filters.in_stock ? '1' : '0')
-            }
-            if (filters.min_price) {
-                params.append('min_price', filters.min_price.toString())
-            }
-            if (filters.max_price) {
-                params.append('max_price', filters.max_price.toString())
-            }
-            if (filters.search) {
-                params.append('search', filters.search)
-            }
-            // if (filters.sort_by) {
-            //     params.append('sort_by', filters.sort_by)
-            // }
-            if (filters.on_sale) {
-                params.append('on_sale', '1')
-            }
-            if (filters.page) {
-                params.append('page', filters.page.toString())
-            }
-
-            const queryString = params.toString()
-            const url = `${apiUrl}products${queryString ? `?${queryString}` : ''}`
+            const queryParams = buildQueryParams(filters)
 
             const response = await $fetch<{
                 data: Product[]
@@ -64,7 +65,9 @@ export const useProducts = () => {
                     from: number
                     to: number
                 }
-            }>(url)
+            }>(`${apiUrl}products`, {
+                query: queryParams
+            })
 
             products.value = response.data || []
 

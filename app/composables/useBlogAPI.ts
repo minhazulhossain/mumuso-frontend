@@ -1,7 +1,9 @@
 // composables/useBlogAPI.ts
+import type { BlogQueryParams } from '~/types/blog'
+
 export const useBlogAPI = () => {
   const fetchPosts = async (category?: string, page: number = 1, search?: string) => {
-    const params: any = {
+    const params: BlogQueryParams = {
       _page: page,
       _limit: 9
     }
@@ -9,15 +11,15 @@ export const useBlogAPI = () => {
     if (category) params.category = category
     if (search) params.search = search
 
-    return await $fetch('blog', { params })
+    return await $fetch('/api/blog', { query: params })
   }
 
   const fetchCategories = async () => {
-    return await $fetch('blog/categories')
+    return await $fetch('/api/blog/categories')
   }
 
   const fetchPost = async (slug: string) => {
-    return await $fetch(`blog/posts/${slug}`)
+    return await $fetch(`/api/blog/${slug}`)
   }
 
   return {

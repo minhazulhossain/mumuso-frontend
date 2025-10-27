@@ -1,4 +1,3 @@
-// nuxt.config.ts - Support BOTH proxied and direct API calls
 export default defineNuxtConfig({
     modules: ['@nuxt/ui', 'nuxt-auth-utils'],
     css: ['~/assets/css/main.css'],

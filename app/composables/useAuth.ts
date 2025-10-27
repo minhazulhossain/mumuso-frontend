@@ -1,3 +1,13 @@
+import type { AuthFormData, ProfileUpdateData, PasswordResetData } from '~/types/auth'
+
+/**
+ * Handle authentication errors with consistent messaging
+ */
+const handleAuthError = (error: any, defaultMessage: string): never => {
+    const message = error.data?.message || error.message || defaultMessage
+    throw new Error(message)
+}
+
 export const useAuth = () => {
     const user = useUserSession()
 
@@ -9,34 +19,25 @@ export const useAuth = () => {
                 body: { email, password }
             })
 
-            // Refresh session
             await user.fetch()
-
             return data
         } catch (error: any) {
-            throw new Error(error.data?.message || error.message || 'Login failed')
+            handleAuthError(error, 'Login failed')
         }
     }
 
     // Register new user
-    const register = async (formData: {
-        name: string
-        email: string
-        password: string
-        password_confirmation: string
-    }) => {
+    const register = async (formData: AuthFormData) => {
         try {
             const data = await $fetch('/api/auth/register', {
                 method: 'POST',
                 body: formData
             })
 
-            // Refresh session
             await user.fetch()
-
             return data
         } catch (error: any) {
-            throw new Error(error.data?.message || error.message || 'Registration failed')
+            handleAuthError(error, 'Registration failed')
         }
     }
 
@@ -46,11 +47,9 @@ export const useAuth = () => {
             await $fetch('/api/auth/logout', {
                 method: 'POST'
             })
-
-            user.clear()
-            await navigateTo('/auth/login')
         } catch (error) {
             console.error('Logout error:', error)
+        } finally {
             user.clear()
             await navigateTo('/auth/login')
         }
@@ -69,56 +68,39 @@ export const useAuth = () => {
     // Forgot password
     const forgotPassword = async (email: string) => {
         try {
-            const data = await $fetch('/api/auth/forgot-password', {
+            return await $fetch('/api/auth/forgot-password', {
                 method: 'POST',
                 body: { email }
             })
-
-            return data
         } catch (error: any) {
-            throw new Error(error.data?.message || error.message || 'Failed to send reset link')
+            handleAuthError(error, 'Failed to send reset link')
         }
     }
 
     // Reset password
-    const resetPassword = async (formData: {
-        token: string
-        email: string
-        password: string
-        password_confirmation: string
-    }) => {
+    const resetPassword = async (formData: PasswordResetData) => {
         try {
-            const data = await $fetch('/api/auth/reset-password', {
+            return await $fetch('/api/auth/reset-password', {
                 method: 'POST',
                 body: formData
             })
-
-            return data
         } catch (error: any) {
-            throw new Error(error.data?.message || error.message || 'Password reset failed')
+            handleAuthError(error, 'Password reset failed')
         }
     }
 
     // Update user profile
-    const updateProfile = async (formData: {
-        name?: string
-        email?: string
-        current_password?: string
-        password?: string
-        password_confirmation?: string
-    }) => {
+    const updateProfile = async (formData: ProfileUpdateData) => {
         try {
             const data = await $fetch('/api/auth/profile', {
                 method: 'PUT',
                 body: formData
             })
 
-            // Refresh session
             await user.fetch()
-
             return data
         } catch (error: any) {
-            throw new Error(error.data?.message || error.message || 'Profile update failed')
+            handleAuthError(error, 'Profile update failed')
         }
     }
 

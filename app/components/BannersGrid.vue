@@ -18,7 +18,7 @@
           @error="handleImageError(0)"
           loading="eager"
           width="1200"
-          height="675"
+          height="250"
       />
     </div>
 
@@ -53,11 +53,11 @@
 <script setup lang="ts">
 
 const items = [
-  'https://picsum.photos/1200/675?random=1',
-  'https://picsum.photos/1200/675?random=2',
-  'https://picsum.photos/1200/675?random=3',
-  'https://picsum.photos/1200/675?random=4',
-  'https://picsum.photos/1200/675?random=5',
+  'https://picsum.photos/1200/250?random=1',
+  'https://picsum.photos/1200/250?random=2',
+  'https://picsum.photos/1200/250?random=3',
+  'https://picsum.photos/1200/250?random=4',
+  'https://picsum.photos/1200/250?random=5',
 ]
 
 // Track loading state for each image

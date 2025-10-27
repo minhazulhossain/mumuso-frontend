@@ -1,4 +1,26 @@
-import type {CartItem} from "../../types/cart"
+import type { CartItem } from '~/types/cart'
+import type { CartErrorData, CartResponse } from '~/types/server'
+
+/**
+ * Handle cart errors with toast notification
+ */
+const handleCartError = (
+    toast: ReturnType<typeof useToast>,
+    error: any,
+    defaultMessage: string
+) => {
+    const errorData = error.data as CartErrorData | undefined
+    const message = errorData?.message || defaultMessage
+    const availableStock = errorData?.available_stock
+
+    toast.add({
+        title: 'Error',
+        description: availableStock !== undefined
+            ? `${message}. Only ${availableStock} available.`
+            : message,
+        color: 'error'
+    })
+}
 
 export const useCart = () => {
     const toast = useToast()
@@ -20,34 +42,35 @@ export const useCart = () => {
         return cartItems.value.reduce((total, item) => total + item.quantity, 0)
     })
 
+    // Fetch product details for a cart item
+    const fetchProductDetails = async (slug: string) => {
+        const baseUrl = config.public.apiBase.replace(/\/$/, '')
+        try {
+            const response = await $fetch<{ data: any }>(`${baseUrl}/products/${slug}`)
+            return response.data
+        } catch (error) {
+            console.error(`Failed to fetch product ${slug}:`, error)
+            return null
+        }
+    }
+
     // Fetch cart from backend
     const fetchCart = async () => {
         try {
             isLoading.value = true
-            const response = await $fetch('/api/cart', {
-                method: 'GET'
-            })
+            const response = await $fetch<CartResponse>('/api/cart')
 
-            // If response has items without product details (guest cart)
-            // Fetch product details for each item
-            if (response.items && response.items.length > 0) {
+            // If response has items without product details (guest cart), fetch product details
+            if (response.items?.length) {
                 cartItems.value = await Promise.all(
                     response.items.map(async (item: any) => {
                         if (!item.product && item.slug) {
-                            try {
-                                // Fetch product details from public API
-                                const baseUrl = config.public.apiBase.replace(/\/$/, '')
-                                const product = await $fetch(`${baseUrl}/products/${item.slug}`).then((res: any) => res.data)
-                                return {...item, product}
-                            } catch (error) {
-                                console.error(`Failed to fetch product ${item.slug}:`, error)
-                                return item
-                            }
+                            const product = await fetchProductDetails(item.slug)
+                            return product ? { ...item, product } : item
                         }
                         return item
                     })
                 )
-
             } else {
                 cartItems.value = response.items || []
             }
@@ -55,11 +78,7 @@ export const useCart = () => {
             return response
         } catch (error) {
             console.error('Failed to fetch cart:', error)
-            toast.add({
-                title: 'Error',
-                description: 'Failed to load cart',
-                color: 'error'
-            })
+            handleCartError(toast, error, 'Failed to load cart')
             return null
         } finally {
             isLoading.value = false
@@ -70,32 +89,22 @@ export const useCart = () => {
     const addToCart = async (slug: string, quantity: number = 1) => {
         try {
             isLoading.value = true
-
-            const response = await $fetch('/api/cart/add', {
+            const response = await $fetch<CartResponse>('/api/cart/add', {
                 method: 'POST',
-                body: {slug, quantity}
+                body: { slug, quantity }
             })
 
             await fetchCart()
 
             toast.add({
                 title: 'Success',
-                description: response?.message || 'Added to cart',
+                description: response.message || 'Added to cart',
                 color: 'success'
             })
 
             return true
         } catch (error: any) {
-            const message = error.data?.message || 'Failed to add item to cart'
-            const availableStock = error.data?.available_stock
-
-            toast.add({
-                title: 'Error',
-                description: availableStock !== undefined
-                    ? `${message}. Only ${availableStock} available.`
-                    : message,
-                color: 'error'
-            })
+            handleCartError(toast, error, 'Failed to add item to cart')
             return false
         } finally {
             isLoading.value = false
@@ -106,33 +115,22 @@ export const useCart = () => {
     const updateCartItemQuantity = async (slug: string, quantity: number) => {
         try {
             isLoading.value = true
-
-            const response = await $fetch(`/api/cart/update/${slug}`, {
+            const response = await $fetch<CartResponse>(`/api/cart/update/${slug}`, {
                 method: 'PUT',
-                body: {quantity}
+                body: { quantity }
             })
 
             await fetchCart()
 
             toast.add({
                 title: 'Success',
-                description: response?.message || 'Cart updated',
+                description: response.message || 'Cart updated',
                 color: 'success'
             })
 
             return true
         } catch (error: any) {
-            const message = error.data?.message || 'Failed to update cart'
-            const availableStock = error.data?.available_stock
-
-            toast.add({
-                title: 'Error',
-                description: availableStock !== undefined
-                    ? `${message}. Only ${availableStock} available.`
-                    : message,
-                color: 'error'
-            })
-
+            handleCartError(toast, error, 'Failed to update cart')
             await fetchCart()
             return false
         } finally {
@@ -144,8 +142,7 @@ export const useCart = () => {
     const removeFromCart = async (slug: string) => {
         try {
             isLoading.value = true
-
-            const response = await $fetch(`/api/cart/remove/${slug}`, {
+            const response = await $fetch<CartResponse>(`/api/cart/remove/${slug}`, {
                 method: 'DELETE'
             })
 
@@ -159,11 +156,7 @@ export const useCart = () => {
 
             return true
         } catch (error: any) {
-            toast.add({
-                title: 'Error',
-                description: error.data?.message || 'Failed to remove item',
-                color: 'error'
-            })
+            handleCartError(toast, error, 'Failed to remove item')
             return false
         } finally {
             isLoading.value = false
@@ -174,8 +167,7 @@ export const useCart = () => {
     const clearCart = async () => {
         try {
             isLoading.value = true
-
-            const response = await $fetch('/api/cart/clear', {
+            const response = await $fetch<CartResponse>('/api/cart/clear', {
                 method: 'DELETE'
             })
 
@@ -183,17 +175,13 @@ export const useCart = () => {
 
             toast.add({
                 title: 'Cart Cleared',
-                description: response?.message || 'All items removed from cart',
+                description: response.message || 'All items removed from cart',
                 color: 'warning'
             })
 
             return true
         } catch (error: any) {
-            toast.add({
-                title: 'Error',
-                description: error.data?.message || 'Failed to clear cart',
-                color: 'error'
-            })
+            handleCartError(toast, error, 'Failed to clear cart')
             return false
         } finally {
             isLoading.value = false
@@ -204,8 +192,7 @@ export const useCart = () => {
     const checkout = async () => {
         try {
             isLoading.value = true
-
-            const response = await $fetch('/api/cart/checkout', {
+            const response = await $fetch<CartResponse>('/api/cart/checkout', {
                 method: 'POST'
             })
 
@@ -225,14 +212,7 @@ export const useCart = () => {
 
             return true
         } catch (error: any) {
-            const message = error.data?.message || 'Failed to complete checkout'
-
-            toast.add({
-                title: 'Checkout Failed',
-                description: message,
-                color: 'error'
-            })
-
+            handleCartError(toast, error, 'Failed to complete checkout')
             await fetchCart()
             return false
         } finally {
