@@ -10,7 +10,7 @@ interface SEOOptions {
 }
 
 export const useSEO = (options: SEOOptions = {}) => {
-    const settings = inject('settings') as any
+    const { data: settings } = useNuxtData('settings')
     const route = useRoute()
     const config = useRuntimeConfig()
 

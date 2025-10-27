@@ -19,21 +19,14 @@
       <UCard :ui="{ root: 'rounded-none mb-2', header: 'p-0 sm:px-0' }">
         <template #header>
           <div class="relative w-full aspect-[380/288] bg-gray-100">
-            <!-- Skeleton loader -->
-            <USkeleton
-                v-if="!loadedImages[item.img]"
-                class="w-full h-full absolute inset-0"
-                :ui="{ background: 'bg-gray-200' }"
-            />
 
             <!-- Actual image -->
             <img
                 :src="item.img"
                 :class="[
                 'w-full h-full object-cover transition-opacity duration-300',
-                loadedImages[item.img] ? 'opacity-100' : 'opacity-0'
+
               ]"
-                @load="handleImageLoad(item.img)"
                 :alt="item.name"
             >
           </div>
@@ -57,37 +50,37 @@ interface Product {
 const fallbackProducts: Product[] = [
   {
     id: 1,
-    img: 'https://picsum.photos/380/288?random=1',
+    img: '/promo/1.jpg',
     name: 'Mini Fan',
     description: 'Beat the heat in style with this adorably appealing Mini Fan from the house of MUMUSO.'
   },
   {
     id: 2,
-    img: 'https://picsum.photos/380/288?random=2',
+    img: '/promo/2.jpg',
     name: 'Portable Fan',
     description: 'Beat the heat in style with this adorably appealing Mini Fan from the house of MUMUSO.'
   },
   {
     id: 3,
-    img: 'https://picsum.photos/380/288?random=3',
+    img: '/promo/3.jpg',
     name: 'Desk Fan',
     description: 'Beat the heat in style with this adorably appealing Mini Fan from the house of MUMUSO.'
   },
   {
     id: 4,
-    img: 'https://picsum.photos/380/288?random=4',
+    img: '/promo/1.jpg',
     name: 'USB Fan',
     description: 'Beat the heat in style with this adorably appealing Mini Fan from the house of MUMUSO.'
   },
   {
     id: 5,
-    img: 'https://picsum.photos/380/288?random=5',
+    img: '/promo/2.jpg',
     name: 'Hand Fan',
     description: 'Beat the heat in style with this adorably appealing Mini Fan from the house of MUMUSO.'
   },
   {
     id: 6,
-    img: 'https://picsum.photos/380/288?random=6',
+    img: '/promo/3.jpg',
     name: 'Clip Fan',
     description: 'Beat the heat in style with this adorably appealing Mini Fan from the house of MUMUSO.'
   }

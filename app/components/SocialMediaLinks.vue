@@ -10,15 +10,12 @@ const props = defineProps<{
 const { fetchSocialMedia } = useSettings()
 
 // Fetch social media links if not provided via props
-const { data: socialLinks } = props.links
-    ? { data: ref(props.links) }
-    : await fetchSocialMedia()
+const { data: socialLinks, pending, error } = await fetchSocialMedia()
 
-const iconSize = computed(() => props.iconSize || 'w-6 h-6')
 
 // Platform icons mapping (you can use actual SVG or icon library)
 const platformIcons: Record<string, string> = {
-  facebook: 'i-lucide-github',
+  facebook: 'i-lucide-facebook',
   twitter: 'i-heroicons-x-mark',
   instagram: 'i-heroicons-camera',
   linkedin: 'i-heroicons-briefcase',
@@ -59,12 +56,8 @@ const getPlatformName = (link: SocialMediaLink) => {
         class="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors duration-200"
     >
       <!-- Using UnoCSS/Heroicons classes - replace with your icon library -->
-      <div :class="[getIcon(link.platform), iconSize]" />
+      <UIcon :name="getIcon(link.platform)" class="size-7" />
 
-      <!-- Optional username display -->
-      <span v-if="showUsername && link.username" class="ml-2 text-sm">
-        {{ link.username }}
-      </span>
     </a>
   </div>
 </template>

@@ -1,63 +1,46 @@
 <template>
   <div class="grid grid-cols-4 grid-rows-3 gap-2 md:gap-4">
     <!-- First item spans full width (4 columns) -->
-    <div class="col-span-4 bg-gray-200 dark:bg-gray-800 rounded-none overflow-hidden relative aspect-[16/9]">
-      <!-- Skeleton Loader -->
-      <USkeleton
-          v-if="!imageLoaded[0]"
-          class="absolute inset-0 w-full h-full"
-      />
-
-      <!-- Actual Image -->
+    <NuxtLink to="/shop" class="col-span-4 bg-gray-200 dark:bg-gray-800 rounded-none overflow-hidden relative
+      transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-101 hover:shadow-2xs">
       <img
           :src="items[0]"
           alt="Item 1"
-          class="w-full h-full object-cover transition-opacity duration-300"
-          :class="{ 'opacity-0': !imageLoaded[0], 'opacity-100': imageLoaded[0] }"
-          @load="handleImageLoad(0)"
-          @error="handleImageError(0)"
+          class="w-full object-cover transition-opacity duration-300"
           loading="eager"
           width="1200"
-          height="675"
+
       />
-    </div>
+    </NuxtLink>
 
     <!-- Remaining items span 2 columns each -->
-    <div
+    <NuxtLink to="shop"
         v-for="(item, index) in items.slice(1)"
         :key="index"
-        class="col-span-2 bg-gray-200 dark:bg-gray-800 rounded-none overflow-hidden relative"
+        class="col-span-2 bg-gray-200 dark:bg-gray-800 rounded-none overflow-hidden relative
+        transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-101 hover:shadow-2xs"
     >
-      <!-- Skeleton Loader -->
-      <USkeleton
-          v-if="!imageLoaded[index + 1]"
-          class="absolute inset-0 w-full h-full"
-      />
 
-      <!-- Actual Image -->
       <img
           :src="item"
           :alt="`Item ${index + 2}`"
-          class="w-full h-full object-cover transition-opacity duration-300"
-          :class="{ 'opacity-0': !imageLoaded[index + 1], 'opacity-100': imageLoaded[index + 1] }"
-          @load="handleImageLoad(index + 1)"
-          @error="handleImageError(index + 1)"
+          class="w-full object-cover transition-opacity duration-300"
           loading="lazy"
           width="600"
-          height="450"
+
       />
-    </div>
+    </NuxtLink>
   </div>
 </template>
 
 <script setup lang="ts">
 
 const items = [
-  'https://picsum.photos/1200/675?random=1',
-  'https://picsum.photos/1200/675?random=2',
-  'https://picsum.photos/1200/675?random=3',
-  'https://picsum.photos/1200/675?random=4',
-  'https://picsum.photos/1200/675?random=5',
+  '/banners/1.jpg',
+  '/banners/2.png',
+  '/banners/3.jpg',
+  '/banners/4.png',
+  '/banners/5.png',
 ]
 
 // Track loading state for each image

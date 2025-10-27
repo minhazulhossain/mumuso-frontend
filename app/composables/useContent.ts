@@ -5,16 +5,20 @@ import type {ApiResponse} from "../../types/api";
 export const useContent = () => {
 
     const config = useRuntimeConfig()
+    const apiBase = config.public.apiBase
 
-    const fetchHeroBanners = async () => {
-        let response = await $fetch<ApiResponse<HeroBanner[]>>(`${config.public.apiBase}content/hero-banners`)
-
-        if (!response.status) {
-            throw new Error(response.message)
-        }
-
-        return response.data
-
+    const fetchHeroBanners = () => {
+        return useFetch(`${apiBase}content/hero-banners`, {
+            key: 'hero-banners',
+            server: true,
+            // Make sure this returns the data immediately
+            transform: (response) => {
+                return response?.data || []
+            },
+            getCachedData: (key) => {
+                return useNuxtApp().static.data[key] ?? useNuxtApp().payload.data[key]
+            },
+        })
     }
 
     const fetchCategories = async () => {
