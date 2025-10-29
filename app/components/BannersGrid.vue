@@ -1,16 +1,15 @@
 <template>
   <div class="grid grid-cols-4 grid-rows-3 gap-2 md:gap-4">
     <!-- First item spans full width (4 columns) -->
-    <div class="col-span-4 bg-gray-200 dark:bg-gray-800 rounded-none overflow-hidden relative aspect-[16/9]">
+    <div class="col-span-4 bg-gray-200 dark:bg-gray-800 rounded-none overflow-hidden relative">
       <!-- Actual Image -->
       <NuxtImg
           :src="items[0]"
           alt="Item 1"
-          class="w-full h-full object-cover transition-opacity duration-300"
+          class="w-full transition-opacity duration-300"
           loading="eager"
           width="1200"
-          height="675"
-          sizes="100vw"
+          height="auto"
           format="webp"
       />
     </div>
@@ -25,10 +24,10 @@
       <NuxtImg
           :src="item"
           :alt="`Item ${index + 2}`"
-          class="w-full h-full object-cover transition-opacity duration-300"
+          class="w-full object-cover transition-opacity duration-300"
           loading="lazy"
           width="600"
-          height="450"
+          height="auto"
           sizes="xs:50vw sm:50vw md:50vw"
           format="webp"
       />
@@ -39,11 +38,11 @@
 <script setup lang="ts">
 
 const items = [
-  'https://picsum.photos/1200/675?random=1',
-  'https://picsum.photos/1200/675?random=2',
-  'https://picsum.photos/1200/675?random=3',
-  'https://picsum.photos/1200/675?random=4',
-  'https://picsum.photos/1200/675?random=5',
+  '/banners/1.jpg',
+  '/banners/2.png',
+  '/banners/3.jpg',
+  '/banners/4.png',
+  '/banners/5.png',
 ]
 
 // Track loading state for each image

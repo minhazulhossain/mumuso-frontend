@@ -30,16 +30,20 @@
         <div class="lg:col-span-2 space-y-4">
           <div
               v-for="item in cartItems"
-              :key="item.productId"
+              :key="`${item.slug}-${item.variation_id || 'default'}`"
               class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
           >
             <div class="flex gap-4">
               <!-- Product Image -->
               <NuxtLink :to="`/shop/product/${item.product.slug}`" class="flex-shrink-0">
-                <img
-                    :src="item.product.image ?? 'https://placehold.co/120x120'"
-                    :alt="item.product.name"
+                <NuxtImg
+                    :src="item.variation?.images?.thumb || item.product.image || 'https://placehold.co/120x120'"
+                    :alt="item.variation?.name || item.product.name"
                     class="w-24 h-24 object-cover rounded-lg hover:opacity-90 transition-opacity"
+                    width="120"
+                    height="120"
+                    loading="lazy"
+                    format="webp"
                 />
               </NuxtLink>
 
@@ -54,28 +58,49 @@
                     >
                       {{ item?.product?.name }}
                     </NuxtLink>
+                    <!-- Variation Name -->
+                    <p v-if="item.variation" class="text-sm font-medium text-primary-600 dark:text-primary-400 mt-1">
+                      {{ item.variation.name }}
+                    </p>
                     <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                      SKU: {{ item?.product?.sku }}
+                      SKU: {{ item.variation?.sku || item?.product?.sku }}
                     </p>
                   </div>
                   <div class="text-right flex-shrink-0">
-                    <p class="font-bold text-lg text-gray-900 dark:text-white">
-                      ${{ (item?.product?.price * item?.quantity).toFixed(2) }}
-                    </p>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">
-                      ${{ parseFloat(item?.product?.price).toFixed(2) }} each
-                    </p>
+                    <div class="space-y-1">
+                      <!-- Item Total -->
+                      <p class="font-bold text-lg text-gray-900 dark:text-white">
+                        ${{ getItemTotal(item).toFixed(2) }}
+                      </p>
+                      <!-- Original Total (if discount) -->
+                      <p v-if="hasDiscount(item)" class="text-sm text-gray-400 line-through">
+                        ${{ getItemOriginalTotal(item).toFixed(2) }}
+                      </p>
+                      <!-- Price per unit -->
+                      <div class="flex items-center gap-2 justify-end">
+                        <p class="text-sm font-medium text-gray-900 dark:text-white">
+                          ${{ getItemPrice(item).toFixed(2) }} each
+                        </p>
+                        <p v-if="hasDiscount(item)" class="text-xs text-gray-400 line-through">
+                          ${{ getItemOriginalPrice(item).toFixed(2) }}
+                        </p>
+                      </div>
+                      <!-- Discount Badge -->
+                      <UBadge v-if="item.discount" color="success" variant="soft" size="xs">
+                        {{ item.discount.summary }}
+                      </UBadge>
+                    </div>
                   </div>
                 </div>
 
                 <!-- Stock Status -->
-                <div v-if="item.product.stock <= 5" class="mb-2">
+                <div v-if="getItemStock(item) <= 5" class="mb-2">
                   <UBadge
-                      :color="item.product.stock === 0 ? 'error' : 'warning'"
+                      :color="getItemStock(item) === 0 ? 'error' : 'warning'"
                       variant="soft"
                       size="xs"
                   >
-                    {{ item.product.stock === 0 ? 'Out of stock' : `Only ${item.product.stock} left` }}
+                    {{ getItemStock(item) === 0 ? 'Out of stock' : `Only ${getItemStock(item)} left` }}
                   </UBadge>
                 </div>
 
@@ -85,7 +110,7 @@
                     <span class="text-sm text-gray-600 dark:text-gray-400">Quantity:</span>
                     <div class="flex items-center gap-2 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
                       <UButton
-                          @click="decrementQuantity(item.productId)"
+                          @click="decrementQuantity(item)"
                           icon="i-heroicons-minus"
                           size="xs"
                           color="secondary"
@@ -96,18 +121,18 @@
                         {{ item.quantity }}
                       </span>
                       <UButton
-                          @click="incrementQuantity(item.productId, item.product.stock)"
+                          @click="incrementQuantity(item, getItemStock(item))"
                           icon="i-heroicons-plus"
                           size="xs"
                           color="secondary"
                           variant="ghost"
-                          :disabled="item.quantity >= item.product.stock"
+                          :disabled="item.quantity >= getItemStock(item)"
                       />
                     </div>
                   </div>
 
                   <UButton
-                      @click="removeItemFromCart(item.productId)"
+                      @click="removeItemFromCart(item)"
                       icon="i-heroicons-trash"
                       size="sm"
                       color="error"
@@ -118,7 +143,7 @@
                 </div>
 
                 <!-- Max Stock Warning -->
-                <p v-if="item.quantity >= item.product.stock" class="text-xs text-orange-500 mt-2">
+                <p v-if="item.quantity >= getItemStock(item)" class="text-xs text-orange-500 mt-2">
                   <UIcon name="i-heroicons-exclamation-triangle" class="inline"/>
                   Maximum available quantity reached
                 </p>
@@ -139,58 +164,51 @@
           <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm sticky top-4">
             <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Order Summary</h2>
 
-            <!-- Coupon Code Section -->
-            <div class="mb-6 pb-6 border-b border-gray-200 dark:border-gray-700">
-              <div class="flex gap-2">
-                <UInput
-                    v-model="couponCode"
-                    placeholder="Enter coupon code"
-                    size="lg"
-                    class="flex-1"
-                    :disabled="couponApplied"
-                />
-                <UButton
-                    v-if="!couponApplied"
-                    @click="applyCoupon"
-                    :loading="applyingCoupon"
-                    size="lg"
-                    color="secondary"
-                >
-                  Apply
-                </UButton>
-                <UButton
-                    v-else
-                    @click="removeCoupon"
-                    size="lg"
-                    color="error"
-                    variant="soft"
-                    icon="i-heroicons-x-mark"
-                >
-                  Remove
-                </UButton>
-              </div>
-
-              <!-- Applied Coupon Display -->
-              <div v-if="couponApplied" class="mt-3">
-                <UBadge color="success" variant="soft" size="lg">
-                  <UIcon name="i-heroicons-check-circle"/>
-                  {{ appliedCouponCode }} applied
-                </UBadge>
+            <!-- Applied Discounts Section -->
+            <div v-if="appliedDiscounts && appliedDiscounts.length > 0" class="mb-6 pb-6 border-b border-gray-200 dark:border-gray-700">
+              <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                <UIcon name="i-heroicons-tag" class="text-green-500" />
+                Active Discounts
+              </h3>
+              <div class="space-y-3">
+                <div v-for="discount in appliedDiscounts" :key="discount.name" class="bg-green-50 dark:bg-green-900/20 rounded-lg p-3">
+                  <div class="flex items-start justify-between gap-2 mb-1">
+                    <div class="flex-1 min-w-0">
+                      <p class="text-sm font-semibold text-green-700 dark:text-green-300">{{ discount.name }}</p>
+                      <p class="text-xs text-gray-600 dark:text-gray-400">{{ discount.summary }}</p>
+                    </div>
+                    <UBadge color="success" variant="solid" size="xs">
+                      -${{ discount.discount_amount.toFixed(2) }}
+                    </UBadge>
+                  </div>
+                  <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Applied to {{ discount.items_affected }} {{ discount.items_affected === 1 ? 'item' : 'items' }}
+                  </p>
+                </div>
               </div>
             </div>
 
             <!-- Price Breakdown -->
             <div class="space-y-3 mb-6">
-              <!-- Subtotal -->
+              <!-- Original Subtotal (if discount) -->
+              <div v-if="cartDiscount > 0" class="flex justify-between text-gray-500 dark:text-gray-400">
+                <span>Original Subtotal</span>
+                <span class="font-medium line-through">${{ cartOriginalTotal.toFixed(2) }}</span>
+              </div>
+
+              <!-- Subtotal (after discounts) -->
               <div class="flex justify-between text-gray-600 dark:text-gray-400">
                 <span>Subtotal</span>
                 <span class="font-medium">${{ subtotal.toFixed(2) }}</span>
               </div>
 
-              <!-- Discount -->
-              <div v-if="discount > 0" class="flex justify-between text-green-600 dark:text-green-400">
-                <span>Discount ({{ discountPercentage }}%)</span>
-                <span class="font-medium">-${{ discount.toFixed(2) }}</span>
+              <!-- Backend Discount -->
+              <div v-if="cartSavings > 0" class="flex justify-between text-green-600 dark:text-green-400">
+                <span class="flex items-center gap-1">
+                  <UIcon name="i-heroicons-tag" class="text-sm" />
+                  Discount Savings
+                </span>
+                <span class="font-medium">-${{ cartSavings.toFixed(2) }}</span>
               </div>
 
               <!-- Shipping -->
@@ -264,135 +282,72 @@
 </template>
 
 <script setup lang="ts">
+import { getItemPrice, getItemOriginalPrice, hasDiscount, getItemTotal, getItemOriginalTotal } from '~~/types'
+
 const toast = useToast()
 const router = useRouter()
-const { cartItems, removeFromCart, updateCartItemQuantity } = useCart()
-
-// Coupon state
-const couponCode = ref('')
-const couponApplied = ref(false)
-const appliedCouponCode = ref('')
-const applyingCoupon = ref(false)
-const discountPercentage = ref(0)
+const {
+  cartItems,
+  cartTotal,
+  cartOriginalTotal,
+  cartDiscount,
+  cartSavings,
+  appliedDiscounts,
+  removeFromCart,
+  updateCartItemQuantity
+} = useCart()
 
 // Constants
 const taxRate = 10 // 10% tax
 const freeShippingThreshold = 50
 
-// Computed values
+// Computed values - use backend discount data
 const subtotal = computed(() => {
-  if (!cartItems.value) return 0
-  return cartItems.value.reduce((sum, item) => {
-    return sum + (item.product.price * item.quantity)
-  }, 0)
-})
-
-const discount = computed(() => {
-  return (subtotal.value * discountPercentage.value) / 100
-})
-
-const subtotalAfterDiscount = computed(() => {
-  return subtotal.value - discount.value
+  // Use cart total which already includes backend discounts
+  return cartTotal.value || 0
 })
 
 const shipping = computed(() => {
-  if (subtotalAfterDiscount.value >= freeShippingThreshold) return 0
-  return subtotalAfterDiscount.value > 0 ? 5.99 : 0
+  if (subtotal.value >= freeShippingThreshold) return 0
+  return subtotal.value > 0 ? 5.99 : 0
 })
 
 const tax = computed(() => {
-  return (subtotalAfterDiscount.value * taxRate) / 100
+  return (subtotal.value * taxRate) / 100
 })
 
 const total = computed(() => {
-  return subtotalAfterDiscount.value + shipping.value + tax.value
+  return subtotal.value + shipping.value + tax.value
 })
 
+// Helper to get stock quantity (variation or product)
+const getItemStock = (item: any) => {
+  return item.variation?.stock_quantity ?? item.product?.stock ?? 0
+}
+
 // Methods
-const incrementQuantity = (productId: string, maxStock: number) => {
-  const item = cartItems.value?.find(i => i.productId === productId)
+const incrementQuantity = (item: any, maxStock: number) => {
   if (item && item.quantity < maxStock) {
-    updateCartItemQuantity(productId, item.quantity + 1)
+    updateCartItemQuantity(item.product?.slug || item.slug, item.quantity + 1, item.variation_id)
   }
 }
 
-const decrementQuantity = (productId: string) => {
-  const item = cartItems.value?.find(i => i.productId === productId)
+const decrementQuantity = (item: any) => {
   if (item && item.quantity > 1) {
-    updateCartItemQuantity(productId, item.quantity - 1)
+    updateCartItemQuantity(item.product?.slug || item.slug, item.quantity - 1, item.variation_id)
   }
 }
 
-const removeItemFromCart = (productId: string) => {
-  const item = cartItems.value?.find(i => i.productId === productId)
+const removeItemFromCart = (item: any) => {
   if (item) {
-    removeFromCart(productId)
+    removeFromCart(item.product?.slug || item.slug, item.variation_id)
     toast.add({
       title: 'Removed from cart',
-      description: `${item.product.name} has been removed`,
+      description: `${item.product.name}${item.variation ? ' - ' + item.variation.name : ''} has been removed`,
       color: 'success',
       icon: 'i-heroicons-trash'
     })
   }
-}
-
-const applyCoupon = async () => {
-  if (!couponCode.value.trim()) {
-    toast.add({
-      title: 'Invalid coupon',
-      description: 'Please enter a coupon code',
-      color: 'error'
-    })
-    return
-  }
-
-  applyingCoupon.value = true
-
-  // Simulate API call
-  await new Promise(resolve => setTimeout(resolve, 1000))
-
-  // Demo coupons for testing
-  const validCoupons: Record<string, number> = {
-    'SAVE10': 10,
-    'SAVE20': 20,
-    'SAVE30': 30,
-    'WELCOME': 15,
-    'HOLIDAY': 25
-  }
-
-  const code = couponCode.value.toUpperCase()
-  if (validCoupons[code]) {
-    couponApplied.value = true
-    appliedCouponCode.value = code
-    discountPercentage.value = validCoupons[code]
-
-    toast.add({
-      title: 'Coupon applied!',
-      description: `You saved ${validCoupons[code]}% on your order`,
-      color: 'success',
-      icon: 'i-heroicons-gift'
-    })
-  } else {
-    toast.add({
-      title: 'Invalid coupon',
-      description: 'This coupon code is not valid',
-      color: 'error'
-    })
-  }
-
-  applyingCoupon.value = false
-}
-
-const removeCoupon = () => {
-  couponApplied.value = false
-  appliedCouponCode.value = ''
-  discountPercentage.value = 0
-  couponCode.value = ''
-
-  toast.add({
-    title: 'Coupon removed',
-    color: 'success'
-  })
 }
 
 const handleCheckout = () => {

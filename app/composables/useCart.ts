@@ -1,5 +1,6 @@
-import type { CartItem } from '~/types/cart'
-import type { CartErrorData, CartResponse } from '~/types/server'
+import type { CartItem, CartTotals, AppliedDiscount } from '~~/types'
+import type { CartErrorData, CartResponse } from '~~/types/server'
+import { getItemTotal } from '~~/types'
 
 /**
  * Handle cart errors with toast notification
@@ -27,15 +28,39 @@ export const useCart = () => {
     const config = useRuntimeConfig()
 
     const cartItems = useState<CartItem[]>('cart', () => [])
+    const cartTotals = useState<CartTotals | null>('cartTotals', () => null)
+    const appliedDiscounts = useState<AppliedDiscount[]>('appliedDiscounts', () => [])
     const isCartOpen = useState('isCartOpen', () => false)
     const isLoading = useState('cartLoading', () => false)
     const reservationTimer = useState<NodeJS.Timeout | null>('reservationTimer', () => null)
 
     // Computed values
     const cartTotal = computed(() => {
+        // Use totals from backend if available
+        if (cartTotals.value?.final) {
+            return cartTotals.value.final
+        }
+        // Otherwise calculate from items
         return cartItems.value.reduce((total, item) => {
-            return total + (item.product?.price || 0) * item.quantity
+            return total + getItemTotal(item)
         }, 0)
+    })
+
+    const cartOriginalTotal = computed(() => {
+        // Use totals from backend if available
+        if (cartTotals.value?.original) {
+            return cartTotals.value.original
+        }
+        // Otherwise calculate from items (same as cartTotal if no discounts)
+        return cartTotal.value
+    })
+
+    const cartDiscount = computed(() => {
+        return cartTotals.value?.discount || 0
+    })
+
+    const cartSavings = computed(() => {
+        return cartTotals.value?.savings || 0
     })
 
     const cartItemsCount = computed(() => {
@@ -75,6 +100,10 @@ export const useCart = () => {
                 cartItems.value = response.items || []
             }
 
+            // Store discount data from backend
+            cartTotals.value = response.totals || null
+            appliedDiscounts.value = response.applied_discounts || []
+
             return response
         } catch (error) {
             console.error('Failed to fetch cart:', error)
@@ -86,12 +115,22 @@ export const useCart = () => {
     }
 
     // Add item to cart
-    const addToCart = async (slug: string, quantity: number = 1) => {
+    const addToCart = async (slug: string, quantity: number = 1, variationId?: number) => {
         try {
             isLoading.value = true
+            const body: { slug: string; quantity: number; variation_id?: number } = {
+                slug,
+                quantity
+            }
+
+            // Include variation_id if provided
+            if (variationId) {
+                body.variation_id = variationId
+            }
+
             const response = await $fetch<CartResponse>('/api/cart/add', {
                 method: 'POST',
-                body: { slug, quantity }
+                body
             })
 
             await fetchCart()
@@ -112,12 +151,19 @@ export const useCart = () => {
     }
 
     // Update cart item quantity
-    const updateCartItemQuantity = async (slug: string, quantity: number) => {
+    const updateCartItemQuantity = async (slug: string, quantity: number, variationId?: number) => {
         try {
             isLoading.value = true
+            const body: { quantity: number; variation_id?: number } = { quantity }
+
+            // Include variation_id if provided
+            if (variationId !== undefined) {
+                body.variation_id = variationId
+            }
+
             const response = await $fetch<CartResponse>(`/api/cart/update/${slug}`, {
                 method: 'PUT',
-                body: { quantity }
+                body
             })
 
             await fetchCart()
@@ -139,10 +185,17 @@ export const useCart = () => {
     }
 
     // Remove item from cart
-    const removeFromCart = async (slug: string) => {
+    const removeFromCart = async (slug: string, variationId?: number) => {
         try {
             isLoading.value = true
-            const response = await $fetch<CartResponse>(`/api/cart/remove/${slug}`, {
+
+            // Build URL with variation_id query param if provided
+            let url = `/api/cart/remove/${slug}`
+            if (variationId !== undefined) {
+                url += `?variation_id=${variationId}`
+            }
+
+            const response = await $fetch<CartResponse>(url, {
                 method: 'DELETE'
             })
 
@@ -257,19 +310,27 @@ export const useCart = () => {
         isCartOpen.value = !isCartOpen.value
     }
 
-    // Get item by slug
-    const getItemBySlug = (slug: string) => {
-        return cartItems.value.find(item => item.slug === slug)
+    // Get item by slug and variation_id
+    const getItemBySlug = (slug: string, variationId?: number) => {
+        return cartItems.value.find(item => {
+            const slugMatches = item.slug === slug
+            const variationMatches = (item.variation_id ?? null) === (variationId ?? null)
+            return slugMatches && variationMatches
+        })
     }
 
     // Check if item is in cart
-    const isInCart = (slug: string) => {
-        return cartItems.value.some(item => item.slug === slug)
+    const isInCart = (slug: string, variationId?: number) => {
+        return cartItems.value.some(item => {
+            const slugMatches = item.slug === slug
+            const variationMatches = (item.variation_id ?? null) === (variationId ?? null)
+            return slugMatches && variationMatches
+        })
     }
 
-    // Get item quantity by slug
-    const getItemQuantity = (slug: string) => {
-        return getItemBySlug(slug)?.quantity || 0
+    // Get item quantity by slug and variation_id
+    const getItemQuantity = (slug: string, variationId?: number) => {
+        return getItemBySlug(slug, variationId)?.quantity || 0
     }
 
     // Initialize cart on mount
@@ -287,6 +348,11 @@ export const useCart = () => {
         // State
         cartItems: readonly(cartItems),
         cartTotal,
+        cartOriginalTotal,
+        cartDiscount,
+        cartSavings,
+        cartTotals: readonly(cartTotals),
+        appliedDiscounts: readonly(appliedDiscounts),
         cartItemsCount,
         isCartOpen,
         isLoading: readonly(isLoading),

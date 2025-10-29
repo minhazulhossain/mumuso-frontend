@@ -1,3 +1,25 @@
+export interface ProductVariationImage {
+    thumb: string
+    medium: string
+    large: string
+    original: string
+}
+
+export interface ProductVariation {
+    id: number
+    name: string
+    sku: string
+    price: string
+    compare_price: string | null
+    stock_quantity: number
+    stock_status: string
+    is_active: boolean
+    sort_order: number
+    attribute_values: string[]
+    images: ProductVariationImage
+    product_id: number
+}
+
 export interface Product {
     id: number
     name: string
@@ -17,6 +39,25 @@ export interface Product {
     rating?: number
     reviews_count?: number
     short_description?: string
+    variations?: ProductVariation[]
+    description?: string
+    weight?: string
+    status?: string
+    images?: {
+        featured: {
+            thumb: string
+            medium: string
+            large: string
+            original: string
+        }
+        all: Array<{
+            id: number
+            url: string
+            thumb: string
+            alt: string
+        }>
+    }
+    related_products?: Product[]
 }
 
 export interface Pagination {

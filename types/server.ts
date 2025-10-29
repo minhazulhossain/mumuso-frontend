@@ -14,6 +14,7 @@ export interface GuestCartData {
 export interface GuestCartItem {
     slug: string
     quantity: number
+    variation_id?: number
 }
 
 /**

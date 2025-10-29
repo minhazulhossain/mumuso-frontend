@@ -96,32 +96,44 @@
             <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-2">
               {{ product.name }}
             </h1>
-            <p class="text-lg text-gray-600 dark:text-gray-400">SKU: {{ product.sku }}</p>
+            <p class="text-lg text-gray-600 dark:text-gray-400">SKU: {{ currentSku }}</p>
           </div>
 
           <!-- Price -->
-          <div class="flex items-baseline gap-4">
-            <span class="text-4xl font-bold text-primary-500">
-              ${{ parseFloat(product.price).toFixed(2) }}
-            </span>
-            <span v-if="product.compare_price" class="text-2xl text-gray-400 line-through">
-              ${{ parseFloat(product.compare_price).toFixed(2) }}
-            </span>
+          <div class="space-y-2">
+            <div class="flex items-baseline gap-4">
+              <span class="text-4xl font-bold text-primary-500">
+                ${{ parseFloat(currentPrice).toFixed(2) }}
+              </span>
+              <span v-if="currentComparePrice" class="text-2xl text-gray-400 line-through">
+                ${{ parseFloat(currentComparePrice).toFixed(2) }}
+              </span>
+            </div>
+            <!-- Discount Badge (inline with price) -->
+            <div v-if="product.has_discount && product.discount_percentage" class="flex items-center gap-2">
+              <UBadge color="success" variant="soft" size="lg">
+                <UIcon name="i-heroicons-tag" class="mr-1" />
+                Save {{ product.discount_percentage }}%
+              </UBadge>
+              <span class="text-sm text-green-600 dark:text-green-400 font-medium">
+                You save ${{ (parseFloat(currentComparePrice || '0') - parseFloat(currentPrice)).toFixed(2) }}
+              </span>
+            </div>
           </div>
 
           <!-- Stock Info -->
           <div class="flex items-center gap-4">
             <div class="flex items-center gap-2">
               <UIcon
-                  :name="product.in_stock ? 'i-check-circle' : 'i-x-circle'"
-                  :class="product.in_stock ? 'text-green-500' : 'text-red-500'"
+                  :name="currentInStock ? 'i-lucide-check-circle' : 'i-lucide-x-circle'"
+                  :class="currentInStock ? 'text-green-500' : 'text-red-500'"
               />
               <span class="text-gray-700 dark:text-gray-300">
-                {{ product.in_stock ? `${product.stock_quantity} in stock` : 'Out of stock' }}
+                {{ currentInStock ? `${currentStockQuantity} in stock` : 'Out of stock' }}
               </span>
             </div>
             <UBadge
-                v-if="product.stock_quantity < 10 && product.in_stock"
+                v-if="currentStockQuantity < 10 && currentInStock"
                 color="warning"
                 variant="soft"
             >
@@ -144,6 +156,14 @@
             </div>
           </div>
 
+          <!-- Variation Selector -->
+          <ProductVariationSelector
+              v-if="product.variations && product.variations.length > 0"
+              v-model="selectedVariationId"
+              :variations="product.variations"
+              @variation-selected="handleVariationSelected"
+          />
+
           <!-- Product Info -->
           <div class="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 space-y-2">
             <div v-if="product.weight" class="flex justify-between">
@@ -154,14 +174,14 @@
               <span class="text-gray-600 dark:text-gray-400">Status:</span>
               <span class="font-medium text-gray-900 dark:text-white">{{ product.status }}</span>
             </div>
-            <div v-if="product.variations.length > 0" class="flex justify-between">
+            <div v-if="product.variations && product.variations.length > 0" class="flex justify-between">
               <span class="text-gray-600 dark:text-gray-400">Variations:</span>
               <span class="font-medium text-gray-900 dark:text-white">{{ product.variations.length }} available</span>
             </div>
           </div>
 
           <!-- Quantity Selector -->
-          <div v-if="product.in_stock" class="flex items-center gap-4">
+          <div v-if="currentInStock" class="flex items-center gap-4">
             <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Quantity:</label>
             <div class="flex items-center gap-2">
               <UButton
@@ -173,28 +193,34 @@
               />
               <span class="w-12 text-center font-semibold text-gray-900 dark:text-white">{{ quantity }}</span>
               <UButton
-                  @click="quantity = Math.min(product.stock_quantity, quantity + 1)"
+                  @click="quantity = Math.min(currentStockQuantity, quantity + 1)"
                   icon="i-heroicons-plus"
                   color="secondary"
                   size="sm"
-                  :disabled="quantity >= product.stock_quantity"
+                  :disabled="quantity >= currentStockQuantity"
               />
             </div>
             <span class="text-sm text-gray-500">
-              Max: {{ product.stock_quantity }}
+              Max: {{ currentStockQuantity }}
             </span>
           </div>
 
           <!-- Actions -->
           <div class="flex gap-4 pt-4">
             <UButton
-                v-if="product.in_stock"
+                v-if="currentInStock"
                 @click="handleAddToCart"
                 size="xl"
                 class="flex-1"
                 icon="i-heroicons-shopping-cart"
             >
-              Add to Cart - ${{ (parseFloat(product.price) * quantity).toFixed(2) }}
+              <span v-if="product.has_discount" class="flex items-center gap-2">
+                Add to Cart - ${{ (parseFloat(currentPrice) * quantity).toFixed(2) }}
+                <span class="text-xs line-through opacity-75">${{ (parseFloat(currentComparePrice || currentPrice) * quantity).toFixed(2) }}</span>
+              </span>
+              <span v-else>
+                Add to Cart - ${{ (parseFloat(currentPrice) * quantity).toFixed(2) }}
+              </span>
             </UButton>
             <UButton
                 v-else
@@ -250,7 +276,7 @@
 </template>
 
 <script setup lang="ts">
-import type {Product} from '@/types/product';
+import type {Product, ProductVariation} from '@/types/product';
 
 const route = useRoute()
 const toast = useToast()
@@ -264,6 +290,43 @@ const selectedImage = ref('')
 const isZoomed = ref(false)
 const zoomStyle = ref({})
 const relatedProducts = ref<Product[]>([])
+const selectedVariationId = ref<number | null>(null)
+const selectedVariation = ref<ProductVariation | null>(null)
+
+// Computed properties for current display values (variation or product)
+const currentPrice = computed(() => {
+  return selectedVariation.value
+      ? selectedVariation.value.price
+      : product.value?.price || '0'
+})
+
+const currentComparePrice = computed(() => {
+  return selectedVariation.value
+      ? selectedVariation.value.compare_price
+      : product.value?.compare_price
+})
+
+const currentStockQuantity = computed(() => {
+  return selectedVariation.value
+      ? selectedVariation.value.stock_quantity
+      : product.value?.stock_quantity || 0
+})
+
+const currentStockStatus = computed(() => {
+  return selectedVariation.value
+      ? selectedVariation.value.stock_status
+      : product.value?.stock_status || 'out_of_stock'
+})
+
+const currentInStock = computed(() => {
+  return currentStockStatus.value === 'in_stock'
+})
+
+const currentSku = computed(() => {
+  return selectedVariation.value
+      ? selectedVariation.value.sku
+      : product.value?.sku || ''
+})
 
 // Breadcrumb links
 const breadcrumbLinks = computed(() => {
@@ -281,7 +344,7 @@ const breadcrumbLinks = computed(() => {
     }
     links.push({
       label: product.value.name,
-      to: `/shop/${product.value.slug}`
+      to: `/shop/product/${product.value.slug}`
     })
   }
 
@@ -322,13 +385,50 @@ const handleMouseMove = (event: MouseEvent) => {
   }
 }
 
+// Handle variation selection
+const handleVariationSelected = (variation: ProductVariation) => {
+  selectedVariation.value = variation
+  selectedVariationId.value = variation.id
+
+  // Update selected image to variation image
+  if (variation.images?.medium) {
+    selectedImage.value = variation.images.medium
+  }
+
+  // Reset quantity when changing variation
+  quantity.value = 1
+}
+
 // Handlers
-const handleAddToCart = () => {
-  if (product.value) {
-    addToCart(product.value.slug, quantity.value)
+const handleAddToCart = async () => {
+  if (!product.value) return
+
+  // If product has variations, ensure one is selected
+  if (product.value.variations && product.value.variations.length > 0) {
+    if (!selectedVariationId.value) {
+      toast.add({
+        title: 'Please select a variation',
+        description: 'Choose a product variation before adding to cart',
+        color: 'warning',
+        icon: 'i-heroicons-exclamation-triangle'
+      })
+      return
+    }
+  }
+
+  // Add to cart with variation ID if selected
+  const success = await addToCart(
+      product.value.slug,
+      quantity.value,
+      selectedVariationId.value || undefined
+  )
+
+  if (success) {
     toast.add({
       title: 'Added to cart!',
-      description: `${quantity.value}x ${product.value.name}`,
+      description: selectedVariation.value
+          ? `${quantity.value}x ${selectedVariation.value.name}`
+          : `${quantity.value}x ${product.value.name}`,
       color: 'success',
       icon: 'i-heroicons-shopping-cart'
     })

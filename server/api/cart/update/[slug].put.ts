@@ -1,7 +1,8 @@
 import { z } from 'zod'
 
 const bodySchema = z.object({
-    quantity: z.number().min(1)
+    quantity: z.number().min(1),
+    variation_id: z.number().optional()
 })
 
 export default defineEventHandler(async (event) => {
@@ -17,5 +18,5 @@ export default defineEventHandler(async (event) => {
         })
     }
 
-    return await updateGuestCartItem(event, slug!, body.quantity)
+    return await updateGuestCartItem(event, slug!, body.quantity, body.variation_id)
 })

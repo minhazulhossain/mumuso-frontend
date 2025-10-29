@@ -1,5 +1,5 @@
 import type {HeroBanner, Category} from "~~/types/content";
-import type {ApiResponse} from "../../types/api";
+import type {ApiResponse} from "../../types";
 
 
 export const useContent = () => {
@@ -32,8 +32,24 @@ export const useContent = () => {
 
     }
 
+    const fetchFeaturedCategories = async () => {
+
+        return useFetch(`${apiBase}categories/featured`, {
+            key: 'featured-categories',
+            server: true,
+            // Make sure this returns the data immediately
+            transform: (response) => {
+                return response?.data || []
+            },
+            getCachedData: (key) => {
+                return useNuxtApp().static.data[key] ?? useNuxtApp().payload.data[key]
+            },
+        })
+    }
+
     return {
         fetchHeroBanners,
-        fetchCategories
+        fetchCategories,
+        fetchFeaturedCategories
     }
 }

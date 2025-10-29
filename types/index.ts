@@ -25,7 +25,11 @@ export type {
 export type {
     CartItem,
     CartResponse,
-    ApiErrorResponse
+    ApiErrorResponse,
+    CartItemDiscount,
+    CartItemPricing,
+    AppliedDiscount,
+    CartTotals
 } from './cart'
 
 export {
@@ -33,8 +37,11 @@ export {
     getItemSlug,
     getItemName,
     getItemPrice,
+    getItemOriginalPrice,
     getItemImage,
-    getItemTotal
+    getItemTotal,
+    getItemOriginalTotal,
+    hasDiscount
 } from './cart'
 
 // Product types

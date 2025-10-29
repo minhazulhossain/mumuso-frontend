@@ -39,17 +39,27 @@ export const getGuestCart = async (event: H3Event) => {
 export const addToGuestCart = async (
     event: H3Event,
     slug: string,
-    quantity: number
+    quantity: number,
+    variation_id?: number
 ) => {
     const session = await getGuestCartSession(event)
 
-    // Check if item already exists
-    const existingItem = session.data.items.find(item => item.slug === slug)
+    // Check if item already exists (same slug AND same variation_id)
+    // Handle both undefined and explicit number comparison
+    const existingItem = session.data.items.find(item => {
+        const slugMatches = item.slug === slug
+        const variationMatches = (item.variation_id ?? null) === (variation_id ?? null)
+        return slugMatches && variationMatches
+    })
 
     if (existingItem) {
         existingItem.quantity += quantity
     } else {
-        session.data.items.push({ slug, quantity })
+        const newItem: GuestCartItem = { slug, quantity }
+        if (variation_id !== undefined && variation_id !== null) {
+            newItem.variation_id = variation_id
+        }
+        session.data.items.push(newItem)
     }
 
     await session.update(session.data)
@@ -66,11 +76,18 @@ export const addToGuestCart = async (
 export const updateGuestCartItem = async (
     event: H3Event,
     slug: string,
-    quantity: number
+    quantity: number,
+    variation_id?: number
 ) => {
     const session = await getGuestCartSession(event)
 
-    const item = session.data.items.find(item => item.slug === slug)
+    // Find item by slug and variation_id
+    // Handle both undefined and explicit number comparison
+    const item = session.data.items.find(item => {
+        const slugMatches = item.slug === slug
+        const variationMatches = (item.variation_id ?? null) === (variation_id ?? null)
+        return slugMatches && variationMatches
+    })
 
     if (!item) {
         throw createError({
@@ -93,11 +110,19 @@ export const updateGuestCartItem = async (
  */
 export const removeFromGuestCart = async (
     event: H3Event,
-    slug: string
+    slug: string,
+    variation_id?: number
 ) => {
     const session = await getGuestCartSession(event)
 
-    session.data.items = session.data.items.filter(item => item.slug !== slug)
+    // Remove item by slug and variation_id
+    // Handle both undefined and explicit number comparison
+    session.data.items = session.data.items.filter(item => {
+        const slugMatches = item.slug === slug
+        const variationMatches = (item.variation_id ?? null) === (variation_id ?? null)
+        return !(slugMatches && variationMatches)
+    })
+
     await session.update(session.data)
 
     return {
@@ -142,15 +167,25 @@ export const syncGuestCartToBackend = async (
     }
 
     // Send all items to backend
-    const syncPromises = items.map(item =>
-        $fetch(`${baseUrl}/cart/add`, {
+    const syncPromises = items.map(item => {
+        const body: { slug: string; quantity: number; variation_id?: number } = {
+            slug: item.slug,
+            quantity: item.quantity
+        }
+
+        // Include variation_id if present
+        if (item.variation_id) {
+            body.variation_id = item.variation_id
+        }
+
+        return $fetch(`${baseUrl}/cart/add`, {
             method: 'POST',
             headers: authHeaders,
-            body: { slug: item.slug, quantity: item.quantity }
+            body
         }).catch(error => {
             console.error(`Failed to sync item ${item.slug}:`, error)
         })
-    )
+    })
 
     await Promise.allSettled(syncPromises)
 

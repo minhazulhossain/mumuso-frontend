@@ -2,7 +2,10 @@
   "permissions": {
     "allow": [
       "mcp__nuxt-ui-remote__list_components",
-      "mcp__nuxt-ui-remote__get_component"
+      "mcp__nuxt-ui-remote__get_component",
+      "Bash(npm run dev:*)",
+      "Bash(npm run dev:typecheck:*)",
+      "Bash(npm run:*)"
     ],
     "deny": [],
     "ask": []

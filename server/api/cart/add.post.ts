@@ -2,7 +2,8 @@ import { z } from 'zod'
 
 const bodySchema = z.object({
     slug: z.string(),
-    quantity: z.number().min(1).default(1)
+    quantity: z.number().min(1).default(1),
+    variation_id: z.number().optional()
 })
 
 export default defineEventHandler(async (event) => {
@@ -18,6 +19,6 @@ export default defineEventHandler(async (event) => {
         })
     }
 
-    // For guests, just store slug and quantity
-    return await addToGuestCart(event, body.slug, body.quantity)
+    // For guests, store slug, quantity, and variation_id if provided
+    return await addToGuestCart(event, body.slug, body.quantity, body.variation_id)
 })
