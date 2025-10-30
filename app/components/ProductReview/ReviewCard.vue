@@ -112,7 +112,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Review } from '~/types/review'
+import type { Review } from '#shared/types/review'
 
 const props = defineProps<{
   review: Review

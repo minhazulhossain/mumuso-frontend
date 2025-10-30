@@ -276,7 +276,7 @@
 </template>
 
 <script setup lang="ts">
-import type {Product, ProductVariation} from '@/types/product';
+import type {Product, ProductVariation} from '#shared/types/product';
 
 const route = useRoute()
 const toast = useToast()

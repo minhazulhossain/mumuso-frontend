@@ -1,5 +1,5 @@
 // composables/useReviews.ts
-import type { Purchase, Review, ReviewStats, ReviewSortBy } from '~/types/review'
+import type { Purchase, Review, ReviewStats, ReviewSortBy } from '#shared/types/review'
 
 export const useReviews = (productId: string) => {
     const reviews = ref<Review[]>([])

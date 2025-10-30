@@ -1,6 +1,6 @@
 // server/utils/auth.ts
 import type { H3Event } from 'h3'
-import type { BackendAuthResponse } from '~/types/auth'
+import type { BackendAuthResponse } from '#shared/types/auth'
 
 /**
  * Set user session and sync guest cart to backend

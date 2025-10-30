@@ -10,7 +10,8 @@ export type {
     ProfileUpdateData,
     PasswordResetData,
     UserSession,
-    BackendAuthResponse
+    BackendAuthResponse,
+    User
 } from './auth'
 
 // Blog types
@@ -55,7 +56,6 @@ export type {
 // Review types
 export type {
     ReviewSortBy,
-    User,
     ReviewImage,
     Review,
     ReviewForm,

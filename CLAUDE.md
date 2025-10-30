@@ -6,6 +6,40 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a Nuxt 4 e-commerce frontend application that communicates with a Laravel backend API. The application features a shopping cart system with both guest and authenticated user support, blog functionality, product catalog, checkout flow, and dynamic site settings.
 
+## Directory Structure (Nuxt 4.x)
+
+This project follows the **Nuxt 4.x directory structure**:
+
+```
+app/                    # Application code (Vue components, composables, pages)
+├── assets/            # Stylesheets, fonts, images
+├── components/        # Vue components
+├── composables/       # Composables and state management
+├── layouts/           # Layout wrappers
+├── middleware/        # Route middleware
+├── pages/            # File-based routing
+├── plugins/          # Vue plugins
+└── app.config.ts     # App-level configuration
+
+server/                # Server-side code (Nitro)
+├── api/              # API endpoints
+├── plugins/          # Server plugins
+└── utils/            # Server utilities
+
+shared/                # Code shared between app and server
+├── types/            # TypeScript definitions (auto-imported)
+└── utils/            # Shared utilities (auto-imported)
+
+public/                # Static assets served at root
+nuxt.config.ts        # Nuxt configuration
+```
+
+**Important Notes:**
+- Files directly in `shared/types/` and `shared/utils/` are auto-imported
+- Nested subdirectories require explicit import configuration
+- Use `#shared` alias to import from shared directory
+- Code in `shared/` cannot import Vue or Nitro-specific code
+
 ## Development Commands
 
 ```bash
@@ -58,6 +92,19 @@ The application implements a sophisticated dual cart system:
 2. User logs in → `server/api/auth/login.post.ts` retrieves guest cart
 3. Guest cart items synced to backend via `syncGuestCartToBackend()`
 4. Session cart cleared after successful sync
+
+**Shared Cart Utilities** (`shared/utils/cart-helpers.ts`):
+Common cart logic shared between components (auto-imported):
+- `getItemStock(item)` - Get stock from variation or product
+- `formatPrice(price)` - Format price to 2 decimal places
+- `getStockStatus(stock)` - Get stock badge info (color, message)
+- `isMaxStockReached(item)` - Check if max stock reached
+- `canIncrementQuantity(item)` / `canDecrementQuantity(item)` - Quantity control helpers
+- `getItemImageUrl(item)` - Get safe image URL
+- `getItemDisplayName(item)` - Get display name with variation
+- `calculateShipping()` / `calculateTax()` / `calculateOrderTotal()` - Price calculations
+
+Used by: `app/components/CartSidebar.vue`, `app/pages/cart.vue`
 
 ### Server API Routes
 
@@ -116,14 +163,16 @@ Composables provide reusable business logic and state management:
 
 ### Type Definitions
 
-All TypeScript types are centralized in `types/` directory with a central export file:
+All TypeScript types are centralized in `shared/types/` directory following Nuxt 4.x structure. Types in this directory are automatically available to both the Vue app and Nitro server.
 
-**Import types from index (recommended):**
+**Import types using #shared alias (recommended):**
 ```typescript
-import type { Product, CartItem, AuthFormData } from '~/types'
+import type { Product, CartItem, AuthFormData } from '#shared/types'
+// Or from specific files:
+import type { AuthFormData } from '#shared/types/auth'
 ```
 
-**Type files:**
+**Type files in `shared/types/`:**
 - `index.ts`: Central export file for all types
 - `auth.ts`: Authentication types (AuthFormData, ProfileUpdateData, BackendAuthResponse, etc.)
 - `blog.ts`: Blog types (BlogQueryParams, BlogPost, BlogCategory)
@@ -134,7 +183,7 @@ import type { Product, CartItem, AuthFormData } from '~/types'
 - `server.ts`: Server-side types (GuestCartData, GuestCartItem, CartErrorData)
 - `api.ts`: Generic API response wrappers
 
-See `types/README.md` for detailed documentation on each type.
+See `shared/types/README.md` for detailed documentation on each type.
 
 ## Configuration
 
@@ -217,7 +266,9 @@ const body = await readValidatedBody(event, bodySchema.parse)
 ## File References
 
 When working with authentication: server/utils/api.ts, app/composables/useAuth.ts, server/api/auth/login.post.ts
-When working with cart: server/utils/guestCart.ts, app/composables/useCart.ts, server/api/cart/
+When working with cart: server/utils/guestCart.ts, app/composables/useCart.ts, server/api/cart/, shared/utils/cart-helpers.ts
 When working with settings: app/composables/useSettings.ts, app/app.vue
+When working with types: shared/types/ (import via #shared/types), see shared/types/README.md
+When working with shared utilities: shared/utils/ (auto-imported), e.g., cart-helpers.ts for cart operations
 When working with images: Use NuxtImg/NuxtPicture components for automatic optimization
 When adding new API routes: Follow pattern in server/api/ with proper HTTP method suffix (.get.ts, .post.ts, etc.)

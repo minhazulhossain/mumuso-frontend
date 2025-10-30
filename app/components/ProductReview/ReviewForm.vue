@@ -127,7 +127,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Review, Purchase } from '~/types/review'
+import type { Review, Purchase } from '#shared/types/review'
 
 const props = defineProps<{
   userReview?: Review | null

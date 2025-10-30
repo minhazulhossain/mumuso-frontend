@@ -1,5 +1,3 @@
-import type { AuthFormData, ProfileUpdateData, PasswordResetData } from '~/types/auth'
-
 /**
  * Handle authentication errors with consistent messaging
  */

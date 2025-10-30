@@ -1,7 +1,3 @@
-import type { CartItem, CartTotals, AppliedDiscount } from '~~/types'
-import type { CartErrorData, CartResponse } from '~~/types/server'
-import { getItemTotal } from '~~/types'
-
 /**
  * Handle cart errors with toast notification
  */
@@ -32,7 +28,7 @@ export const useCart = () => {
     const appliedDiscounts = useState<AppliedDiscount[]>('appliedDiscounts', () => [])
     const isCartOpen = useState('isCartOpen', () => false)
     const isLoading = useState('cartLoading', () => false)
-    const reservationTimer = useState<NodeJS.Timeout | null>('reservationTimer', () => null)
+    const reservationTimer = useState<number | null>('reservationTimer', () => null)
 
     // Computed values
     const cartTotal = computed(() => {
@@ -83,7 +79,7 @@ export const useCart = () => {
     const fetchCart = async () => {
         try {
             isLoading.value = true
-            const response = await $fetch<CartResponse>('/api/cart')
+            const response: CartResponse = await $fetch<CartResponse>('/api/cart')
 
             // If response has items without product details (guest cart), fetch product details
             if (response.items?.length) {
@@ -101,8 +97,8 @@ export const useCart = () => {
             }
 
             // Store discount data from backend
-            cartTotals.value = response.totals || null
-            appliedDiscounts.value = response.applied_discounts || []
+            cartTotals.value = response?.totals || null
+            appliedDiscounts.value = response?.applied_discounts || []
 
             return response
         } catch (error) {

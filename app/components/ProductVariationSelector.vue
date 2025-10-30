@@ -130,7 +130,7 @@
 </template>
 
 <script setup lang="ts">
-import type { ProductVariation } from '~/types/product'
+import type { ProductVariation } from '#shared/types/product'
 
 interface Props {
   variations: ProductVariation[]

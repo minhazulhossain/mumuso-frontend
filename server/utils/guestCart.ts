@@ -1,6 +1,6 @@
 // server/utils/guestCart.ts
 import type { H3Event } from 'h3'
-import type { GuestCartData, GuestCartItem } from '~/types/server'
+import type { GuestCartData, GuestCartItem } from '#shared/types/server'
 
 const SESSION_NAME = 'guest-cart'
 const SESSION_PASSWORD = process.env.NUXT_SESSION_PASSWORD || 'nuxt-guest-cart-secret-key-change-in-production-min-32-chars'

@@ -1,12 +1,3 @@
-interface User {
-    id: number
-    name: string
-    email: string
-    email_verified_at?: string
-    created_at: string
-    updated_at: string
-}
-
 export const useAppUserSession = () => {
     const user = useState<User | null>('user', () => null)
     const loggedIn = computed(() => !!user.value)

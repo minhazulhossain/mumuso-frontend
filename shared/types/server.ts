@@ -28,9 +28,9 @@ export interface CartErrorData {
 /**
  * Generic cart response
  */
-export interface CartResponse {
-    message?: string
-    items?: any[]
-    total?: number
-    count?: number
-}
+// export interface CartResponse {
+//     message?: string
+//     items?: any[]
+//     total?: number
+//     count?: number
+// }

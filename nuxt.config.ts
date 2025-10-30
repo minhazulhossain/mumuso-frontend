@@ -27,6 +27,14 @@ export default defineNuxtConfig({
     compatibilityDate: '2025-07-15',
     devtools: { enabled: true },
 
+    // Nuxt 4.2.0 experimental features for better performance
+    experimental: {
+        // Reduces JS bundle size by ~39% for prerendered sites
+        asyncDataHandlerExtraction: true,
+        // Enhanced TypeScript support with smart component features
+        typescriptPlugin: false, // Set to true if you want advanced TS features
+    },
+
     runtimeConfig: {
         public: {
             // Backend API base URL - used by server routes

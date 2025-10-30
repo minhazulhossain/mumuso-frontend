@@ -3,12 +3,12 @@
  */
 export type ReviewSortBy = 'recent' | 'helpful' | 'rating'
 
-export interface User {
-    id: string
-    name: string
-    email: string
-    avatar?: string
-}
+// export interface User {
+//     id: string
+//     name: string
+//     email: string
+//     avatar?: string
+// }
 
 export interface ReviewImage {
     id: string | number

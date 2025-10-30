@@ -1,13 +1,16 @@
-# Types Directory
+# Shared Types Directory
 
-This directory contains all TypeScript type definitions for the Mumuso frontend application.
+This directory contains all TypeScript type definitions shared between the Vue app and Nitro server.
+
+**Location:** `shared/types/` (Nuxt 4.x structure)
+**Auto-imports:** Types in this directory are automatically imported in both app and server contexts.
 
 ## File Structure
 
 ### `index.ts`
 Central export file for all types. Import from here for convenient access to all types:
 ```typescript
-import type { Product, CartItem, AuthFormData } from '~/types'
+import type { Product, CartItem, AuthFormData } from '#shared/types'
 ```
 
 ### `api.ts`
@@ -70,27 +73,31 @@ Server-side types for API routes and utilities.
 
 ### Import from index (Recommended)
 ```typescript
-import type { Product, CartItem, AuthFormData } from '~/types'
+import type { Product, CartItem, AuthFormData } from '#shared/types'
 ```
 
 ### Import from specific files
 ```typescript
-import type { AuthFormData } from '~/types/auth'
-import type { BlogQueryParams } from '~/types/blog'
+import type { AuthFormData } from '#shared/types/auth'
+import type { BlogQueryParams } from '#shared/types/blog'
 ```
 
-### Server-side imports
+### Server-side imports (same pattern)
 ```typescript
-import type { GuestCartData, GuestCartItem } from '~/types/server'
-import type { BackendAuthResponse } from '~/types/auth'
+import type { GuestCartData, GuestCartItem } from '#shared/types/server'
+import type { BackendAuthResponse } from '#shared/types/auth'
 ```
 
-## Type Organization Guidelines
+### Auto-imports
+Thanks to Nuxt 4.x, types in `shared/types/` are automatically available in both app and server without explicit imports in many cases.
 
-1. **Client types** - Types used in Vue components and composables go in their respective domain files (auth, blog, product, etc.)
-2. **Server types** - Types used only in server routes and utilities go in `server.ts`
-3. **Shared types** - Types used by both client and server go in their domain files
+## Type Organization Guidelines (Nuxt 4.x)
+
+1. **Shared types** - All types in `shared/types/` are available to both Vue app and Nitro server
+2. **Server types** - Server-specific types go in `server.ts`
+3. **Domain types** - Types organized by domain (auth, blog, product, cart, etc.)
 4. **API types** - Generic API response wrappers go in `api.ts`
+5. **No Vue/Nitro imports** - Code in `shared/` cannot import Vue or Nitro-specific code
 
 ## Adding New Types
 

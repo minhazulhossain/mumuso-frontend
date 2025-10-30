@@ -1,7 +1,3 @@
-import type {HeroBanner, Category} from "~~/types/content";
-import type {ApiResponse} from "../../types";
-
-
 export const useContent = () => {
 
     const config = useRuntimeConfig()
@@ -12,7 +8,7 @@ export const useContent = () => {
             key: 'hero-banners',
             server: true,
             // Make sure this returns the data immediately
-            transform: (response) => {
+            transform: (response: ApiResponse) => {
                 return response?.data || []
             },
             getCachedData: (key) => {
@@ -38,7 +34,7 @@ export const useContent = () => {
             key: 'featured-categories',
             server: true,
             // Make sure this returns the data immediately
-            transform: (response) => {
+            transform: (response: ApiResponse) => {
                 return response?.data || []
             },
             getCachedData: (key) => {

@@ -94,13 +94,13 @@
                 </div>
 
                 <!-- Stock Status -->
-                <div v-if="getItemStock(item) <= 5" class="mb-2">
+                <div v-if="getStockStatus(getItemStock(item)).showBadge" class="mb-2">
                   <UBadge
-                      :color="getItemStock(item) === 0 ? 'error' : 'warning'"
+                      :color="getStockStatus(getItemStock(item)).color"
                       variant="soft"
                       size="xs"
                   >
-                    {{ getItemStock(item) === 0 ? 'Out of stock' : `Only ${getItemStock(item)} left` }}
+                    {{ getStockStatus(getItemStock(item)).message }}
                   </UBadge>
                 </div>
 
@@ -115,7 +115,7 @@
                           size="xs"
                           color="secondary"
                           variant="ghost"
-                          :disabled="item.quantity <= 1"
+                          :disabled="!canDecrementQuantity(item)"
                       />
                       <span class="text-sm font-semibold w-10 text-center text-gray-900 dark:text-white">
                         {{ item.quantity }}
@@ -126,7 +126,7 @@
                           size="xs"
                           color="secondary"
                           variant="ghost"
-                          :disabled="item.quantity >= getItemStock(item)"
+                          :disabled="!canIncrementQuantity(item)"
                       />
                     </div>
                   </div>
@@ -143,7 +143,7 @@
                 </div>
 
                 <!-- Max Stock Warning -->
-                <p v-if="item.quantity >= getItemStock(item)" class="text-xs text-orange-500 mt-2">
+                <p v-if="isMaxStockReached(item)" class="text-xs text-orange-500 mt-2">
                   <UIcon name="i-heroicons-exclamation-triangle" class="inline"/>
                   Maximum available quantity reached
                 </p>
@@ -282,10 +282,10 @@
 </template>
 
 <script setup lang="ts">
-import { getItemPrice, getItemOriginalPrice, hasDiscount, getItemTotal, getItemOriginalTotal } from '~~/types'
 
 const toast = useToast()
 const router = useRouter()
+
 const {
   cartItems,
   cartTotal,
@@ -293,13 +293,19 @@ const {
   cartDiscount,
   cartSavings,
   appliedDiscounts,
+  cartItemsCount,
+  isCartOpen,
+  isLoading,
+  updateCartItemQuantity,
   removeFromCart,
-  updateCartItemQuantity
+  clearCart,
+  checkout
 } = useCart()
 
 // Constants
 const taxRate = 10 // 10% tax
 const freeShippingThreshold = 50
+const shippingRate = 5.99
 
 // Computed values - use backend discount data
 const subtotal = computed(() => {
@@ -308,32 +314,26 @@ const subtotal = computed(() => {
 })
 
 const shipping = computed(() => {
-  if (subtotal.value >= freeShippingThreshold) return 0
-  return subtotal.value > 0 ? 5.99 : 0
+  return calculateShipping(subtotal.value, freeShippingThreshold, shippingRate)
 })
 
 const tax = computed(() => {
-  return (subtotal.value * taxRate) / 100
+  return calculateTax(subtotal.value, taxRate)
 })
 
 const total = computed(() => {
-  return subtotal.value + shipping.value + tax.value
+  return calculateOrderTotal(subtotal.value, shipping.value, tax.value)
 })
-
-// Helper to get stock quantity (variation or product)
-const getItemStock = (item: any) => {
-  return item.variation?.stock_quantity ?? item.product?.stock ?? 0
-}
 
 // Methods
 const incrementQuantity = (item: any, maxStock: number) => {
-  if (item && item.quantity < maxStock) {
+  if (item && canIncrementQuantity(item)) {
     updateCartItemQuantity(item.product?.slug || item.slug, item.quantity + 1, item.variation_id)
   }
 }
 
 const decrementQuantity = (item: any) => {
-  if (item && item.quantity > 1) {
+  if (item && canDecrementQuantity(item)) {
     updateCartItemQuantity(item.product?.slug || item.slug, item.quantity - 1, item.variation_id)
   }
 }
@@ -350,6 +350,46 @@ const removeItemFromCart = (item: any) => {
   }
 }
 
+
+const localCartOpen = computed({
+  get: () => isCartOpen.value,
+  set: (val) => {
+    isCartOpen.value = val
+  }
+})
+
+// Helper to get item price (after discount)
+const getItemPrice = (item: any): number => {
+  const price = item.variation?.price ?? item.product?.price ?? 0
+  return parseFloat(price)
+}
+
+// Helper to get original price (before discount)
+const getItemOriginalPrice = (item: any): number => {
+  const originalPrice = item.variation?.original_price ?? item.product?.original_price ?? item.variation?.price ?? item.product?.price ?? 0
+  return parseFloat(originalPrice)
+}
+
+// Helper to check if item has discount
+const hasDiscount = (item: any): boolean => {
+  const currentPrice = getItemPrice(item)
+  const originalPrice = getItemOriginalPrice(item)
+  return originalPrice > currentPrice
+}
+
+// Helper to get item total (price * quantity)
+const getItemTotal = (item: any): number => {
+  return getItemPrice(item) * (item.quantity || 1)
+}
+
+// Helper to get original item total (original price * quantity)
+const getItemOriginalTotal = (item: any): number => {
+  return getItemOriginalPrice(item) * (item.quantity || 1)
+}
+
+// Use shared helper for max stock check
+const checkMaxStock = isMaxStockReached
+
 const handleCheckout = () => {
   // Navigate to checkout page
   router.push('/checkout')
@@ -363,7 +403,7 @@ const handleCheckout = () => {
 }
 
 // SEO
-useSeoMeta({
+useSEO({
   title: 'Shopping Cart',
   description: 'Review your cart and proceed to checkout'
 })

@@ -5,7 +5,13 @@
       "mcp__nuxt-ui-remote__get_component",
       "Bash(npm run dev:*)",
       "Bash(npm run dev:typecheck:*)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(npx nuxt:*)",
+      "WebFetch(domain:nuxt.com)",
+      "WebSearch",
+      "WebFetch(domain:vueschool.io)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []

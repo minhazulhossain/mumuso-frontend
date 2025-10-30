@@ -1,5 +1,5 @@
 <template>
-  <USlideover v-model="localCartOpen">
+  <USlideover v-model="localCartOpen" title="Mini Cart" description="mini-cart">
     <UButton
         icon="i-heroicons-shopping-cart"
         variant="ghost"
@@ -115,7 +115,7 @@
                     icon="i-lucide-plus"
                     size="xs"
                     color="secondary"
-                    :disabled="isLoading || (getItemStock(item) && item.quantity >= getItemStock(item))"
+                    :disabled="isLoading || checkMaxStock(item)"
                 />
                 <UButton
                     @click="removeFromCart(item.product?.slug || item.slug, item.variation_id)"
@@ -129,7 +129,7 @@
               </div>
 
               <!-- Stock Warning -->
-              <p v-if="getItemStock(item) && item.quantity >= getItemStock(item)" class="text-xs text-orange-500 mt-1">
+              <p v-if="checkMaxStock(item)" class="text-xs text-orange-500 mt-1">
                 Max stock reached
               </p>
             </div>
@@ -161,7 +161,7 @@
                   <p class="text-xs font-medium text-green-600 dark:text-green-400">{{ discount.name }}</p>
                   <p class="text-xs text-gray-500 dark:text-gray-400">{{ discount.summary }} • {{ discount.items_affected }} {{ discount.items_affected === 1 ? 'item' : 'items' }}</p>
                 </div>
-                <span class="text-xs font-semibold text-green-600 dark:text-green-400">-${{ discount.discount_amount.toFixed(2) }}</span>
+                <span class="text-xs font-semibold text-green-600 dark:text-green-400">-${{ discount.discount_amount?.toFixed(2) }}</span>
               </div>
             </div>
 
@@ -170,17 +170,17 @@
               <!-- Original Total (if discount) -->
               <div v-if="cartDiscount > 0" class="flex justify-between text-sm text-gray-500 dark:text-gray-400">
                 <span>Subtotal:</span>
-                <span class="line-through">${{ cartOriginalTotal.toFixed(2) }}</span>
+                <span class="line-through">${{ cartOriginalTotal?.toFixed(2) }}</span>
               </div>
               <!-- Savings -->
               <div v-if="cartSavings > 0" class="flex justify-between text-sm text-green-600 dark:text-green-400">
                 <span>Savings:</span>
-                <span>-${{ cartSavings.toFixed(2) }}</span>
+                <span>-${{ cartSavings?.toFixed(2) }}</span>
               </div>
               <!-- Final Total -->
               <div class="flex justify-between items-center text-lg font-semibold pt-2 border-t border-gray-200 dark:border-gray-700">
                 <span class="text-gray-900 dark:text-white">Total:</span>
-                <span class="text-primary-500">${{ cartTotal.toFixed(2) }}</span>
+                <span class="text-primary-500">${{ cartTotal?.toFixed(2) }}</span>
               </div>
             </div>
 
@@ -214,7 +214,6 @@
 </template>
 
 <script setup lang="ts">
-import { getItemPrice, getItemOriginalPrice, hasDiscount, getItemTotal, getItemOriginalTotal } from '~~/types'
 
 const {
   cartItems,
@@ -242,15 +241,41 @@ const localCartOpen = computed({
   }
 })
 
-// Helper to get stock quantity (variation or product)
-const getItemStock = (item: any) => {
-  return item.variation?.stock_quantity ?? item.product?.stock ?? 0
+// Helper to get item price (after discount)
+const getItemPrice = (item: any): number => {
+  const price = item.variation?.price ?? item.product?.price ?? 0
+  return parseFloat(price)
 }
+
+// Helper to get original price (before discount)
+const getItemOriginalPrice = (item: any): number => {
+  const originalPrice = item.variation?.original_price ?? item.product?.original_price ?? item.variation?.price ?? item.product?.price ?? 0
+  return parseFloat(originalPrice)
+}
+
+// Helper to check if item has discount
+const hasDiscount = (item: any): boolean => {
+  const currentPrice = getItemPrice(item)
+  const originalPrice = getItemOriginalPrice(item)
+  return originalPrice > currentPrice
+}
+
+// Helper to get item total (price * quantity)
+const getItemTotal = (item: any): number => {
+  return getItemPrice(item) * (item.quantity || 1)
+}
+
+// Helper to get original item total (original price * quantity)
+const getItemOriginalTotal = (item: any): number => {
+  return getItemOriginalPrice(item) * (item.quantity || 1)
+}
+
+// Use shared helper for max stock check
+const checkMaxStock = isMaxStockReached
 
 const handleCheckout = async () => {
   // Check if user is logged in
   if (!loggedIn.value) {
-    // Close cart and redirect to login
     localCartOpen.value = false
     await navigateTo('/checkout')
     return

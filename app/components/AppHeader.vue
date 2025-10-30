@@ -202,10 +202,9 @@
 </template>
 
 <script setup>
-const { data: settings } = useSettings()
+
 
 const colorMode = useColorMode()
-const route = useRoute()
 const router = useRouter()
 const { searchProducts: searchProductsAPI } = useProducts()
 const { fetchCategories } = useContent()
