@@ -51,17 +51,17 @@
         </div>
 
         <!-- Savings Info -->
-        <p v-if="product.has_discount && product.compare_price" class="text-xs text-green-600 dark:text-green-400 font-medium">
-          Save ${{ (parseFloat(product.compare_price) - parseFloat(product.price)).toFixed(2) }}
-        </p>
+<!--        <p v-if="product.has_discount && product.compare_price" class="text-xs text-green-600 dark:text-green-400 font-medium">-->
+<!--          Save ${{ (parseFloat(product.compare_price) - parseFloat(product.price)).toFixed(2) }}-->
+<!--        </p>-->
 
         <!-- Stock Info -->
-        <div v-if="product.in_stock && product.stock_quantity < 10" class="flex items-center gap-1">
-          <UIcon name="i-heroicons-exclamation-triangle" class="text-xs text-orange-500" />
-          <span class="text-xs text-orange-600 dark:text-orange-400">
-            Only {{ product.stock_quantity }} left
-          </span>
-        </div>
+<!--        <div v-if="product.in_stock && product.stock_quantity < 10" class="flex items-center gap-1">-->
+<!--          <UIcon name="i-heroicons-exclamation-triangle" class="text-xs text-orange-500" />-->
+<!--          <span class="text-xs text-orange-600 dark:text-orange-400">-->
+<!--            Only {{ product.stock_quantity }} left-->
+<!--          </span>-->
+<!--        </div>-->
       </div>
     </div>
   </NuxtLink>

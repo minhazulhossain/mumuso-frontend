@@ -294,7 +294,6 @@ const {
   cartSavings,
   appliedDiscounts,
   cartItemsCount,
-  isCartOpen,
   isLoading,
   updateCartItemQuantity,
   removeFromCart,
@@ -349,14 +348,6 @@ const removeItemFromCart = (item: any) => {
     })
   }
 }
-
-
-const localCartOpen = computed({
-  get: () => isCartOpen.value,
-  set: (val) => {
-    isCartOpen.value = val
-  }
-})
 
 // Helper to get item price (after discount)
 const getItemPrice = (item: any): number => {

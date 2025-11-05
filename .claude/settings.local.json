@@ -11,7 +11,8 @@
       "WebFetch(domain:nuxt.com)",
       "WebSearch",
       "WebFetch(domain:vueschool.io)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "WebFetch(domain:ui.nuxt.com)"
     ],
     "deny": [],
     "ask": []

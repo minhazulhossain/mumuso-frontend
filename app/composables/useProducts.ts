@@ -1,5 +1,5 @@
 import type {Ref} from 'vue'
-import type {Product, Category, Pagination, ProductFilters} from '../../types';
+// import type {Product, Category, Pagination, ProductFilters} from '../../types';
 
 export const useProducts = () => {
     const config = useRuntimeConfig()

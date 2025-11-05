@@ -46,7 +46,7 @@
           <div
               v-for="item in cartItems"
               :key="item.slug || item.productId"
-              class="flex gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg"
+              class="flex gap-4 rounded-lg"
           >
             <!-- Product Image -->
             <NuxtLink
@@ -56,7 +56,7 @@
               <NuxtImg
                   :src="item.variation?.images?.thumb || item.product?.image || 'https://placehold.co/60x60'"
                   :alt="item.variation?.name || item.product?.name || 'Product'"
-                  class="w-20 h-20 object-cover rounded-lg"
+                  class="w-20 h-20 object-cover"
                   width="80"
                   height="80"
                   loading="lazy"
@@ -108,6 +108,7 @@
                     size="xs"
                     color="secondary"
                     :disabled="item.quantity <= 1 || isLoading"
+                    :ui="{ base: 'rounded-none' }"
                 />
                 <span class="text-sm font-medium w-8 text-center">{{ item.quantity }}</span>
                 <UButton
@@ -116,6 +117,7 @@
                     size="xs"
                     color="secondary"
                     :disabled="isLoading || checkMaxStock(item)"
+                    :ui="{ base: 'rounded-none' }"
                 />
                 <UButton
                     @click="removeFromCart(item.product?.slug || item.slug, item.variation_id)"
@@ -125,6 +127,7 @@
                     variant="soft"
                     class="ml-auto"
                     :disabled="isLoading"
+                    :ui="{ base: 'rounded-none' }"
                 />
               </div>
 
@@ -184,7 +187,9 @@
               </div>
             </div>
 
-            <UButton class="w-full" color="success" variant="soft" block as="a" href="/cart">View Cart</UButton>
+            <UButton class="w-full" color="success"
+                     variant="soft" block as="a"
+                     href="/cart" :ui="{ base: 'rounded-none' }">View Cart</UButton>
 
             <div class="flex gap-2">
               <UButton
@@ -193,6 +198,7 @@
                   variant="soft"
                   block
                   :disabled="isLoading"
+                  :ui="{ base: 'rounded-none' }"
               >
                 Clear Cart
               </UButton>
@@ -202,6 +208,7 @@
                   block
                   :loading="checkoutLoading"
                   :disabled="isLoading"
+                  :ui="{ base: 'rounded-none' }"
               >
                 Checkout
               </UButton>
@@ -214,6 +221,8 @@
 </template>
 
 <script setup lang="ts">
+
+const route = useRoute()
 
 const {
   cartItems,
@@ -235,9 +244,26 @@ const { loggedIn } = useAuth()
 const checkoutLoading = ref(false)
 
 const localCartOpen = computed({
-  get: () => isCartOpen.value,
+  get: () => {
+    // Auto-close cart sidebar when on cart page
+    if (route.path === '/cart') {
+      return false
+    }
+    return isCartOpen.value
+  },
   set: (val) => {
+    // Prevent opening cart sidebar when on cart page
+    if (route.path === '/cart' && val === true) {
+      return
+    }
     isCartOpen.value = val
+  }
+})
+
+// Watch route changes and auto-close cart when navigating to cart page
+watch(() => route.path, (newPath) => {
+  if (newPath === '/cart') {
+    isCartOpen.value = false
   }
 })
 

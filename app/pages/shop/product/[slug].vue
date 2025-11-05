@@ -8,7 +8,7 @@
       />
 
       <!-- Loading State - Skeleton -->
-      <SingleProductSkeleton v-if="loading" />
+      <SingleProductSkeleton v-if="loading"/>
 
       <!-- Error State -->
       <div v-else-if="error" class="text-center py-16">
@@ -34,9 +34,11 @@
                 @mouseleave="isZoomed = false"
             />
             <!-- Zoom Hint -->
-            <div v-if="!isZoomed" class="absolute inset-0 bg-opacity-0 group-hover:bg-opacity-10 transition-all flex items-center justify-center pointer-events-none">
-              <div class="bg-white dark:bg-gray-800 rounded-full p-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                <UIcon name="i-lucide-lightbulb" class="text-2xl text-gray-700 dark:text-gray-300" />
+            <div v-if="!isZoomed"
+                 class="absolute inset-0 bg-opacity-0 group-hover:bg-opacity-10 transition-all flex items-center justify-center pointer-events-none">
+              <div
+                  class="bg-white dark:bg-gray-800 rounded-full p-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                <UIcon name="i-lucide-lightbulb" class="text-2xl text-gray-700 dark:text-gray-300"/>
               </div>
             </div>
             <!-- Discount Badge -->
@@ -72,9 +74,9 @@
         </div>
 
         <!-- Product Details -->
-        <div class="space-y-6">
+        <div class="space-y-4">
           <!-- Category & Status -->
-          <div class="flex items-center gap-2 flex-wrap">
+          <div class="flex items-center gap-2">
             <UBadge
                 v-for="category in product.categories"
                 :key="category.id"
@@ -112,7 +114,7 @@
             <!-- Discount Badge (inline with price) -->
             <div v-if="product.has_discount && product.discount_percentage" class="flex items-center gap-2">
               <UBadge color="success" variant="soft" size="lg">
-                <UIcon name="i-heroicons-tag" class="mr-1" />
+                <UIcon name="i-heroicons-tag" class="mr-1"/>
                 Save {{ product.discount_percentage }}%
               </UBadge>
               <span class="text-sm text-green-600 dark:text-green-400 font-medium">
@@ -190,6 +192,7 @@
                   color="secondary"
                   size="sm"
                   :disabled="quantity <= 1"
+                  :ui="{ base: 'rounded-none' }"
               />
               <span class="w-12 text-center font-semibold text-gray-900 dark:text-white">{{ quantity }}</span>
               <UButton
@@ -198,6 +201,7 @@
                   color="secondary"
                   size="sm"
                   :disabled="quantity >= currentStockQuantity"
+                  :ui="{ base: 'rounded-none' }"
               />
             </div>
             <span class="text-sm text-gray-500">
@@ -213,10 +217,13 @@
                 size="xl"
                 class="flex-1"
                 icon="i-heroicons-shopping-cart"
+                :ui="{ base: 'rounded-none' }"
             >
               <span v-if="product.has_discount" class="flex items-center gap-2">
                 Add to Cart - ${{ (parseFloat(currentPrice) * quantity).toFixed(2) }}
-                <span class="text-xs line-through opacity-75">${{ (parseFloat(currentComparePrice || currentPrice) * quantity).toFixed(2) }}</span>
+                <span class="text-xs line-through opacity-75">${{
+                    (parseFloat(currentComparePrice || currentPrice) * quantity).toFixed(2)
+                  }}</span>
               </span>
               <span v-else>
                 Add to Cart - ${{ (parseFloat(currentPrice) * quantity).toFixed(2) }}
@@ -232,27 +239,30 @@
             </UButton>
             <UButton
                 size="xl"
-                color="secondary"
-                variant="soft"
-                icon="i-heroicons-heart"
+                :color="isInWishlist(product.slug) ? 'primary' : 'secondary'"
+                :variant="isInWishlist(product.slug) ? 'solid' : 'soft'"
+                :icon="isInWishlist(product.slug) ? 'i-heroicons-heart-solid' : 'i-heroicons-heart'"
                 @click="handleWishlist"
+                :ui="{
+                  base: 'transition-all duration-200 rounded-none'
+                }"
             >
-              Save
+              {{ isInWishlist(product.slug) ? 'Saved' : 'Save' }}
             </UButton>
           </div>
 
           <!-- Additional Info -->
           <div class="border-t border-gray-200 dark:border-gray-700 pt-6 space-y-3">
             <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-              <UIcon name="i-heroicons-truck" />
+              <UIcon name="i-heroicons-truck"/>
               <span>Free shipping on orders over $50</span>
             </div>
             <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-              <UIcon name="i-heroicons-arrow-path" />
+              <UIcon name="i-heroicons-arrow-path"/>
               <span>30-day return policy</span>
             </div>
             <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-              <UIcon name="i-heroicons-shield-check" />
+              <UIcon name="i-heroicons-shield-check"/>
               <span>Secure checkout</span>
             </div>
           </div>
@@ -276,12 +286,13 @@
 </template>
 
 <script setup lang="ts">
-import type {Product, ProductVariation} from '#shared/types/product';
+// import type {Product, ProductVariation} from '#shared/types/product';
 
 const route = useRoute()
 const toast = useToast()
-const { fetchProduct, fetchProducts, loading, error } = useProducts()
-const { addToCart, toggleCart } = useCart()
+const {fetchProduct, fetchProducts, loading, error} = useProducts()
+const {addToCart, toggleCart} = useCart()
+const {isInWishlist, toggleWishlist, initWishlist} = useWishlist()
 
 // State
 const product = ref<Product | null>(null)
@@ -331,8 +342,8 @@ const currentSku = computed(() => {
 // Breadcrumb links
 const breadcrumbLinks = computed(() => {
   const links = [
-    { label: 'Home', to: '/' },
-    { label: 'Shop', to: '/shop' }
+    {label: 'Home', to: '/'},
+    {label: 'Shop', to: '/shop'}
   ]
 
   if (product.value) {
@@ -440,12 +451,25 @@ const handleAddToCart = async () => {
 }
 
 const handleWishlist = () => {
-  toast.add({
-    title: 'Added to wishlist!',
-    description: 'Product saved for later',
-    color: 'success',
-    icon: 'i-heroicons-heart'
-  })
+  if (!product.value) return
+
+  const isAdded = toggleWishlist(product.value)
+
+  if (isAdded) {
+    toast.add({
+      title: 'Added to wishlist!',
+      description: `${product.value.name} saved for later`,
+      color: 'success',
+      icon: 'i-heroicons-heart-solid'
+    })
+  } else {
+    toast.add({
+      title: 'Removed from wishlist',
+      description: `${product.value.name} removed from your wishlist`,
+      color: 'secondary',
+      icon: 'i-heroicons-heart'
+    })
+  }
 }
 
 const handleImageError = (event: Event) => {
@@ -463,6 +487,8 @@ watch(() => route.params.slug, () => {
 // Initial load
 onMounted(async () => {
   try {
+    // Initialize wishlist from localStorage
+    initWishlist()
     await loadProduct()
   } catch (err) {
     console.error('Failed to load product:', err)
@@ -473,8 +499,8 @@ watchEffect(() => {
   if (product.value) {
     useSEO({
       title: product.value.name,
-      description: product.value.short_description || product.value.description || `Buy ${product.value.name} - ${product.value.categories.map((c:any) => c.name).join(', ')}`,
-      keywords: `${product.value.name}, ${product.value.categories.map((c:any) => c.name).join(', ')}, ${product.value.sku}`,
+      description: product.value.short_description || product.value.description || `Buy ${product.value.name} - ${product.value.categories.map((c: any) => c.name).join(', ')}`,
+      keywords: `${product.value.name}, ${product.value.categories.map((c: any) => c.name).join(', ')}, ${product.value.sku}`,
     })
   }
 })

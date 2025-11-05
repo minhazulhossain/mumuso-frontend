@@ -107,6 +107,7 @@ import TermsAcceptance from '~/components/checkout/TermsAcceptance.vue'
 const toast = useToast()
 const router = useRouter()
 const { cartItems } = useCart()
+const { initiatePayment } = usePayment()
 
 // Stepper steps configuration
 const steps = [
@@ -190,7 +191,7 @@ const shippingMethods = [
 const selectedShippingMethod = ref('standard')
 
 // Payment
-const selectedPaymentMethod = ref('card')
+const selectedPaymentMethod = ref('sslcommerz')
 const paymentInfo = ref({
   cardNumber: '',
   cardName: '',
@@ -310,36 +311,62 @@ const handlePlaceOrder = async () => {
 
   processingOrder.value = true
 
-  // Simulate API call
-  await new Promise(resolve => setTimeout(resolve, 2000))
+  try {
+    // Step 1: Create order object
+    const order = {
+      contact: contactInfo.value,
+      shipping: shippingAddress.value,
+      billing: sameAsShipping.value ? shippingAddress.value : billingAddress.value,
+      shippingMethod: selectedShippingMethod.value,
+      paymentMethod: selectedPaymentMethod.value,
+      items: cartItems.value,
+      orderNotes: orderNotes.value,
+      shippingCost: shippingCost.value,
+    }
 
-  processingOrder.value = false
+    // TODO: Replace with actual API call to create order in backend
+    // const response = await $fetch('/api/orders', { method: 'POST', body: order })
+    // const orderId = response.data.id
 
-  // Create order object
-  const order = {
-    contact: contactInfo.value,
-    shipping: shippingAddress.value,
-    billing: sameAsShipping.value ? shippingAddress.value : billingAddress.value,
-    shippingMethod: selectedShippingMethod.value,
-    paymentMethod: selectedPaymentMethod.value,
-    items: cartItems.value,
-    orderNotes: orderNotes.value,
-    shippingCost: shippingCost.value,
-    orderNumber: `ORD-${Date.now()}`,
-    orderDate: new Date().toISOString()
+    // For now, simulate order creation with a temporary ID
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    const orderId = Math.floor(Math.random() * 10000)
+
+    // Step 2: Handle payment based on selected method
+    if (selectedPaymentMethod.value === 'sslcommerz') {
+      // Initiate SSLCommerz payment gateway
+      const paymentResponse = await initiatePayment(orderId)
+
+      if (!paymentResponse) {
+        toast.add({
+          title: 'Payment Error',
+          description: 'Failed to initiate payment. Please try again.',
+          color: 'error'
+        })
+        return
+      }
+      // User will be automatically redirected to SSLCommerz payment gateway
+      // After payment completion, SSLCommerz will redirect back to success/failed/cancelled page
+    } else {
+      // Handle other payment methods (card, paypal, apple pay)
+      toast.add({
+        title: 'Order placed successfully!',
+        description: `Order #${orderId}`,
+        color: 'success',
+        icon: 'i-heroicons-check-circle'
+      })
+      await router.push(`/order-confirmation?order=${orderId}`)
+    }
+  } catch (error: any) {
+    console.error('Order placement error:', error)
+    toast.add({
+      title: 'Order Error',
+      description: error.message || 'Failed to process order. Please try again.',
+      color: 'error'
+    })
+  } finally {
+    processingOrder.value = false
   }
-
-  console.log('Order placed:', order)
-
-  toast.add({
-    title: 'Order placed successfully!',
-    description: `Order #${order.orderNumber}`,
-    color: 'success',
-    icon: 'i-heroicons-check-circle'
-  })
-
-  // Redirect to order confirmation
-  await router.push(`/order-confirmation?order=${order.orderNumber}`)
 }
 
 // Redirect if cart is empty

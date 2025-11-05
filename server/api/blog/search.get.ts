@@ -1,4 +1,4 @@
-import { posts } from '../_posts'
+import {posts} from '../_posts'
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event)
@@ -8,11 +8,9 @@ export default defineEventHandler(async (event) => {
 
   await new Promise(resolve => setTimeout(resolve, 400))
 
-  const results = allPosts.filter(post => 
-    post.title.toLowerCase().includes(searchTerm) ||
-    post.excerpt.toLowerCase().includes(searchTerm) ||
-    post.tags.some(tag => tag.toLowerCase().includes(searchTerm))
+  return allPosts.filter(post =>
+      post.title.toLowerCase().includes(searchTerm) ||
+      post.excerpt.toLowerCase().includes(searchTerm) ||
+      post.tags.some(tag => tag.toLowerCase().includes(searchTerm))
   )
-
-  return results
 })

@@ -105,6 +105,56 @@
           </div>
         </div>
       </div>
+
+      <!-- SSLCommerz Notice -->
+      <div v-if="selectedPaymentMethod === 'sslcommerz'" class="space-y-4 pt-4">
+        <div class="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+          <div class="flex items-start gap-3">
+            <UIcon name="i-heroicons-shield-check" class="text-green-600 dark:text-green-400 text-xl mt-0.5"/>
+            <div>
+              <p class="font-medium text-green-900 dark:text-green-100 mb-2">Secure Payment Gateway</p>
+              <p class="text-sm text-green-800 dark:text-green-200 mb-3">
+                You will be redirected to SSLCommerz secure payment gateway to complete your purchase.
+              </p>
+              <p class="text-xs text-green-700 dark:text-green-300 mb-2 font-medium">Supported Payment Methods:</p>
+              <div class="grid grid-cols-3 md:grid-cols-6 gap-2">
+                <div class="bg-white dark:bg-gray-800 rounded p-2 text-center">
+                  <UIcon name="i-heroicons-credit-card" class="text-blue-600 mb-1" />
+                  <span class="text-xs text-gray-900 dark:text-white block">Visa</span>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded p-2 text-center">
+                  <UIcon name="i-heroicons-credit-card" class="text-orange-600 mb-1" />
+                  <span class="text-xs text-gray-900 dark:text-white block">Master</span>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded p-2 text-center">
+                  <UIcon name="i-heroicons-credit-card" class="text-blue-500 mb-1" />
+                  <span class="text-xs text-gray-900 dark:text-white block">Amex</span>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded p-2 text-center">
+                  <UIcon name="i-heroicons-device-phone-mobile" class="text-pink-600 mb-1" />
+                  <span class="text-xs text-gray-900 dark:text-white block">bKash</span>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded p-2 text-center">
+                  <UIcon name="i-heroicons-device-phone-mobile" class="text-orange-500 mb-1" />
+                  <span class="text-xs text-gray-900 dark:text-white block">Nagad</span>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded p-2 text-center">
+                  <UIcon name="i-heroicons-device-phone-mobile" class="text-purple-600 mb-1" />
+                  <span class="text-xs text-gray-900 dark:text-white block">Rocket</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+          <UIcon name="i-heroicons-lock-closed" class="text-blue-600 dark:text-blue-400" />
+          <div class="text-sm">
+            <span class="text-blue-900 dark:text-blue-100 font-medium">256-bit SSL Encryption</span>
+            <span class="text-blue-700 dark:text-blue-300 block text-xs">Your payment information is secure and encrypted</span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -130,6 +180,12 @@ const emit = defineEmits<{
 
 // Payment Methods
 const paymentMethods = [
+  {
+    id: 'sslcommerz',
+    name: 'SSLCommerz',
+    icon: 'i-heroicons-shield-check',
+    iconColor: 'text-green-600'
+  },
   {
     id: 'card',
     name: 'Credit Card',

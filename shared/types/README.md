@@ -24,6 +24,7 @@ Authentication and user-related types.
 - `PasswordResetData` - Password reset form data
 - `UserSession` - User session data stored in cookies
 - `BackendAuthResponse` - Laravel backend auth response format
+- `User` - User data structure (used across auth, reviews, etc.)
 
 ### `blog.ts`
 Blog and content management types.
@@ -34,10 +35,13 @@ Blog and content management types.
 
 ### `cart.ts`
 Shopping cart types and utility functions.
-- `Product` - Product information in cart
 - `CartItem` - Cart item structure (guest & authenticated)
 - `CartResponse` - API cart response
 - `ApiErrorResponse` - Cart error responses
+- `CartItemDiscount` - Discount information for cart items
+- `CartItemPricing` - Pricing information with discounts
+- `AppliedDiscount` - Applied discount details
+- `CartTotals` - Cart totals with discounts
 - Utility functions: `hasProductDetails`, `getItemSlug`, `getItemName`, etc.
 
 ### `content.ts`
@@ -55,9 +59,8 @@ Product catalog types.
 ### `review.ts`
 Product review system types.
 - `ReviewSortBy` - Review sorting options ('recent', 'helpful', 'rating')
-- `User` - User information in reviews
 - `ReviewImage` - Review image data
-- `Review` - Review data structure
+- `Review` - Review data structure (includes User from auth.ts)
 - `ReviewForm` - Review submission form
 - `ReviewStats` - Review statistics and ratings
 - `Purchase` - Purchase verification data
@@ -67,13 +70,36 @@ Server-side types for API routes and utilities.
 - `GuestCartData` - Guest cart session structure
 - `GuestCartItem` - Guest cart item format
 - `CartErrorData` - Cart error response data
-- `CartResponse` - Generic cart response
+
+### `settings.ts`
+Application settings and configuration types.
+- `Settings` - Complete settings object structure
+- `BrandingSettings` - Branding assets (logo, favicon, og_image)
+- `SiteSettings` - Site configuration (name, url, contact, active status)
+- `SEOSettings` - SEO and analytics settings (keywords, Google Analytics, GTM)
+- `CompanySettings` - Company information (name, address, phone, timezone)
+- `SocialMediaLink` - Social media link configuration
+- `FooterMenuItem` - Footer menu item structure
+- `FooterSettings` - Footer configuration and menu items
+
+### `wishlist.ts`
+Wishlist functionality types.
+- `WishlistItem` - Wishlist item stored in cache/localStorage
+
+### `payment.ts`
+Payment and transaction types.
+- `Payment` - Payment record structure
+- `PaymentStatus` - Payment status enum ('pending' | 'processing' | 'completed' | 'failed' | 'cancelled')
+- `PaymentMethod` - Payment method types (visa, bkash, nagad, etc.)
+- `PaymentInitiateRequest` - Payment initiation request payload
+- `PaymentInitiateResponse` - Payment gateway URL response
+- `PaymentStatusResponse` - Payment status query response
 
 ## Usage Examples
 
 ### Import from index (Recommended)
 ```typescript
-import type { Product, CartItem, AuthFormData } from '#shared/types'
+import type { Product, CartItem, AuthFormData, Settings } from '#shared/types'
 ```
 
 ### Import from specific files

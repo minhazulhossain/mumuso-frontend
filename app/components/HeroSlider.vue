@@ -59,7 +59,7 @@
 </template>
 
 <script setup lang="ts">
-import type { HeroBanner } from '#shared/types/content'
+// import type { HeroBanner } from '#shared/types/content'
 
 interface Props {
   banners: HeroBanner[]

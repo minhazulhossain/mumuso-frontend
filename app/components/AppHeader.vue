@@ -121,92 +121,121 @@
     <HeaderDesktop :items="categoryItems" />
 
     <!-- Mobile Search Modal -->
-<!--    <UModal v-model="showMobileSearch" :ui="{ content: 'md:hidden' }">-->
-<!--      <UCard>-->
-<!--        <template #header>-->
-<!--          <div class="flex items-center justify-between">-->
-<!--            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Search Products</h3>-->
-<!--            <UButton-->
-<!--                color="neutral"-->
-<!--                variant="ghost"-->
-<!--                icon="i-heroicons-x-mark-20-solid"-->
-<!--                size="sm"-->
-<!--                @click="showMobileSearch = false"-->
-<!--            />-->
-<!--          </div>-->
-<!--        </template>-->
+    <UModal v-model:open="showMobileSearch">
+      <template #content>
+        <UCard>
+          <template #header>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="p-2 bg-primary-50 dark:bg-primary-900/20 rounded-lg">
+                  <UIcon name="i-heroicons-magnifying-glass" class="text-primary-600 dark:text-primary-400 text-xl" />
+                </div>
+                <div>
+                  <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Search Products</h3>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">Find what you're looking for</p>
+                </div>
+              </div>
+              <UButton
+                color="secondary"
+                variant="ghost"
+                icon="i-heroicons-x-mark-20-solid"
+                size="sm"
+                @click="showMobileSearch = false"
+              />
+            </div>
+          </template>
 
-<!--        <div class="space-y-4">-->
-<!--          <UInput-->
-<!--              v-model="searchQueryMobile"-->
-<!--              placeholder="Search products..."-->
-<!--              icon="i-heroicons-magnifying-glass"-->
-<!--              size="lg"-->
-<!--              color="neutral"-->
-<!--              autofocus-->
-<!--          />-->
+          <div class="space-y-4">
+            <UInput
+              v-model="searchQueryMobile"
+              class="w-full"
+              placeholder="Search products..."
+              icon="i-heroicons-magnifying-glass"
+              size="lg"
+              autofocus
+              :ui="{
+                wrapper: 'w-full',
+                base: 'w-full'
+              }"
+            />
 
-<!--          &lt;!&ndash; Loading State &ndash;&gt;-->
-<!--          <div v-if="isSearchingMobile" class="text-center py-6">-->
-<!--            <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 animate-spin text-primary-500 mx-auto" />-->
-<!--            <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">Searching...</p>-->
-<!--          </div>-->
+            <!-- Loading State -->
+            <div v-if="isSearchingMobile" class="flex flex-col items-center justify-center py-12">
+              <UIcon name="i-heroicons-arrow-path" class="w-10 h-10 animate-spin text-primary-500 mb-3" />
+              <p class="text-sm text-gray-500 dark:text-gray-400">Searching...</p>
+            </div>
 
-<!--          &lt;!&ndash; Results &ndash;&gt;-->
-<!--          <div v-else-if="searchResultsMobile.length > 0" class="space-y-2">-->
-<!--            <button-->
-<!--                v-for="product in searchResultsMobile"-->
-<!--                :key="product.id"-->
-<!--                class="w-full p-3 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors text-left flex items-center gap-3"-->
-<!--                @click="handleProductSelect(product.slug)"-->
-<!--            >-->
-<!--              <UAvatar-->
-<!--                  v-if="product.image"-->
-<!--                  :src="product.image"-->
-<!--                  :alt="product.name"-->
-<!--                  size="lg"-->
-<!--              />-->
-<!--              <div class="flex-1 min-w-0">-->
-<!--                <p class="font-medium text-gray-900 dark:text-white truncate">-->
-<!--                  {{ product.name }}-->
-<!--                </p>-->
-<!--                <div class="flex items-center gap-2 mt-1">-->
-<!--                  <p class="text-sm font-semibold text-primary-600 dark:text-primary-400">-->
-<!--                    {{ formatPrice(product.price) }}-->
-<!--                  </p>-->
-<!--                  <p v-if="product.compare_price" class="text-sm line-through text-gray-400">-->
-<!--                    {{ formatPrice(product.compare_price) }}-->
-<!--                  </p>-->
-<!--                </div>-->
-<!--              </div>-->
-<!--            </button>-->
-<!--          </div>-->
+            <!-- Results -->
+            <div v-else-if="searchResultsMobile.length > 0" class="space-y-2">
+              <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                {{ searchResultsMobile.length }} Results
+              </p>
+              <div class="space-y-2 max-h-96 overflow-y-auto">
+                <button
+                  v-for="product in searchResultsMobile"
+                  :key="product.id"
+                  class="w-full p-3 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors text-left flex items-center gap-3 border border-gray-200 dark:border-gray-700"
+                  @click="handleProductSelect(product.slug)"
+                >
+                  <UAvatar
+                    v-if="product.image"
+                    :src="product.image"
+                    :alt="product.name"
+                    size="lg"
+                  />
+                  <div class="flex-1 min-w-0">
+                    <p class="font-medium text-gray-900 dark:text-white truncate">
+                      {{ product.name }}
+                    </p>
+                    <div class="flex items-center gap-2 mt-1">
+                      <p class="text-sm font-semibold text-primary-600 dark:text-primary-400">
+                        {{ formatPrice(product.price) }}
+                      </p>
+                      <p v-if="product.compare_price" class="text-sm line-through text-gray-400">
+                        {{ formatPrice(product.compare_price) }}
+                      </p>
+                    </div>
+                  </div>
+                  <UIcon name="i-heroicons-chevron-right" class="w-5 h-5 text-gray-400 shrink-0" />
+                </button>
+              </div>
+            </div>
 
-<!--          &lt;!&ndash; No Results &ndash;&gt;-->
-<!--          <div v-else-if="searchQueryMobile.length >= 2" class="text-center py-8">-->
-<!--            <UIcon name="i-heroicons-magnifying-glass" class="w-12 h-12 text-gray-300 dark:text-gray-700 mx-auto mb-3" />-->
-<!--            <p class="text-gray-900 dark:text-white font-medium">No products found</p>-->
-<!--            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">-->
-<!--              Try searching with different keywords-->
-<!--            </p>-->
-<!--          </div>-->
+            <!-- No Results -->
+            <div v-else-if="searchQueryMobile.length >= 2" class="text-center py-12">
+              <div class="inline-flex items-center justify-center w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full mb-4">
+                <UIcon name="i-heroicons-magnifying-glass" class="w-8 h-8 text-gray-400" />
+              </div>
+              <p class="text-gray-900 dark:text-white font-medium mb-1">No products found</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">
+                Try searching with different keywords
+              </p>
+            </div>
 
-<!--          &lt;!&ndash; Empty State &ndash;&gt;-->
-<!--          <div v-else class="text-center py-6 text-sm text-gray-500 dark:text-gray-400">-->
-<!--            Start typing to search products...-->
-<!--          </div>-->
-<!--        </div>-->
-<!--      </UCard>-->
-<!--    </UModal>-->
+            <!-- Empty State -->
+            <div v-else class="text-center py-12">
+              <div class="inline-flex items-center justify-center w-16 h-16 bg-primary-50 dark:bg-primary-900/20 rounded-full mb-4">
+                <UIcon name="i-heroicons-sparkles" class="w-8 h-8 text-primary-600 dark:text-primary-400" />
+              </div>
+              <p class="text-gray-900 dark:text-white font-medium mb-1">Start searching</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">
+                Type at least 2 characters to search
+              </p>
+            </div>
+          </div>
+        </UCard>
+      </template>
+    </UModal>
   </header>
 </template>
 
-<script setup>
+<script setup lang="ts">
 
 
 const colorMode = useColorMode()
 const router = useRouter()
-const { searchProducts: searchProductsAPI } = useProducts()
+const config = useRuntimeConfig()
+const apiUrl = config.public.apiBase
 const { fetchCategories } = useContent()
 
 // Desktop Search state
@@ -229,6 +258,23 @@ const toggleColorMode = () => {
   colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
 }
 
+// Global search function that doesn't modify useProducts state
+const performGlobalSearch = async (query) => {
+  try {
+    const response = await $fetch(`${apiUrl}products`, {
+      query: { search: query }
+    })
+
+    if (response?.data && Array.isArray(response.data)) {
+      return response.data.slice(0, 8)
+    }
+    return []
+  } catch (error) {
+    console.error('Search error:', error)
+    return []
+  }
+}
+
 // Desktop Search
 watch(searchQuery, async (newQuery) => {
   if (searchTimeout) {
@@ -245,13 +291,7 @@ watch(searchQuery, async (newQuery) => {
 
   searchTimeout = setTimeout(async () => {
     try {
-      const response = await searchProductsAPI(newQuery.trim())
-
-      if (response?.products && Array.isArray(response.products)) {
-        searchResults.value = response.products.slice(0, 8)
-      } else {
-        searchResults.value = []
-      }
+      searchResults.value = await performGlobalSearch(newQuery.trim())
     } catch (error) {
       console.error('Search error:', error)
       searchResults.value = []
@@ -277,13 +317,7 @@ watch(searchQueryMobile, async (newQuery) => {
 
   searchTimeoutMobile = setTimeout(async () => {
     try {
-      const response = await searchProductsAPI(newQuery.trim())
-
-      if (response?.products && Array.isArray(response.products)) {
-        searchResultsMobile.value = response.products.slice(0, 8)
-      } else {
-        searchResultsMobile.value = []
-      }
+      searchResultsMobile.value = await performGlobalSearch(newQuery.trim())
     } catch (error) {
       console.error('Search error:', error)
       searchResultsMobile.value = []
@@ -295,7 +329,7 @@ watch(searchQueryMobile, async (newQuery) => {
 
 const handleProductSelect = (productSlug) => {
   if (productSlug) {
-    router.push(`/products/${productSlug}`)
+    router.push(`/shop/product/${productSlug}`)
     showMobileSearch.value = false
     showResults.value = false
     searchQuery.value = ''

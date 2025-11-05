@@ -13,7 +13,7 @@
     </section>
 
     <!-- Categories Section -->
-    <section class="py-12 md:py-16 bg-white dark:bg-gray-950">
+    <section class="py-6 md:py-16 bg-white dark:bg-gray-950">
       <UContainer>
         <CategoriesGrid />
       </UContainer>

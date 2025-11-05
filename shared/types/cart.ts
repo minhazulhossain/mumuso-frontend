@@ -1,18 +1,5 @@
 // types/cart.ts
-
-/**
- * Product information
- */
-export interface Product {
-    id?: number
-    slug: string
-    name: string
-    description?: string
-    price: number
-    image?: string
-    stock?: number
-    [key: string]: any // Allow additional fields
-}
+import type { Product } from './product'
 
 /**
  * Discount information for a cart item
