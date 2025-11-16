@@ -24,32 +24,35 @@ export default defineNuxtConfig({
         }
     },
 
-    compatibilityDate: '2025-07-15',
+    compatibilityDate: '2024-11-16', // ✅ Fixed - current date
 
     nitro: {
         preset: 'vercel',
         compressPublicAssets: true,
-        routeRules: {
-            '/api/**': {
-                proxy: process.env.NUXT_PUBLIC_API_BASE + '/api/**'
-            }
-        }
+        // ✅ Removed problematic proxy
     },
 
-    devtools: { enabled: true },
-
-    // Nuxt 4.2.0 experimental features for better performance
-    experimental: {
-        // Reduces JS bundle size by ~39% for prerendered sites
-        asyncDataHandlerExtraction: true,
-        // Enhanced TypeScript support with smart component features
-        typescriptPlugin: false, // Set to true if you want advanced TS features
-    },
+    devtools: { enabled: false }, // ✅ Disable in production
 
     runtimeConfig: {
+        // ✅ Session config for nuxt-auth-utils - required for production
+        session: {
+            password: process.env.NUXT_SESSION_PASSWORD || (() => {
+                if (process.env.NODE_ENV === 'production') {
+                    throw new Error('NUXT_SESSION_PASSWORD environment variable is required in production')
+                }
+                return 'dev-password-min-32-characters-required-xxx'
+            })()
+        },
+
         public: {
-            // Backend API base URL - used by server routes
-            apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://mumusoadmin.coderdrivelab.com/api/v1/'
+            // ✅ API base URL - required
+            apiBase: process.env.NUXT_PUBLIC_API_BASE || (() => {
+                if (process.env.NODE_ENV === 'production') {
+                    throw new Error('NUXT_PUBLIC_API_BASE environment variable is required in production')
+                }
+                return 'https://mumusoadmin.coderdrivelab.com/api/v1/'
+            })()
         }
     }
 })
