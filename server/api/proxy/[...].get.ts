@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
     }
 
     const config = useRuntimeConfig()
-    const backendUrl = process.env.BACKEND_API_BASE || 'http://mumusoadmin.coderdrivelab.com/api/v1/'
+    const backendUrl = process.env.BACKEND_API_BASE || 'https://mumusoadmin.coderdrivelab.com/api/v1/'
 
     // Build the full URL
     const url = new URL(path, backendUrl)
