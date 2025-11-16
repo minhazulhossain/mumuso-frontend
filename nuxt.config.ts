@@ -44,8 +44,8 @@ export default defineNuxtConfig({
         public: {
             // ✅ API base URL - uses CORS proxy for HTTP backend support
             // Production (Vercel HTTPS) uses CORS proxy to call HTTP backend
-            // Development (local HTTP) calls backend directly
-            apiBase: process.env.NUXT_PUBLIC_API_BASE || 'https://api.allorigins.win/raw?url=http://mumusoadmin.coderdrivelab.com/api/v1/'
+            // Uses cors-anywhere.herokuapp.com - more reliable for URL forwarding
+            apiBase: process.env.NUXT_PUBLIC_API_BASE || 'https://cors-anywhere.herokuapp.com/http://mumusoadmin.coderdrivelab.com/api/v1/'
         }
     }
 })
