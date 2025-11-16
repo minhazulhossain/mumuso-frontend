@@ -1,9 +1,10 @@
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const query = getQuery(event)
+  const apiBase = config.public.apiBase
 
   try {
-    const response = await $fetch(`${config.public.apiBase}blog`, {
+    const response = await $fetch(`${apiBase}blog`, {
       query: {
         per_page: query._limit || 9,
         page: query._page || 1,

@@ -43,9 +43,24 @@ export const useContent = () => {
         })
     }
 
+    const fetchCategory = async (slug: string) => {
+        return useFetch(`${apiBase}categories/${slug}`, {
+            key: 'category-' + slug,
+            server: true,
+            // Make sure this returns the data immediately
+            transform: (response: ApiResponse) => {
+                return response?.data || []
+            },
+            getCachedData: (key) => {
+                return useNuxtApp().static.data[key] ?? useNuxtApp().payload.data[key]
+            },
+        })
+    }
+
     return {
         fetchHeroBanners,
         fetchCategories,
-        fetchFeaturedCategories
+        fetchFeaturedCategories,
+        fetchCategory
     }
 }

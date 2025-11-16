@@ -1,8 +1,16 @@
 <template>
-  <ShopLayoutPage title="Shop" sub-title="Discover our amazing products" />
+  <ShopLayoutPage :title="category?.name" :sub-title="category?.description" :loading-content="pending"/>
 </template>
 <script setup lang="ts">
 
-  const route = useRoute()
+const {fetchCategory} = useContent()
+const route = useRoute()
+
+onMounted(async () => {
+  await fetchCategory(route.params.slug as string)
+})
+
+
+const {data: category, pending} = await fetchCategory(route.params.slug as string)
 
 </script>

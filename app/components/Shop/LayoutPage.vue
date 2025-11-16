@@ -102,7 +102,7 @@
             </div>
           </div>
           <!-- Loading State -->
-          <div v-if="loading">
+          <div v-if="loadingContent">
             <!-- Grid Skeleton -->
             <template v-if="viewMode === 'grid'">
               <div class="grid grid-cols-2 md:grid-cols-2 xl:grid-cols-3 gap-3">
@@ -254,6 +254,7 @@
 const props = defineProps<{
   title?: string
   subTitle?: string,
+  loadingContent ?: boolean
 }>()
 
 const {
