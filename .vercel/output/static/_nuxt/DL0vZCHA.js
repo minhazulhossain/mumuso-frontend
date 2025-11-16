@@ -1,0 +1,1 @@
+import{b5 as r,b6 as s,ai as u}from"./R_UQo4UH.js";import{u as i}from"./BV5vhKKJ.js";const m=r(async(n,f)=>{let e,t;const{loggedIn:a,fetch:o}=i();if([e,t]=s(()=>o()),await e,t(),!a.value)return u("/auth/login")});export{m as default};

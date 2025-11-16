@@ -1,0 +1,281 @@
+{
+  "version": 3,
+  "overrides": {},
+  "routes": [
+    {
+      "headers": {
+        "cache-control": "public, max-age=31536000, immutable"
+      },
+      "src": "/_nuxt/builds/meta/(.*)"
+    },
+    {
+      "headers": {
+        "cache-control": "public, max-age=1, immutable"
+      },
+      "src": "/_nuxt/builds/(.*)"
+    },
+    {
+      "headers": {
+        "cache-control": "public, max-age=31536000, immutable"
+      },
+      "src": "/_fonts/(.*)"
+    },
+    {
+      "headers": {
+        "cache-control": "public, max-age=31536000, immutable"
+      },
+      "src": "/_nuxt/(.*)"
+    },
+    {
+      "src": "/_nuxt/builds/meta(.*)",
+      "headers": {
+        "cache-control": "public,max-age=31536000,immutable"
+      },
+      "continue": true
+    },
+    {
+      "src": "/_nuxt/builds(.*)",
+      "headers": {
+        "cache-control": "public,max-age=31536000,immutable"
+      },
+      "continue": true
+    },
+    {
+      "src": "/_fonts(.*)",
+      "headers": {
+        "cache-control": "public,max-age=31536000,immutable"
+      },
+      "continue": true
+    },
+    {
+      "src": "/_nuxt(.*)",
+      "headers": {
+        "cache-control": "public,max-age=31536000,immutable"
+      },
+      "continue": true
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "(?<url>/__nuxt_error)",
+      "dest": "/__fallback"
+    },
+    {
+      "src": "/wishlist",
+      "dest": "/wishlist"
+    },
+    {
+      "src": "/shop",
+      "dest": "/shop"
+    },
+    {
+      "src": "/payment/success",
+      "dest": "/payment/success"
+    },
+    {
+      "src": "/payment/failed",
+      "dest": "/payment/failed"
+    },
+    {
+      "src": "/payment/cancelled",
+      "dest": "/payment/cancelled"
+    },
+    {
+      "src": "/order-confirmation",
+      "dest": "/order-confirmation"
+    },
+    {
+      "src": "/maintenance",
+      "dest": "/maintenance"
+    },
+    {
+      "src": "/contact",
+      "dest": "/contact"
+    },
+    {
+      "src": "/checkout",
+      "dest": "/checkout"
+    },
+    {
+      "src": "/cart",
+      "dest": "/cart"
+    },
+    {
+      "src": "/blog",
+      "dest": "/blog"
+    },
+    {
+      "src": "/auth/register",
+      "dest": "/auth/register"
+    },
+    {
+      "src": "/auth/login",
+      "dest": "/auth/login"
+    },
+    {
+      "src": "/api/user/stats",
+      "dest": "/api/user/stats"
+    },
+    {
+      "src": "/api/user/addresses",
+      "dest": "/api/user/addresses"
+    },
+    {
+      "src": "/api/payment/initiate",
+      "dest": "/api/payment/initiate"
+    },
+    {
+      "src": "/api/newsletter/subscribe",
+      "dest": "/api/newsletter/subscribe"
+    },
+    {
+      "src": "/api/cart/extend-reservation",
+      "dest": "/api/cart/extend-reservation"
+    },
+    {
+      "src": "/api/cart/count",
+      "dest": "/api/cart/count"
+    },
+    {
+      "src": "/api/cart/clear",
+      "dest": "/api/cart/clear"
+    },
+    {
+      "src": "/api/cart/checkout",
+      "dest": "/api/cart/checkout"
+    },
+    {
+      "src": "/api/cart/add",
+      "dest": "/api/cart/add"
+    },
+    {
+      "src": "/api/cart",
+      "dest": "/api/cart"
+    },
+    {
+      "src": "/api/blog/search",
+      "dest": "/api/blog/search"
+    },
+    {
+      "src": "/api/blog/categories",
+      "dest": "/api/blog/categories"
+    },
+    {
+      "src": "/api/blog",
+      "dest": "/api/blog"
+    },
+    {
+      "src": "/api/auth/session",
+      "dest": "/api/auth/session"
+    },
+    {
+      "src": "/api/auth/reset-password",
+      "dest": "/api/auth/reset-password"
+    },
+    {
+      "src": "/api/auth/register",
+      "dest": "/api/auth/register"
+    },
+    {
+      "src": "/api/auth/logout",
+      "dest": "/api/auth/logout"
+    },
+    {
+      "src": "/api/auth/login",
+      "dest": "/api/auth/login"
+    },
+    {
+      "src": "/api/auth/forgot-password",
+      "dest": "/api/auth/forgot-password"
+    },
+    {
+      "src": "/api/_posts",
+      "dest": "/api/_posts"
+    },
+    {
+      "src": "/api/_auth/session",
+      "dest": "/api/_auth/session"
+    },
+    {
+      "src": "/account",
+      "dest": "/account"
+    },
+    {
+      "src": "/__nuxt_error",
+      "dest": "/__nuxt_error"
+    },
+    {
+      "src": "/",
+      "dest": "/index"
+    },
+    {
+      "src": "/shop/product/(?<slug>[^/]+)",
+      "dest": "/shop/product/[slug]"
+    },
+    {
+      "src": "/shop/category/(?<category>[^/]+)",
+      "dest": "/shop/category/[category]"
+    },
+    {
+      "src": "/categories/(?<slug>[^/]+)",
+      "dest": "/categories/[slug]"
+    },
+    {
+      "src": "/blog/category/(?<name>[^/]+)",
+      "dest": "/blog/category/[name]"
+    },
+    {
+      "src": "/blog/(?<slug>[^/]+)",
+      "dest": "/blog/[slug]"
+    },
+    {
+      "src": "/api/user/addresses/(?<id>[^/]+)/default",
+      "dest": "/api/user/addresses/[id]/default"
+    },
+    {
+      "src": "/api/user/addresses/(?<id>[^/]+)",
+      "dest": "/api/user/addresses/[id]"
+    },
+    {
+      "src": "/api/payment/status/(?<transactionId>[^/]+)",
+      "dest": "/api/payment/status/[transactionId]"
+    },
+    {
+      "src": "/api/newsletter/verify/(?<token>[^/]+)",
+      "dest": "/api/newsletter/verify/[token]"
+    },
+    {
+      "src": "/api/newsletter/unsubscribe/(?<token>[^/]+)",
+      "dest": "/api/newsletter/unsubscribe/[token]"
+    },
+    {
+      "src": "/api/cart/update/(?<slug>[^/]+)",
+      "dest": "/api/cart/update/[slug]"
+    },
+    {
+      "src": "/api/cart/remove/(?<slug>[^/]+)",
+      "dest": "/api/cart/remove/[slug]"
+    },
+    {
+      "src": "/api/blog/(?<slug>[^/]+)",
+      "dest": "/api/blog/[slug]"
+    },
+    {
+      "src": "/api/_nuxt_icon/(?<collection>[^/]+)",
+      "dest": "/api/_nuxt_icon/[collection]"
+    },
+    {
+      "src": "/_ipx/(?:.*)",
+      "dest": "/_ipx/[...]"
+    },
+    {
+      "src": "/__nuxt_island/(?:.*)",
+      "dest": "/__nuxt_island/[...]"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/__fallback"
+    }
+  ]
+}
