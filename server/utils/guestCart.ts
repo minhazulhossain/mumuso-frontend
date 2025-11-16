@@ -3,16 +3,20 @@ import type { H3Event } from 'h3'
 import type { GuestCartData, GuestCartItem } from '#shared/types/server'
 
 const SESSION_NAME = 'guest-cart'
-const SESSION_PASSWORD = process.env.NUXT_SESSION_PASSWORD
-
-if (!SESSION_PASSWORD) {
-    throw new Error('NUXT_SESSION_PASSWORD environment variable is required')
-}
 
 /**
  * Get guest cart session with initialization
  */
 const getGuestCartSession = async (event: H3Event) => {
+    const SESSION_PASSWORD = process.env.NUXT_SESSION_PASSWORD
+
+    if (!SESSION_PASSWORD) {
+        throw createError({
+            statusCode: 500,
+            message: 'NUXT_SESSION_PASSWORD environment variable is required'
+        })
+    }
+
     const session = await useSession<GuestCartData>(event, {
         password: SESSION_PASSWORD,
         name: SESSION_NAME

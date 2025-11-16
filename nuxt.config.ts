@@ -35,24 +35,15 @@ export default defineNuxtConfig({
     devtools: { enabled: false }, // ✅ Disable in production
 
     runtimeConfig: {
-        // ✅ Session config for nuxt-auth-utils - required for production
+        // ✅ Session config for nuxt-auth-utils
+        // WARNING: Must be set via environment variable in production
         session: {
-            password: process.env.NUXT_SESSION_PASSWORD || (() => {
-                if (process.env.NODE_ENV === 'production') {
-                    throw new Error('NUXT_SESSION_PASSWORD environment variable is required in production')
-                }
-                return 'dev-password-min-32-characters-required-xxx'
-            })()
+            password: process.env.NUXT_SESSION_PASSWORD || 'dev-secret-key-change-in-production-min-32-xxx'
         },
 
         public: {
-            // ✅ API base URL - required
-            apiBase: process.env.NUXT_PUBLIC_API_BASE || (() => {
-                if (process.env.NODE_ENV === 'production') {
-                    throw new Error('NUXT_PUBLIC_API_BASE environment variable is required in production')
-                }
-                return 'https://mumusoadmin.coderdrivelab.com/api/v1/'
-            })()
+            // ✅ API base URL - must be configured properly
+            apiBase: process.env.NUXT_PUBLIC_API_BASE || 'https://mumusoadmin.coderdrivelab.com/api/v1/'
         }
     }
 })
