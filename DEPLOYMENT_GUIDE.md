@@ -2,11 +2,12 @@
 
 ## Status
 ✅ **Build:** Succeeds without errors
-❌ **Configuration:** Incomplete - missing environment variables
+✅ **Server:** Starts successfully with fallback values
+⚠️  **Configuration:** Environment variables recommended for production security
 
 ## Critical Steps to Deploy
 
-### 1. Set Vercel Environment Variables (MOST IMPORTANT)
+### 1. Set Vercel Environment Variables (STRONGLY RECOMMENDED)
 
 Go to **Vercel Dashboard → Your Project → Settings → Environment Variables** and add:
 
@@ -15,9 +16,15 @@ NUXT_SESSION_PASSWORD=42fb3ccd4d6f4df49f4429771b02141f
 NUXT_PUBLIC_API_BASE=https://mumusoadmin.coderdrivelab.com/api/v1/
 ```
 
-**Why:** Without these variables:
-- `NUXT_SESSION_PASSWORD` missing → Session encryption fails → Login breaks
-- `NUXT_PUBLIC_API_BASE` missing → All API calls fail with 500 errors
+**Why:**
+- `NUXT_SESSION_PASSWORD`: Uses fallback for development, but production should use a unique secure key
+- `NUXT_PUBLIC_API_BASE`: Uses fallback pointing to coderdrivelab.com, but you should configure your own API endpoint
+
+**Important:** If these variables are not set:
+- Server will still start and serve pages
+- Cart operations will work but use insecure session password
+- API calls will go to the fallback domain instead of your configured API
+- This is fine for testing but **not recommended for production**
 
 ### 2. Update Local .env to HTTPS (Already Done ✅)
 
@@ -78,21 +85,27 @@ Nuxt 4 + Vercel preset (`nitro.preset: 'vercel'`) is properly configured in `nux
 
 ## Troubleshooting
 
-### "NUXT_SESSION_PASSWORD environment variable is required"
-- **Cause:** Not set on Vercel
-- **Fix:** Add to Vercel Environment Variables (see Step 1)
+### "Function Invocation Failed" Error
+- **Cause:** Missing `@iconify/utils` dependency (now fixed)
+- **Status:** ✅ Resolved - added to package.json
 
-### API calls return 500 errors
-- **Cause:** `NUXT_PUBLIC_API_BASE` not set or incorrect
-- **Fix:** Verify environment variables in Vercel dashboard
+### API calls go to wrong domain
+- **Cause:** `NUXT_PUBLIC_API_BASE` not set or using fallback
+- **Fix:** Set `NUXT_PUBLIC_API_BASE` to your API domain in Vercel Environment Variables
+- **Example:** `https://your-api.com/api/v1/`
+
+### Cart data not persisting (guest mode)
+- **Cause:** Using fallback `NUXT_SESSION_PASSWORD` instead of production key
+- **Fix:** Set `NUXT_SESSION_PASSWORD` to unique secure key in Vercel
+- **Security:** Different deployments using same password = security risk
 
 ### Mixed content warnings in browser
 - **Cause:** API URL using `http://` instead of `https://`
 - **Fix:** Ensure `NUXT_PUBLIC_API_BASE` uses HTTPS protocol
 
-### Cart/session not persisting
-- **Cause:** Different instances using different session passwords
-- **Fix:** Ensure all Vercel deployments have same `NUXT_SESSION_PASSWORD`
+### 500 errors when using cart features
+- **Cause:** Session encryption issue with fallback password
+- **Fix:** Configure proper `NUXT_SESSION_PASSWORD` in Vercel Environment Variables
 
 ## Next Steps
 
