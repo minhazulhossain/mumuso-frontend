@@ -25,6 +25,17 @@ export default defineNuxtConfig({
     },
 
     compatibilityDate: '2025-07-15',
+
+    nitro: {
+        preset: 'node-server',
+        compressPublicAssets: true,
+        routeRules: {
+            '/api/**': {
+                proxy: process.env.NUXT_PUBLIC_API_BASE + '/api/**'
+            }
+        }
+    },
+
     devtools: { enabled: true },
 
     // Nuxt 4.2.0 experimental features for better performance
@@ -38,7 +49,7 @@ export default defineNuxtConfig({
     runtimeConfig: {
         public: {
             // Backend API base URL - used by server routes
-            apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://127.0.0.1:8000/api/v1/'
+            apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://mumusoadmin.coderdrivelab.com/api/v1/'
         }
     }
 })

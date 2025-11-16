@@ -23,14 +23,14 @@
         <div class="lg:col-span-2">
 
           <!-- Step 1: Contact Information -->
-          <ContactInformationForm
+          <CheckoutContactInformationForm
               v-if="currentStep === 1"
               v-model="contactInfo"
               @next="handleNext"
           />
 
           <!-- Step 2: Shipping Information -->
-          <ShippingAddressForm
+          <CheckoutShippingAddressForm
               v-if="currentStep === 2"
               v-model="shippingAddress"
               v-model:selected-shipping-method="selectedShippingMethod"
@@ -42,22 +42,22 @@
           <!-- Step 3: Payment Information -->
           <div v-if="currentStep === 3" class="space-y-6">
             <!-- Billing Address -->
-            <BillingAddressForm
+            <CheckoutBillingAddressForm
                 v-model="billingAddress"
                 v-model:same-as-shipping="sameAsShipping"
             />
 
             <!-- Payment Method -->
-            <PaymentMethodForm
+            <CheckoutPaymentMethodForm
                 v-model="paymentInfo"
                 v-model:selected-payment-method="selectedPaymentMethod"
             />
 
             <!-- Order Notes -->
-            <OrderNotes v-model="orderNotes" />
+            <CheckoutOrderNotes v-model="orderNotes" />
 
             <!-- Terms and Conditions -->
-            <TermsAcceptance v-model="agreedToTerms" />
+            <CheckoutTermsAcceptance v-model="agreedToTerms" />
 
             <!-- Navigation Buttons -->
             <div class="flex justify-between">
@@ -84,7 +84,7 @@
 
         <!-- Right Side - Order Summary (1 column) -->
         <div class="lg:col-span-1">
-          <OrderSummary
+          <CheckoutOrderSummary
               :cart-items="cartItems || []"
               :shipping-cost="shippingCost"
               :tax-rate="10"
@@ -96,13 +96,6 @@
 </template>
 
 <script setup lang="ts">
-import ContactInformationForm from '~/components/checkout/ContactInformationForm.vue'
-import ShippingAddressForm from '~/components/checkout/ShippingAddressForm.vue'
-import BillingAddressForm from '~/components/checkout/BillingAddressForm.vue'
-import PaymentMethodForm from '~/components/checkout/PaymentMethodForm.vue'
-import OrderSummary from '~/components/checkout/OrderSummary.vue'
-import OrderNotes from '~/components/checkout/OrderNotes.vue'
-import TermsAcceptance from '~/components/checkout/TermsAcceptance.vue'
 
 const toast = useToast()
 const router = useRouter()
