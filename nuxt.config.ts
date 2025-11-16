@@ -43,12 +43,9 @@ export default defineNuxtConfig({
 
         public: {
             // ✅ API base URL - uses CORS proxy for HTTP backend support
-            // Vercel (HTTPS) frontend needs HTTPS API calls, so we use a CORS proxy
-            // allorigins.win is a free CORS proxy that allows HTTP backend access
-            apiBase: process.env.NUXT_PUBLIC_API_BASE ||
-                (process.env.NODE_ENV === 'production'
-                    ? 'https://api.allorigins.win/raw?url=http://mumusoadmin.coderdrivelab.com/api/v1/'
-                    : 'http://mumusoadmin.coderdrivelab.com/api/v1/')
+            // Production (Vercel HTTPS) uses CORS proxy to call HTTP backend
+            // Development (local HTTP) calls backend directly
+            apiBase: process.env.NUXT_PUBLIC_API_BASE || 'https://api.allorigins.win/raw?url=http://mumusoadmin.coderdrivelab.com/api/v1/'
         }
     }
 })
