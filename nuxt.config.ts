@@ -42,10 +42,10 @@ export default defineNuxtConfig({
         },
 
         public: {
-            // ✅ API base URL - uses CORS proxy for HTTP backend support
-            // Production (Vercel HTTPS) uses CORS proxy to call HTTP backend
-            // Uses cors-anywhere.herokuapp.com - more reliable for URL forwarding
-            apiBase: process.env.NUXT_PUBLIC_API_BASE || 'https://cors-anywhere.herokuapp.com/http://mumusoadmin.coderdrivelab.com/api/v1/'
+            // ✅ API base URL - uses server-side proxy to avoid CORS issues
+            // Frontend calls /api/proxy/* which forwards to backend
+            // This avoids all CORS issues by proxying through Vercel server
+            apiBase: process.env.NUXT_PUBLIC_API_BASE || '/api/proxy/'
         }
     }
 })
