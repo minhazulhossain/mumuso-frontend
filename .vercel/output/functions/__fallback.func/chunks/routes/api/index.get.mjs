@@ -25,7 +25,6 @@ const index_get = defineEventHandler(async (event) => {
         // if you add category support later
       }
     });
-    console.log("response", response);
     return {
       posts: response.data,
       total: response.meta.total,

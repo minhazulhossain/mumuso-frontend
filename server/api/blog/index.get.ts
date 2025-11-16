@@ -13,8 +13,6 @@ export default defineEventHandler(async (event) => {
       }
     })
 
-    console.log('response', response)
-
     // Transform Laravel pagination to match your frontend format
     return {
       posts: response.data,

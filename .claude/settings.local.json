@@ -12,7 +12,9 @@
       "WebSearch",
       "WebFetch(domain:vueschool.io)",
       "Bash(cat:*)",
-      "WebFetch(domain:ui.nuxt.com)"
+      "WebFetch(domain:ui.nuxt.com)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []

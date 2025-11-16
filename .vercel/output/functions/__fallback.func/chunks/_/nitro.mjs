@@ -5092,7 +5092,7 @@ function _expandFromEnv(value) {
 const _inlineRuntimeConfig = {
   "app": {
     "baseURL": "/",
-    "buildId": "d6c64638-acbe-43dd-b790-4fc2488479d3",
+    "buildId": "e90da1e6-6217-458f-96f8-bb44f2d32802",
     "buildAssetsDir": "/_nuxt/",
     "cdnURL": ""
   },
@@ -5102,12 +5102,6 @@ const _inlineRuntimeConfig = {
       "/__nuxt_error": {
         "cache": false,
         "isr": false
-      },
-      "/api/**": {
-        "proxy": {
-          "to": "http://mumusoadmin.coderdrivelab.com/api/v1//api/**",
-          "_proxyStripBase": "/api"
-        }
       },
       "/_nuxt/builds/meta/**": {
         "headers": {
@@ -5132,20 +5126,20 @@ const _inlineRuntimeConfig = {
     }
   },
   "public": {
-    "apiBase": "http://mumusoadmin.coderdrivelab.com/api/v1/",
+    "apiBase": "https://mumusoadmin.coderdrivelab.com/api/v1/",
     "auth": {
       "loadStrategy": "server-first"
     }
   },
-  "icon": {
-    "serverKnownCssClasses": []
-  },
   "session": {
     "name": "nuxt-session",
-    "password": "",
+    "password": "42fb3ccd4d6f4df49f4429771b02141f",
     "cookie": {
       "sameSite": "lax"
     }
+  },
+  "icon": {
+    "serverKnownCssClasses": []
   },
   "hash": {
     "scrypt": {}
@@ -6131,7 +6125,10 @@ const refreshUserSession = async (event) => {
 };
 
 const SESSION_NAME = "guest-cart";
-const SESSION_PASSWORD = process.env.NUXT_SESSION_PASSWORD || "nuxt-guest-cart-secret-key-change-in-production-min-32-chars";
+const SESSION_PASSWORD = process.env.NUXT_SESSION_PASSWORD;
+if (!SESSION_PASSWORD) {
+  throw new Error("NUXT_SESSION_PASSWORD environment variable is required");
+}
 const getGuestCartSession = async (event) => {
   const session = await useSession(event, {
     password: SESSION_PASSWORD,
