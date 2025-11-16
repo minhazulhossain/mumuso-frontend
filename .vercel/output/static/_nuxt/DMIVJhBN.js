@@ -1,1 +1,0 @@
-const i=()=>({fetchPosts:async(t,a=1,s)=>{const e={_page:a,_limit:9};return t&&(e.category=t),s&&(e.search=s),await $fetch("/api/blog",{query:e})},fetchCategories:async()=>await $fetch("/api/blog/categories"),fetchPost:async t=>await $fetch(`/api/blog/${t}`)});export{i as u};
