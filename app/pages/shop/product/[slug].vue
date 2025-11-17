@@ -291,7 +291,8 @@
 const route = useRoute()
 const toast = useToast()
 const {fetchProduct, fetchProducts, loading, error} = useProducts()
-const {addToCart, toggleCart} = useCart()
+const cart = inject('cart')
+const {addToCart, toggleCart} = cart
 const {isInWishlist, toggleWishlist, initWishlist} = useWishlist()
 
 // State

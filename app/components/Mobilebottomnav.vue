@@ -95,7 +95,8 @@ import { useRoute } from 'vue-router'
 const route = useRoute()
 const showCategories = ref(false)
 const expandedCategory = ref(null)
-const cartCount = ref(3) // Replace with actual cart count from your store
+const cart = inject('cart')
+const cartItemsCount = computed(() => cart?.cartItemsCount?.value || 0)
 
 const currentRoute = computed(() => route.path)
 

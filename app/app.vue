@@ -16,10 +16,16 @@
   </UApp>
 </template>
 <script setup lang="ts">
+import type { Cart } from '#shared/types'
 
 const { fetchSettings } = useSettings()
+const cart = useCart()
 
 const { data: settings, pending, error } = await fetchSettings()
+
+// Provide settings and cart globally to all child components
+provide('settings', settings)
+provide('cart', cart)
 
 watch(() => settings.value?.site.active, (isActive) => {
   if (isActive === false) {

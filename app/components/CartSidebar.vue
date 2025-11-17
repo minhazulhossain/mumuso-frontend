@@ -224,6 +224,8 @@
 
 const route = useRoute()
 
+const cart = inject('cart')
+
 const {
   cartItems,
   cartTotal,
@@ -238,7 +240,7 @@ const {
   removeFromCart,
   clearCart,
   checkout
-} = useCart()
+} = cart
 
 const { loggedIn } = useAuth()
 const checkoutLoading = ref(false)

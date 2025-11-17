@@ -99,7 +99,8 @@
 
 const toast = useToast()
 const router = useRouter()
-const { cartItems } = useCart()
+const cart = inject('cart')
+const { cartItems } = cart
 const { initiatePayment } = usePayment()
 
 // Stepper steps configuration

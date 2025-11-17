@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
     <UContainer class="py-8">
-      <div class="mb-8">
+      <div class="mb-4 md:mb-8">
         <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">{{ title }}</h1>
         <p class="text-gray-600 dark:text-gray-400">{{ subTitle }}</p>
       </div>
@@ -156,7 +156,7 @@
             <!-- Products Grid View -->
             <div
                 v-if="products.length > 0 && viewMode === 'grid'"
-                class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3"
+                class="grid grid-cols-2 xl:grid-cols-3 gap-3"
             >
               <ShopProductCard
                   v-for="product in products"
@@ -261,7 +261,8 @@ const {
   products, pagination, loading, error, fetchProducts,
   changePage: apiChangePage, getAllCategories
 } = useProducts()
-const {addToCart} = useCart()
+const cart = inject('cart')
+const {addToCart} = cart
 const toast = useToast()
 const route = useRoute()
 const router = useRouter()

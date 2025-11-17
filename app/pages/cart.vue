@@ -286,6 +286,8 @@
 const toast = useToast()
 const router = useRouter()
 
+const cart = inject('cart')
+
 const {
   cartItems,
   cartTotal,
@@ -299,7 +301,7 @@ const {
   removeFromCart,
   clearCart,
   checkout
-} = useCart()
+} = cart
 
 // Constants
 const taxRate = 10 // 10% tax

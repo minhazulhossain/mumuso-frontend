@@ -9,7 +9,9 @@ const props = withDefaults(defineProps<Props>(), {
   showTagline: false,
 })
 
-const { data: settings } = useNuxtData('settings')
+import type {Settings} from '#shared/types'
+
+const settings = inject<Settings>('settings')
 
 const sizeClasses = computed(() => {
   const sizes = {

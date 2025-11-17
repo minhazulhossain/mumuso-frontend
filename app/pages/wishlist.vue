@@ -103,7 +103,8 @@ import type { WishlistItem } from '#shared/types'
 
 const toast = useToast()
 const { wishlistItems, wishlistCount, removeFromWishlist, clearWishlist } = useWishlist()
-const { addToCart } = useCart()
+const cart = inject('cart')
+const { addToCart } = cart
 
 // Format date
 const formatDate = (dateString: string) => {

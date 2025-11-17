@@ -32,7 +32,7 @@ export default defineNuxtConfig({
         // ✅ Removed problematic proxy
     },
 
-    devtools: { enabled: false }, // ✅ Disable in production
+    devtools: { enabled: true }, // ✅ Disable in production
 
     runtimeConfig: {
         // ✅ Session config for nuxt-auth-utils
