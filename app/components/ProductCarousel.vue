@@ -30,8 +30,8 @@
         :items="loading ? skeletonItems : items"
         :ui="{
         item: 'basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5 ps-2',
-        dot: 'w-10 h-2 data-[state=active]:bg-success-600 data-[state=active]:w-20',
-        dots: '-bottom-3 md:-bottom-7'
+        dot: 'w-2 md:w-10 h-1.5 md:h-2 rounded-full transition-all cursor-pointer bg-gray-400 hover:bg-gray-500 data-[state=active]:bg-success-600 data-[state=active]:w-3 md:data-[state=active]:w-20',
+        dots: '-bottom-4 md:-bottom-7 flex gap-1 md:gap-2 justify-center'
 
       }"
 

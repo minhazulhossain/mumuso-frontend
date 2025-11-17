@@ -248,7 +248,6 @@ const toggleCategory = (categoryId) => {
   background: white;
   width: 100%;
   max-height: 80vh;
-  border-radius: 20px 20px 0 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -305,7 +304,6 @@ const toggleCategory = (categoryId) => {
   gap: 12px;
   padding: 16px;
   background: #f9fafb;
-  border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s;
 }

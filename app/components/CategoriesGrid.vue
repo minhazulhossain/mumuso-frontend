@@ -10,11 +10,10 @@
         v-else
         v-slot="{ item }"
         loop
-        dots
-        :slides-to-scroll="3"
+        :slides-to-scroll="slidesToScroll"
         :items="categories"
         :ui="{
-        item: 'basis-[29%] md:basis-1/8 lg:basis-1/8',
+        item: itemBasis,
         dot: 'w-10 h-2 data-[state=active]:bg-success-600 data-[state=active]:w-20'
       }"
     >
@@ -37,7 +36,7 @@
               />
             </div>
           </template>
-          <p class="mb-0 text-sm leading-none">{{ item?.name }}</p>
+          <p class="mb-0 text-sm leading-none truncate">{{ item?.name }}</p>
         </UCard>
       </NuxtLink>
     </UCarousel>
@@ -50,11 +49,42 @@ const { fetchFeaturedCategories } = useContent()
 const { data: categories, pending } = await fetchFeaturedCategories()
 
 const loading = ref(false)
+const isMobile = ref(false)
+const isTablet = ref(false)
 
 const loadedImages = ref<Record<string, boolean>>({})
 
 const handleImageLoad = (src: string) => {
   loadedImages.value[src] = true
 }
+
+// Responsive carousel settings
+const slidesToScroll = computed(() => {
+  if (isMobile.value) return 4
+  if (isTablet.value) return 6
+  return 8
+})
+
+const itemBasis = computed(() => {
+  if (isMobile.value) return 'basis-1/4'
+  if (isTablet.value) return 'basis-1/6'
+  return 'basis-1/8'
+})
+
+// Mobile/tablet detection
+onMounted(() => {
+  const updateBreakpoint = () => {
+    const width = window.innerWidth
+    isMobile.value = width < 768
+    isTablet.value = width >= 768 && width < 1024
+  }
+
+  updateBreakpoint()
+  window.addEventListener('resize', updateBreakpoint)
+
+  onUnmounted(() => {
+    window.removeEventListener('resize', updateBreakpoint)
+  })
+})
 
 </script>

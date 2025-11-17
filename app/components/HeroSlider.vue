@@ -13,8 +13,8 @@
         :items="banners"
         :ui="{
         item: 'w-full',
-        dots: 'absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-20',
-        dot: 'w-10 md:w-14 h-2 rounded-full transition-all cursor-pointer bg-white/50 hover:bg-white/75 data-[state=active]:w-16 md:data-[state=active]:w-20 data-[state=active]:bg-white',
+        dots: 'absolute bottom-2 md:bottom-6 left-1/2 -translate-x-1/2 flex gap-1 md:gap-2 z-20',
+        dot: 'w-2 md:w-10 md:h-2 h-1.5 rounded-full transition-all cursor-pointer bg-white/50 hover:bg-white/75 data-[state=active]:w-3 md:data-[state=active]:w-16 md:data-[state=active]:w-20 data-[state=active]:bg-white',
       }"
         :arrows="false"
         :dots="banners.length > 1"
@@ -31,7 +31,7 @@
         <div class="relative w-full h-full bg-gray-100">
           <!-- Responsive Images -->
           <NuxtPicture
-              :src="banner.image.desktop"
+              :src="isMobile ? (banner.image.mobile || banner.image.desktop) : banner.image.desktop"
               :alt="banner.title"
               :img-attrs="{
                 class: 'w-full h-full object-cover',

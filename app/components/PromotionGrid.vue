@@ -13,10 +13,11 @@
         wheel-gestures
         :items="products"
         :ui="{
-        item: 'basis-[60%] md:basis-[40%] ps-2'
+        item: 'basis-[66%] sm:basis-[60%] md:basis-[40%] ps-0 sm:ps-2 pe-2 sm:pe-4',
+        wrapper: 'justify-start'
       }"
     >
-      <UCard :ui="{ root: 'rounded-none mb-2', header: 'p-0 sm:px-0' }">
+      <UCard :ui="{ root: 'rounded-none mb-2', header: 'p-0 sm:px-0', body:'p-2 sm:p-4' }">
         <template #header>
           <div class="relative w-full aspect-[380/288] bg-gray-100">
             <!-- Actual image -->
@@ -35,7 +36,7 @@
           </div>
         </template>
 
-        <p>{{ item.description }}</p>
+        <p class="text-sm">{{ item.description }}</p>
       </UCard>
     </UCarousel>
   </div>

@@ -5,10 +5,28 @@ export default defineNuxtConfig({
     ui: {
         theme: {
             defaultVariants: {
-                color: 'neutral',
+                color: 'primary',
                 size: 'sm'
             }
+        },
+        colors: {
+            primary: [
+                '#f8fafc',  // 50 - Almost white
+                '#f1f5f9',  // 100 - Very light
+                '#e2e8f0',  // 200 - Light
+                '#cbd5e1',  // 300 - Light-medium
+                '#94a3b8',  // 400 - Medium
+                '#64748b',  // 500 - Base primary
+                '#475569',  // 600 - Dark
+                '#334155',  // 700 - Darker
+                '#1e293b',  // 800 - Very dark
+                '#0f172a'   // 950 - Almost black
+            ]
         }
+    },
+
+    colorMode: {
+        preference: 'light'
     },
 
     image: {

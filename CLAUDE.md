@@ -272,3 +272,4 @@ When working with types: shared/types/ (import via #shared/types), see shared/ty
 When working with shared utilities: shared/utils/ (auto-imported), e.g., cart-helpers.ts for cart operations
 When working with images: Use NuxtImg/NuxtPicture components for automatic optimization
 When adding new API routes: Follow pattern in server/api/ with proper HTTP method suffix (.get.ts, .post.ts, etc.)
+- 46B989 this should be primary color. And default mode should be light not system
