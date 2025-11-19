@@ -4,30 +4,33 @@
 
     <div class="space-y-4">
       <!-- Payment Options -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <button
-            v-for="method in paymentMethods"
-            :key="method.id"
-            type="button"
-            @click="$emit('update:selectedPaymentMethod', method.id)"
-            class="flex flex-col items-center justify-center p-4 border-2 rounded-lg cursor-pointer transition-all"
-            :class="selectedPaymentMethod === method.id
-              ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
-              : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'"
-        >
-          <div class="w-5 h-5 rounded-full border-2 mb-2 flex items-center justify-center transition-colors"
-               :class="selectedPaymentMethod === method.id
-                 ? 'border-primary-500 bg-primary-500'
-                 : 'border-gray-300 dark:border-gray-600'">
-            <div v-if="selectedPaymentMethod === method.id" class="w-2 h-2 bg-white rounded-full"></div>
-          </div>
-          <UIcon :name="method.icon" class="text-3xl mb-2" :class="method.iconColor"/>
-          <span class="text-sm font-medium text-gray-900 dark:text-white">{{ method.name }}</span>
-        </button>
-      </div>
+      <ClientOnly>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <button
+              v-for="method in paymentMethods"
+              :key="method.id"
+              type="button"
+              @click="$emit('update:selectedPaymentMethod', method.id)"
+              class="flex flex-col items-center justify-center p-4 border-2 rounded-lg cursor-pointer transition-all"
+              :class="selectedPaymentMethod === method.id
+                ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
+                : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'"
+          >
+            <div class="w-5 h-5 rounded-full border-2 mb-2 flex items-center justify-center transition-colors"
+                 :class="selectedPaymentMethod === method.id
+                   ? 'border-primary-500 bg-primary-500'
+                   : 'border-gray-300 dark:border-gray-600'">
+              <div v-if="selectedPaymentMethod === method.id" class="w-2 h-2 bg-white rounded-full"></div>
+            </div>
+            <UIcon :name="method.icon" class="text-3xl mb-2" :class="method.iconColor"/>
+            <span class="text-sm font-medium text-gray-900 dark:text-white">{{ method.name }}</span>
+          </button>
+        </div>
+      </ClientOnly>
 
       <!-- Credit Card Form -->
-      <div v-if="selectedPaymentMethod === 'card'" class="space-y-4 pt-4">
+      <ClientOnly>
+        <div v-if="selectedPaymentMethod === 'card'" class="space-y-4 pt-4">
         <UFormField label="Card Number" required>
           <UInput
               :model-value="modelValue.cardNumber"
@@ -80,55 +83,63 @@
             Save card for future purchases
           </label>
         </div>
-      </div>
+        </div>
+      </ClientOnly>
 
       <!-- PayPal Notice -->
-      <div v-if="selectedPaymentMethod === 'paypal'" class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-        <div class="flex items-start gap-3">
-          <UIcon name="i-heroicons-information-circle" class="text-blue-500 text-xl mt-0.5"/>
-          <div>
-            <p class="font-medium text-blue-900 dark:text-blue-100">PayPal Checkout</p>
-            <p class="text-sm text-blue-700 dark:text-blue-300 mt-1">
-              You will be redirected to PayPal to complete your purchase securely.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Apple Pay Notice -->
-      <div v-if="selectedPaymentMethod === 'apple'" class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-        <div class="flex items-start gap-3">
-          <UIcon name="i-heroicons-information-circle" class="text-gray-500 text-xl mt-0.5"/>
-          <div>
-            <p class="font-medium text-gray-900 dark:text-white">Apple Pay</p>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              Complete your purchase quickly and securely with Apple Pay.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Cash on Delivery Notice -->
-      <div v-if="selectedPaymentMethod === 'cash'" class="p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
-        <div class="flex items-start gap-3">
-          <UIcon name="i-heroicons-banknotes" class="text-amber-600 dark:text-amber-400 text-xl mt-0.5"/>
-          <div>
-            <p class="font-medium text-amber-900 dark:text-amber-100 mb-2">Cash on Delivery (COD)</p>
-            <div class="text-sm text-amber-800 dark:text-amber-200 space-y-2">
-              <p>Pay the delivery person when your order arrives at your doorstep.</p>
-              <ul class="list-disc list-inside space-y-1 mt-2">
-                <li>No online payment required</li>
-                <li>Pay directly to the delivery driver</li>
-                <li>Please have the exact amount ready</li>
-                <li>Your order will be confirmed after payment</li>
-              </ul>
+      <ClientOnly>
+        <div v-if="selectedPaymentMethod === 'paypal'" class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+          <div class="flex items-start gap-3">
+            <UIcon name="i-heroicons-information-circle" class="text-blue-500 text-xl mt-0.5"/>
+            <div>
+              <p class="font-medium text-blue-900 dark:text-blue-100">PayPal Checkout</p>
+              <p class="text-sm text-blue-700 dark:text-blue-300 mt-1">
+                You will be redirected to PayPal to complete your purchase securely.
+              </p>
             </div>
           </div>
         </div>
-      </div>
+      </ClientOnly>
+
+      <!-- Apple Pay Notice -->
+      <ClientOnly>
+        <div v-if="selectedPaymentMethod === 'apple'" class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+          <div class="flex items-start gap-3">
+            <UIcon name="i-heroicons-information-circle" class="text-gray-500 text-xl mt-0.5"/>
+            <div>
+              <p class="font-medium text-gray-900 dark:text-white">Apple Pay</p>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                Complete your purchase quickly and securely with Apple Pay.
+              </p>
+            </div>
+          </div>
+        </div>
+      </ClientOnly>
+
+      <!-- Cash on Delivery Notice -->
+      <ClientOnly>
+        <div v-if="selectedPaymentMethod === 'cash'" class="p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+          <div class="flex items-start gap-3">
+            <UIcon name="i-heroicons-banknotes" class="text-amber-600 dark:text-amber-400 text-xl mt-0.5"/>
+            <div>
+              <p class="font-medium text-amber-900 dark:text-amber-100 mb-2">Cash on Delivery (COD)</p>
+              <div class="text-sm text-amber-800 dark:text-amber-200 space-y-2">
+                <p>Pay the delivery person when your order arrives at your doorstep.</p>
+                <ul class="list-disc list-inside space-y-1 mt-2">
+                  <li>No online payment required</li>
+                  <li>Pay directly to the delivery driver</li>
+                  <li>Please have the exact amount ready</li>
+                  <li>Your order will be confirmed after payment</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ClientOnly>
 
       <!-- SSLCommerz Notice -->
-      <div v-if="selectedPaymentMethod === 'sslcommerz'" class="space-y-4 pt-4">
+      <ClientOnly>
+        <div v-if="selectedPaymentMethod === 'sslcommerz'" class="space-y-4 pt-4">
         <div class="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
           <div class="flex items-start gap-3">
             <UIcon name="i-heroicons-shield-check" class="text-green-600 dark:text-green-400 text-xl mt-0.5"/>
@@ -175,7 +186,8 @@
             <span class="text-blue-700 dark:text-blue-300 block text-xs">Your payment information is secure and encrypted</span>
           </div>
         </div>
-      </div>
+        </div>
+      </ClientOnly>
     </div>
   </div>
 </template>
