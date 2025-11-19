@@ -34,8 +34,9 @@
                 @mouseleave="isZoomed = false"
             />
             <!-- Zoom Hint -->
-            <div v-if="!isZoomed"
-                 class="absolute inset-0 bg-opacity-0 group-hover:bg-opacity-10 transition-all flex items-center justify-center pointer-events-none">
+            <div
+                 class="absolute inset-0 bg-opacity-0 group-hover:bg-opacity-10 transition-all flex items-center justify-center pointer-events-none"
+                 :class="{ 'hidden': isZoomed }">
               <div
                   class="bg-white dark:bg-gray-800 rounded-full p-3 opacity-0 group-hover:opacity-100 transition-opacity">
                 <UIcon name="i-lucide-lightbulb" class="text-2xl text-gray-700 dark:text-gray-300"/>
