@@ -102,6 +102,7 @@ const router = useRouter()
 const cart = inject('cart')
 const { cartItems } = cart
 const { initiatePayment } = usePayment()
+const { createOrder } = useOrders()
 
 // Stepper steps configuration
 const steps = [
@@ -322,13 +323,19 @@ const handlePlaceOrder = async () => {
       shippingCost: shippingCost.value,
     }
 
-    // TODO: Replace with actual API call to create order in backend
-    // const response = await $fetch('/api/orders', { method: 'POST', body: order })
-    // const orderId = response.data.id
+    // Step 1: Create order in backend
+    const orderResponse = await createOrder(order)
 
-    // For now, simulate order creation with a temporary ID
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    const orderId = Math.floor(Math.random() * 10000)
+    if (!orderResponse) {
+      toast.add({
+        title: 'Error',
+        description: 'Failed to create order. Please try again.',
+        color: 'error'
+      })
+      return
+    }
+
+    const orderId = orderResponse.id
 
     // Step 2: Handle payment based on selected method
     if (selectedPaymentMethod.value === 'sslcommerz') {

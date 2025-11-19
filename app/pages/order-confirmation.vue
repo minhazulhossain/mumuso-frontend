@@ -1,8 +1,21 @@
 <template>
   <div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
     <UContainer class="max-w-4xl">
+      <!-- Loading State -->
+      <div v-if="loading" class="text-center py-16">
+        <UIcon name="i-heroicons-arrow-path" class="text-4xl text-primary-500 mb-4 animate-spin inline-block"/>
+        <p class="text-gray-600 dark:text-gray-400 mt-4">Loading your order details...</p>
+      </div>
+
+      <!-- Error State -->
+      <div v-else-if="error" class="text-center py-16">
+        <UIcon name="i-heroicons-exclamation-triangle" class="text-4xl text-red-500 mb-4"/>
+        <p class="text-red-600 dark:text-red-400 mb-4">{{ error }}</p>
+        <UButton to="/shop" color="primary">Continue Shopping</UButton>
+      </div>
+
       <!-- Success Message -->
-      <div class="text-center mb-8">
+      <div v-else class="text-center mb-8">
         <div class="inline-flex items-center justify-center w-20 h-20 bg-green-100 dark:bg-green-900/20 rounded-full mb-4">
           <UIcon name="i-heroicons-check-circle" class="text-5xl text-green-500"/>
         </div>
@@ -235,74 +248,48 @@
 <script setup lang="ts">
 const route = useRoute()
 const router = useRouter()
+const { fetchOrder } = useOrders()
 
-// Mock order data (in production, fetch from API using order number)
-const orderNumber = ref(route.query.order || 'ORD-123456789')
-const customerEmail = ref('customer@example.com')
+// Order data state
+const orderData = ref(null)
+const loading = ref(true)
+const error = ref(null)
 
-const orderDate = ref(new Date().toLocaleDateString('en-US', {
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric'
-}))
-
-const estimatedDelivery = ref(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', {
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric'
-}))
-
-// Order items (mock data)
-const orderItems = ref([
-  {
-    id: '1',
-    name: 'Premium Wireless Headphones',
-    image: 'https://placehold.co/80x80',
-    price: 199.99,
-    quantity: 1
-  },
-  {
-    id: '2',
-    name: 'Smart Watch Series 8',
-    image: 'https://placehold.co/80x80',
-    price: 399.99,
-    quantity: 1
-  }
-])
-
-// Addresses
+// Refs for order information (will be populated from API)
+const orderNumber = ref('')
+const customerEmail = ref('')
+const orderDate = ref('')
+const estimatedDelivery = ref('')
+const orderItems = ref([])
 const shippingAddress = ref({
-  name: 'John Doe',
-  address1: '123 Main Street',
-  address2: 'Apt 4B',
-  city: 'New York',
-  state: 'NY',
-  zipCode: '10001',
-  country: 'United States'
+  name: '',
+  address1: '',
+  address2: '',
+  city: '',
+  state: '',
+  zipCode: '',
+  country: ''
 })
-
 const billingAddress = ref({
-  name: 'John Doe',
-  address1: '123 Main Street',
-  address2: 'Apt 4B',
-  city: 'New York',
-  state: 'NY',
-  zipCode: '10001',
-  country: 'United States'
+  name: '',
+  address1: '',
+  address2: '',
+  city: '',
+  state: '',
+  zipCode: '',
+  country: ''
 })
-
-// Payment & Shipping
-const paymentMethod = ref('Credit Card')
-const cardLast4 = ref('4242')
-const shippingMethod = ref('Standard Shipping')
-const shippingDescription = ref('5-7 business days')
+const paymentMethod = ref('')
+const cardLast4 = ref('')
+const shippingMethod = ref('')
+const shippingDescription = ref('')
+const shipping = ref(0)
 
 // Pricing
 const subtotal = computed(() => {
-  return orderItems.value.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+  return orderItems.value.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0)
 })
 
-const shipping = ref(0)
 const tax = computed(() => (subtotal.value * 10) / 100)
 const total = computed(() => subtotal.value + shipping.value + tax.value)
 
@@ -311,13 +298,87 @@ const handlePrint = () => {
   window.print()
 }
 
-// Redirect if no order number
-onMounted(() => {
+// Fetch order data
+const loadOrder = async () => {
   if (!route.query.order) {
-    console.warn('No order number provided')
-    // In production, you might want to redirect to orders page
-    // router.push('/account/orders')
+    error.value = 'No order ID provided'
+    loading.value = false
+    return
   }
+
+  try {
+    const order = await fetchOrder(route.query.order as string)
+
+    if (order) {
+      // Map order data to refs
+      orderData.value = order
+      orderNumber.value = order.id || order.order_number || route.query.order
+      customerEmail.value = order.customer_email || order.contact?.email || ''
+      orderDate.value = new Date(order.created_at).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      })
+
+      // Calculate estimated delivery (7 days from order date)
+      const deliveryDate = new Date(order.created_at)
+      deliveryDate.setDate(deliveryDate.getDate() + 7)
+      estimatedDelivery.value = deliveryDate.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      })
+
+      // Map order items
+      orderItems.value = order.items || []
+
+      // Map addresses
+      if (order.shipping_address) {
+        shippingAddress.value = {
+          name: `${order.shipping_address.first_name || ''} ${order.shipping_address.last_name || ''}`.trim(),
+          address1: order.shipping_address.address1 || '',
+          address2: order.shipping_address.address2 || '',
+          city: order.shipping_address.city || '',
+          state: order.shipping_address.state || '',
+          zipCode: order.shipping_address.zip_code || order.shipping_address.postal_code || '',
+          country: order.shipping_address.country || ''
+        }
+      }
+
+      if (order.billing_address) {
+        billingAddress.value = {
+          name: `${order.billing_address.first_name || ''} ${order.billing_address.last_name || ''}`.trim(),
+          address1: order.billing_address.address1 || '',
+          address2: order.billing_address.address2 || '',
+          city: order.billing_address.city || '',
+          state: order.billing_address.state || '',
+          zipCode: order.billing_address.zip_code || order.billing_address.postal_code || '',
+          country: order.billing_address.country || ''
+        }
+      }
+
+      // Map payment info
+      paymentMethod.value = order.payment_method || route.query.paymentMethod || 'Unknown'
+      cardLast4.value = order.card_last4 || ''
+
+      // Map shipping info
+      shippingMethod.value = order.shipping_method || 'Standard Shipping'
+      shippingDescription.value = order.shipping_description || '5-7 business days'
+      shipping.value = order.shipping_cost || 0
+    } else {
+      error.value = 'Order not found'
+    }
+  } catch (err: any) {
+    error.value = err.message || 'Failed to load order'
+    console.error('Order loading error:', err)
+  } finally {
+    loading.value = false
+  }
+}
+
+// Load order on mount
+onMounted(() => {
+  loadOrder()
 })
 
 // SEO
