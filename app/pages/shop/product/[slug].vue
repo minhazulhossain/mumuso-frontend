@@ -486,15 +486,6 @@ const handleImageError = (event: Event) => {
   target.src = 'https://placehold.co/600x600'
 }
 
-// Fetch product on server and client
-const { pending } = await useAsyncData(async () => {
-  await loadProduct()
-  return product.value
-}, {
-  server: true,
-  watch: [() => route.params.slug]
-})
-
 // Initialize wishlist on client
 onMounted(async () => {
   try {
