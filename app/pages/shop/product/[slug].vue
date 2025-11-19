@@ -14,7 +14,7 @@
       <div v-else-if="error" class="text-center py-16">
         <UIcon name="i-heroicons-exclamation-triangle" class="text-4xl text-red-500 mb-4"/>
         <p class="text-red-600 dark:text-red-400">{{ error }}</p>
-        <UButton @click="loadProduct" color="primary" class="mt-4">Try Again</UButton>
+        <UButton to="/shop" color="primary" class="mt-4">Browse Products</UButton>
       </div>
 
       <!-- Product Content -->
@@ -306,6 +306,24 @@ const relatedProducts = ref<Product[]>([])
 const selectedVariationId = ref<number | null>(null)
 const selectedVariation = ref<ProductVariation | null>(null)
 
+// Fetch product on server and client
+const { data: asyncProduct, pending } = await useAsyncData(
+  () => fetchProduct(route.params.slug as string),
+  {
+    server: true,
+    watch: [() => route.params.slug]
+  }
+)
+
+// Sync async data to product ref
+watch(() => asyncProduct.value, (newProduct) => {
+  if (newProduct) {
+    product.value = newProduct
+    relatedProducts.value = newProduct.related_products || []
+    selectedImage.value = newProduct.images.featured.medium || newProduct.images.featured.original
+  }
+}, { immediate: true })
+
 // Computed properties for current display values (variation or product)
 const currentPrice = computed(() => {
   return selectedVariation.value
@@ -365,24 +383,6 @@ const breadcrumbLinks = computed(() => {
 
   return links
 })
-
-// Load product
-const loadProduct = async () => {
-  const slug = route.params.slug as string
-
-  try {
-    const productData = await fetchProduct(slug)
-
-    if (productData) {
-      product.value = productData
-      relatedProducts.value = productData?.related_products || []
-      selectedImage.value = productData.images.featured.medium || productData.images.featured.original
-    }
-  } catch (err) {
-    // Error is already handled by the composable
-    console.error('Failed to load product:', err)
-  }
-}
 
 // Image zoom handlers
 const toggleZoom = () => {
