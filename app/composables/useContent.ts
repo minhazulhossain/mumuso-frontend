@@ -19,7 +19,7 @@ export const useContent = () => {
     }
 
     const fetchCategories = async () => {
-        let response = await $fetch<ApiResponse<Category[]>>(`${config.public.apiBase}content/navigation-items`)
+        let response = await $fetch<ApiResponse<Category[]>>(`${apiBase}content/navigation-items`)
 
         if (!response?.status) {
             throw new Error(response.message)
