@@ -436,10 +436,13 @@ const initializeFromUrl = () => {
   if (query.sort_by) sortBy.value = query.sort_by as string
 }
 
-// Initial load
-onMounted(async () => {
+// Fetch products on server and client
+const { pending } = await useAsyncData(async () => {
   initializeFromUrl()
   await loadProducts()
+}, {
+  server: true,
+  watch: [() => route.query]
 })
 
 // SEO

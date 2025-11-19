@@ -483,21 +483,20 @@ const handleImageError = (event: Event) => {
   target.src = 'https://placehold.co/600x600'
 }
 
-// Watch for route changes
-watch(() => route.params.slug, () => {
-  if (route.params.slug) {
-    loadProduct()
-  }
+// Fetch product on server and client
+const { pending } = await useAsyncData(async () => {
+  await loadProduct()
+}, {
+  server: true,
+  watch: [() => route.params.slug]
 })
 
-// Initial load
+// Initialize wishlist on client
 onMounted(async () => {
   try {
-    // Initialize wishlist from localStorage
     initWishlist()
-    await loadProduct()
   } catch (err) {
-    console.error('Failed to load product:', err)
+    console.error('Failed to initialize wishlist:', err)
   }
 })
 
