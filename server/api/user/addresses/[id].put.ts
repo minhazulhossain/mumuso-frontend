@@ -1,6 +1,6 @@
 export default defineEventHandler(async (event) => {
-    const config = useRuntimeConfig()
     const session = await getUserSession(event)
+    const backendUrl = process.env.BACKEND_API_BASE || 'https://mumusoadmin.coderdrivelab.com/api/v1/'
 
     if (!session?.user?.token) {
         throw createError({
@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
         const id = getRouterParam(event, 'id')
         const body = await readBody(event)
 
-        return await $fetch(`${config.public.apiBase}user/addresses/${id}`, {
+        return await $fetch(`${backendUrl}user/addresses/${id}`, {
             method: 'PUT',
             headers: {
                 Authorization: `Bearer ${session.user.token}`

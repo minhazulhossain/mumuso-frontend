@@ -1,10 +1,9 @@
 export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig()
   const query = getQuery(event)
-  const apiBase = config.public.apiBase
+  const backendUrl = process.env.BACKEND_API_BASE || 'https://mumusoadmin.coderdrivelab.com/api/v1/'
 
   try {
-    const response = await $fetch(`${apiBase}blog`, {
+    const response = await $fetch(`${backendUrl}blog`, {
       query: {
         per_page: query._limit || 9,
         page: query._page || 1,

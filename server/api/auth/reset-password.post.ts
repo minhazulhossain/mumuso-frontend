@@ -8,11 +8,11 @@ const bodySchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
-    const config = useRuntimeConfig()
     const body = await readValidatedBody(event, bodySchema.parse)
+    const backendUrl = process.env.BACKEND_API_BASE || 'https://mumusoadmin.coderdrivelab.com/api/v1/'
 
     try {
-        return await $fetch(`${config.public.apiBase}reset-password`, {
+        return await $fetch(`${backendUrl}reset-password`, {
             method: 'POST',
             body
         })

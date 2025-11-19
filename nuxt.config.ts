@@ -53,17 +53,14 @@ export default defineNuxtConfig({
     devtools: { enabled: true }, // ✅ Disable in production
 
     runtimeConfig: {
+        // Backend API URL - used by server-side code and client-side code
+        public: {
+            apiBase: process.env.NUXT_PUBLIC_API_BASE || 'https://mumusoadmin.coderdrivelab.com/api/v1/'
+        },
         // ✅ Session config for nuxt-auth-utils
         // WARNING: Must be set via environment variable in production
         session: {
             password: process.env.NUXT_SESSION_PASSWORD || 'dev-secret-key-change-in-production-min-32-xxx'
-        },
-
-        public: {
-            // ✅ API base URL - uses server-side proxy to avoid CORS issues
-            // Frontend calls /api/proxy/* which forwards to backend
-            // This avoids all CORS issues by proxying through Vercel server
-            apiBase: process.env.NUXT_PUBLIC_API_BASE || '/api/proxy/'
         }
     }
 })

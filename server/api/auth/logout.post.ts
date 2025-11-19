@@ -1,11 +1,11 @@
 export default defineEventHandler(async (event) => {
-    const config = useRuntimeConfig()
     const session = await getUserSession(event)
+    const backendUrl = process.env.BACKEND_API_BASE || 'https://mumusoadmin.coderdrivelab.com/api/v1/'
 
     // Attempt to logout on backend if token exists
     if (session?.user?.token) {
         try {
-            await $fetch(`${config.public.apiBase}logout`, {
+            await $fetch(`${backendUrl}logout`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${session.user.token}`,

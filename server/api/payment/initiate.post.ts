@@ -1,6 +1,6 @@
 export default defineEventHandler(async (event) => {
-    const config = useRuntimeConfig()
     const session = await getUserSession(event)
+    const backendUrl = process.env.BACKEND_API_BASE || 'https://mumusoadmin.coderdrivelab.com/api/v1/'
 
     if (!session?.user?.token) {
         throw createError({
@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
     try {
         const body = await readBody(event)
 
-        const response = await $fetch(`${config.public.apiBase}payment/initiate`, {
+        const response = await $fetch(`${backendUrl}payment/initiate`, {
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${session.user.token}`

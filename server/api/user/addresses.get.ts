@@ -1,7 +1,7 @@
 export default defineEventHandler(async (event) => {
 
-    const config = useRuntimeConfig()
     const session = await getUserSession(event)
+    const backendUrl = process.env.BACKEND_API_BASE || 'https://mumusoadmin.coderdrivelab.com/api/v1/'
 
     if (!session?.user?.token) {
         throw createError({
@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
 
     try {
         // Call Laravel API with user's token
-        const response = await $fetch(`${config.public.apiBase}user/addresses`, {
+        const response = await $fetch(`${backendUrl}user/addresses`, {
             headers: {
                 Authorization: `Bearer ${session.user.token}`
             }
