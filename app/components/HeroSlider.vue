@@ -1,13 +1,13 @@
 <template>
   <div class="relative w-full overflow-hidden">
     <!-- Loading State -->
-    <div v-if="loading" :style="{ height: containerHeight }">
+    <div v-if="loading || !banners || banners.length === 0" :style="{ height: containerHeight }">
       <USkeleton class="w-full h-full" />
     </div>
 
     <!-- Carousel -->
     <UCarousel
-        v-else-if="banners?.length > 0"
+        v-else
         ref="carouselRef"
         v-slot="{ item: banner }"
         :items="banners"

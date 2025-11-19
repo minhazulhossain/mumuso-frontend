@@ -5,8 +5,7 @@
         class="relative overflow-hidden bg-gradient-to-br from-white via-primary-50 to-primary-100 dark:from-gray-950 dark:via-primary-950 dark:to-gray-900"
     >
       <HeroSlider
-          v-if="heroBanners"
-          :banners="heroBanners"
+          :banners="heroBanners || []"
           :autoplay="true"
           :loading="pending"
       />
@@ -116,6 +115,9 @@ const sectionStates = ref({
   trending: ''
 })
 
+// Ref for observer instance
+let observer: IntersectionObserver | null = null
+
 // Intersection Observer for scroll animations
 const setupScrollAnimations = () => {
   const observerOptions = {
@@ -123,7 +125,7 @@ const setupScrollAnimations = () => {
     rootMargin: '0px 0px -50px 0px'
   }
 
-  const observer = new IntersectionObserver((entries) => {
+  observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         // Add animation classes when section enters viewport
@@ -148,14 +150,10 @@ const setupScrollAnimations = () => {
   ]
 
   sections.forEach(({ ref: sectionRef, key }) => {
-    if (sectionRef.value) {
+    if (sectionRef.value && observer) {
       sectionRef.value.setAttribute('data-section', key)
       observer.observe(sectionRef.value)
     }
-  })
-
-  onUnmounted(() => {
-    observer.disconnect()
   })
 }
 
@@ -173,5 +171,11 @@ onMounted(async () => {
   }
 
   setupScrollAnimations()
+})
+
+onUnmounted(() => {
+  if (observer) {
+    observer.disconnect()
+  }
 })
 </script>
