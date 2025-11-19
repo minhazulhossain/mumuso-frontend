@@ -308,12 +308,23 @@ const selectedVariation = ref<ProductVariation | null>(null)
 
 // Fetch product on server and client
 const { data: asyncProduct, pending } = await useAsyncData(
+  `product-${route.params.slug}`,
   () => fetchProduct(route.params.slug as string),
   {
     server: true,
     watch: [() => route.params.slug]
   }
 )
+
+// Sync async data to product ref and reset state when route changes
+watch(() => route.params.slug, () => {
+  // Clear product data when slug changes (before new data arrives)
+  product.value = null
+  selectedVariation.value = null
+  selectedVariationId.value = null
+  quantity.value = 1
+  selectedImage.value = ''
+}, { immediate: false })
 
 // Sync async data to product ref
 watch(() => asyncProduct.value, (newProduct) => {
