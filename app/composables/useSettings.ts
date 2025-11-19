@@ -2,7 +2,8 @@ import type { Settings, BrandingSettings, SiteSettings, SEOSettings, FooterSetti
 
 export const useSettings = () => {
     const config = useRuntimeConfig()
-    const apiBase = config.public.apiBase || 'http://localhost:8000/api'
+    // Use /api routes to avoid CORS issues on client
+    const apiBase = '/api/'
 
     // Fetch all settings
     const fetchSettings = () => {

@@ -3,7 +3,8 @@ import type {Ref} from 'vue'
 
 export const useProducts = () => {
     const config = useRuntimeConfig()
-    const apiUrl = config.public.apiBase
+    // Use /api routes to avoid CORS issues on client
+    const apiUrl = '/api/'
 
     // State
     const products: Ref<Product[]> = useState('products', () => [])

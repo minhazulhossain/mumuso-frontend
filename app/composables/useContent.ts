@@ -1,7 +1,8 @@
 export const useContent = () => {
 
     const config = useRuntimeConfig()
-    const apiBase = config.public.apiBase
+    // Use /api routes to avoid CORS issues on client
+    const apiBase = '/api/'
 
     const fetchHeroBanners = () => {
         return useFetch(`${apiBase}content/hero-banners`, {
