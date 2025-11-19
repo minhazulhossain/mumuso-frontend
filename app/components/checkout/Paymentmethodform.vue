@@ -2,9 +2,9 @@
   <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
     <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Payment Method</h2>
 
-    <div class="space-y-4">
-      <!-- Payment Options -->
-      <ClientOnly>
+    <ClientOnly>
+      <div class="space-y-4">
+        <!-- Payment Options -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
           <button
               v-for="method in paymentMethods"
@@ -26,10 +26,8 @@
             <span class="text-sm font-medium text-gray-900 dark:text-white">{{ method.name }}</span>
           </button>
         </div>
-      </ClientOnly>
 
-      <!-- Credit Card Form -->
-      <ClientOnly>
+        <!-- Credit Card Form -->
         <div v-if="selectedPaymentMethod === 'card'" class="space-y-4 pt-4">
         <UFormField label="Card Number" required>
           <UInput
@@ -84,10 +82,8 @@
           </label>
         </div>
         </div>
-      </ClientOnly>
 
-      <!-- PayPal Notice -->
-      <ClientOnly>
+        <!-- PayPal Notice -->
         <div v-if="selectedPaymentMethod === 'paypal'" class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
           <div class="flex items-start gap-3">
             <UIcon name="i-heroicons-information-circle" class="text-blue-500 text-xl mt-0.5"/>
@@ -99,10 +95,8 @@
             </div>
           </div>
         </div>
-      </ClientOnly>
 
-      <!-- Apple Pay Notice -->
-      <ClientOnly>
+        <!-- Apple Pay Notice -->
         <div v-if="selectedPaymentMethod === 'apple'" class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
           <div class="flex items-start gap-3">
             <UIcon name="i-heroicons-information-circle" class="text-gray-500 text-xl mt-0.5"/>
@@ -114,10 +108,8 @@
             </div>
           </div>
         </div>
-      </ClientOnly>
 
-      <!-- Cash on Delivery Notice -->
-      <ClientOnly>
+        <!-- Cash on Delivery Notice -->
         <div v-if="selectedPaymentMethod === 'cash'" class="p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
           <div class="flex items-start gap-3">
             <UIcon name="i-heroicons-banknotes" class="text-amber-600 dark:text-amber-400 text-xl mt-0.5"/>
@@ -135,10 +127,8 @@
             </div>
           </div>
         </div>
-      </ClientOnly>
 
-      <!-- SSLCommerz Notice -->
-      <ClientOnly>
+        <!-- SSLCommerz Notice -->
         <div v-if="selectedPaymentMethod === 'sslcommerz'" class="space-y-4 pt-4">
         <div class="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
           <div class="flex items-start gap-3">
@@ -187,8 +177,8 @@
           </div>
         </div>
         </div>
-      </ClientOnly>
-    </div>
+      </div>
+    </ClientOnly>
   </div>
 </template>
 
