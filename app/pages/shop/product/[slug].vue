@@ -365,14 +365,19 @@ const breadcrumbLinks = computed(() => {
 
 // Load product
 const loadProduct = async () => {
-  product.value = null // Reset product state before fetching
   const slug = route.params.slug as string
-  const productData = await fetchProduct(slug)
 
-  if (productData) {
-    product.value = productData
-    relatedProducts.value = productData?.related_products
-    selectedImage.value = productData.images.featured.medium || productData.images.featured.original
+  try {
+    const productData = await fetchProduct(slug)
+
+    if (productData) {
+      product.value = productData
+      relatedProducts.value = productData?.related_products || []
+      selectedImage.value = productData.images.featured.medium || productData.images.featured.original
+    }
+  } catch (err) {
+    // Error is already handled by the composable
+    console.error('Failed to load product:', err)
   }
 }
 
