@@ -1,9 +1,9 @@
 export default defineEventHandler(async (event) => {
-    const config = useRuntimeConfig()
     const token = getRouterParam(event, 'token')
+    const backendUrl = process.env.BACKEND_API_BASE || 'https://mumusoadmin.coderdrivelab.com/api/v1/'
 
     try {
-        return await $fetch(`${config.public.apiBase}newsletter/unsubscribe/${token}`, {
+        return await $fetch(`${backendUrl}newsletter/unsubscribe/${token}`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json'

@@ -21,7 +21,7 @@
                 color="secondary"
                 variant="ghost"
                 icon="i-heroicons-x-mark"
-                @click="localCartOpen = false"
+                @click="isCartOpen = false"
             />
           </div>
         </template>
@@ -37,7 +37,7 @@
           <UIcon name="i-heroicons-shopping-cart" class="text-6xl text-gray-300 mb-4"/>
           <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Your cart is empty</h3>
           <p class="text-gray-500 dark:text-gray-400 mb-6">Add some products to get started</p>
-          <UButton @click="localCartOpen = false" to="/shop">Continue Shopping</UButton>
+          <UButton @click="isCartOpen = false" to="/shop">Continue Shopping</UButton>
         </div>
 
 
@@ -262,9 +262,10 @@ const localCartOpen = computed({
   }
 })
 
-// Watch route changes and auto-close cart when navigating to cart page
+// Watch route changes and auto-close cart on all navigation
 watch(() => route.path, (newPath) => {
-  if (newPath === '/cart') {
+  // Always close cart when navigating away from current page
+  if (isCartOpen.value) {
     isCartOpen.value = false
   }
 })

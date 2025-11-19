@@ -17,10 +17,10 @@ export interface HeroBanner {
     }
 }
 
-export interface Category{
-    label: string,
-    icon: string,
-    to: string,
-    description: string,
-    children: Array<Category>
-}
+// export interface Category{
+//     label: string,
+//     icon: string,
+//     to: string,
+//     description: string,
+//     children: Array<Category>
+// }
