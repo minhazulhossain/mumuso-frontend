@@ -260,6 +260,7 @@ const validateStep3 = () => {
     return false
   }
 
+  // Card validation only for credit card method
   if (selectedPaymentMethod.value === 'card') {
     if (!paymentInfo.value.cardNumber || !paymentInfo.value.cardName ||
         !paymentInfo.value.expiryDate || !paymentInfo.value.cvv) {
@@ -271,6 +272,9 @@ const validateStep3 = () => {
       return false
     }
   }
+
+  // Cash on Delivery and SSLCommerz don't require card details
+  // They are validated on the payment gateway side
 
   return true
 }
@@ -341,6 +345,15 @@ const handlePlaceOrder = async () => {
       }
       // User will be automatically redirected to SSLCommerz payment gateway
       // After payment completion, SSLCommerz will redirect back to success/failed/cancelled page
+    } else if (selectedPaymentMethod.value === 'cash') {
+      // Handle Cash on Delivery - no payment gateway needed
+      toast.add({
+        title: 'Order placed successfully!',
+        description: `Order #${orderId} - Pay when delivery arrives`,
+        color: 'success',
+        icon: 'i-heroicons-check-circle'
+      })
+      await router.push(`/order-confirmation?order=${orderId}&paymentMethod=cash`)
     } else {
       // Handle other payment methods (card, paypal, apple pay)
       toast.add({
