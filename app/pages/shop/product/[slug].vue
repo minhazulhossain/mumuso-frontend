@@ -354,9 +354,11 @@ const breadcrumbLinks = computed(() => {
         to: `/shop?category=${product.value.categories[0].slug}`
       })
     }
+    // Don't include current page in breadcrumb to avoid hydration mismatch
+    // The last breadcrumb item should be non-clickable (current page)
     links.push({
-      label: product.value.name,
-      to: `/shop/product/${product.value.slug}`
+      label: product.value.name
+      // No 'to' property - makes it non-clickable and current page
     })
   }
 
