@@ -260,7 +260,7 @@ const emit = defineEmits<{
   'update:filters': [filters: Filters]
 }>()
 
-const { getAllCategories } = useProducts()
+const { getAllCategories, products } = useProducts()
 
 // Local state
 const localFilters = ref<Filters>({
@@ -280,7 +280,11 @@ const tempMaxPrice = ref<string | number>('')
 const isUpdatingFromProps = ref(false)
 
 const maxPriceLimit = 10000
-const inStockCount = ref(0) // This should come from API or computed
+
+// Calculate in-stock count from products
+const inStockCount = computed(() => {
+  return products.value.filter(p => p.in_stock).length
+})
 
 // Quick price ranges
 const quickPriceRanges = [
