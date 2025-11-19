@@ -486,6 +486,7 @@ const handleImageError = (event: Event) => {
 // Fetch product on server and client
 const { pending } = await useAsyncData(async () => {
   await loadProduct()
+  return product.value
 }, {
   server: true,
   watch: [() => route.params.slug]

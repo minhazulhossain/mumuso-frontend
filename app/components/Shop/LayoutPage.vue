@@ -440,6 +440,7 @@ const initializeFromUrl = () => {
 const { pending } = await useAsyncData(async () => {
   initializeFromUrl()
   await loadProducts()
+  return products.value
 }, {
   server: true,
   watch: [() => route.query]

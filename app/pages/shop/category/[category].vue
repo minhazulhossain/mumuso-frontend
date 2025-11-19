@@ -94,6 +94,7 @@ const { pending } = await useAsyncData(async () => {
     const { fetchProducts } = useProducts()
     await fetchProducts()
   }
+  return products.value
 }, {
   server: true,
   watch: [() => route.params.category]
