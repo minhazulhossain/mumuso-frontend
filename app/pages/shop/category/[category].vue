@@ -15,13 +15,18 @@
         <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2 capitalize">
           {{ route.params.category }}
         </h1>
-        <p class="text-gray-600 dark:text-gray-400">
+        <p v-if="!loading" class="text-gray-600 dark:text-gray-400">
           {{ categoryProducts.length }} products in this category
         </p>
       </div>
 
+      <!-- Loading State -->
+      <div v-if="loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div v-for="i in 8" :key="i" class="aspect-square bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
+      </div>
+
       <!-- Products Grid -->
-      <div v-if="categoryProducts.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div v-else-if="categoryProducts.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         <NuxtLink
           v-for="product in categoryProducts"
           :key="product.id"
@@ -70,7 +75,7 @@
 
 <script setup lang="ts">
 const route = useRoute()
-const { products } = useProducts()
+const { products, loading } = useProducts()
 
 const categoryProducts = computed(() => {
   return products.value.filter(p => p.category === route.params.category)
@@ -81,5 +86,13 @@ useHead({
   meta: [
     { name: 'description', content: `Browse ${route.params.category} products` }
   ]
+})
+
+onMounted(async () => {
+  // Load products if not already loaded
+  if (products.value.length === 0) {
+    const { fetchProducts } = useProducts()
+    await fetchProducts()
+  }
 })
 </script>

@@ -127,7 +127,7 @@
           <!-- Content -->
           <template v-else>
             <!-- Products Count & View Toggle -->
-            <div class="flex items-center justify-between mb-4">
+            <div v-if="products.length > 0" class="flex items-center justify-between mb-4">
               <div class="text-sm text-gray-600 dark:text-gray-400">
                 Showing {{ products.length }}
                 <span v-if="pagination">of {{ pagination.total }}</span>
@@ -155,7 +155,7 @@
 
             <!-- Products Grid View -->
             <div
-                v-if="products.length > 0 && viewMode === 'grid'"
+                v-if="viewMode === 'grid' && products.length > 0"
                 class="grid grid-cols-2 xl:grid-cols-3 gap-3"
             >
               <ShopProductCard
@@ -168,7 +168,7 @@
 
             <!-- Products List View -->
             <div
-                v-else-if="products.length > 0 && viewMode === 'list'"
+                v-else-if="viewMode === 'list' && products.length > 0"
                 class="space-y-4"
             >
               <ShopProductListItem
