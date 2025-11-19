@@ -10,8 +10,8 @@ export const useReviews = (productId: string) => {
     const error = ref<string | null>(null)
     const config = useRuntimeConfig()
 
-    // Normalize API base URL
-    const apiBase = config.public.apiBase.replace(/\/$/, '')
+    // Use /api/proxy to avoid CORS issues on client
+    const apiBase = '/api/proxy'
 
     const fetchReviews = async (sortBy: ReviewSortBy = 'recent') => {
         loading.value = true

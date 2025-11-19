@@ -65,9 +65,8 @@ export const useCart = () => {
 
     // Fetch product details for a cart item
     const fetchProductDetails = async (slug: string) => {
-        const baseUrl = config.public.apiBase.replace(/\/$/, '')
         try {
-            const response = await $fetch<{ data: any }>(`${baseUrl}/products/${slug}`)
+            const response = await $fetch<{ data: any }>(`/api/proxy/products/${slug}`)
             return response.data
         } catch (error) {
             console.error(`Failed to fetch product ${slug}:`, error)

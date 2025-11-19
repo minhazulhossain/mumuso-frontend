@@ -234,8 +234,6 @@
 
 const colorMode = useColorMode()
 const router = useRouter()
-const config = useRuntimeConfig()
-const apiUrl = config.public.apiBase
 const { fetchCategories } = useContent()
 
 // Desktop Search state
@@ -261,7 +259,7 @@ const toggleColorMode = () => {
 // Global search function that doesn't modify useProducts state
 const performGlobalSearch = async (query) => {
   try {
-    const response = await $fetch(`${apiUrl}products`, {
+    const response = await $fetch(`/api/products`, {
       query: { search: query }
     })
 
