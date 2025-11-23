@@ -12,12 +12,17 @@ export default defineEventHandler(async (event) => {
     try {
         const id = getRouterParam(event, 'id')
 
-        return await $fetch(`${backendUrl}user/addresses/${id}`, {
+        await $fetch(`${backendUrl}user/addresses/${id}`, {
             method: 'DELETE',
             headers: {
                 Authorization: `Bearer ${session.user.token}`
             }
         })
+
+        return {
+            success: true,
+            message: 'Address deleted successfully'
+        }
     } catch (error: any) {
         throw createError({
             statusCode: error.statusCode || 500,

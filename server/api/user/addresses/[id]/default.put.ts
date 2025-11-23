@@ -12,12 +12,18 @@ export default defineEventHandler(async (event) => {
     try {
         const id = getRouterParam(event, 'id')
 
-        return await $fetch(`${backendUrl}user/addresses/${id}/default`, {
+        const response = await $fetch(`${backendUrl}user/addresses/${id}/default`, {
             method: 'PUT',
             headers: {
                 Authorization: `Bearer ${session.user.token}`
             }
         })
+
+        return {
+            success: true,
+            data: response?.data || response,
+            message: 'Address set as default successfully'
+        }
     } catch (error: any) {
         throw createError({
             statusCode: error.statusCode || 500,

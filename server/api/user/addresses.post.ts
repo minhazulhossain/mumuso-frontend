@@ -12,13 +12,19 @@ export default defineEventHandler(async (event) => {
     try {
         const body = await readBody(event)
 
-        return await $fetch(`${backendUrl}user/addresses`, {
+        const response = await $fetch(`${backendUrl}user/addresses`, {
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${session.user.token}`
             },
             body
         })
+
+        return {
+            success: true,
+            data: response?.data || response,
+            message: 'Address created successfully'
+        }
     } catch (error: any) {
         throw createError({
             statusCode: error.statusCode || 500,

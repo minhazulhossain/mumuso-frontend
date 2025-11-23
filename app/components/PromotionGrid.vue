@@ -2,7 +2,7 @@
   <div>
     <!-- Loading state for entire carousel -->
     <div v-if="loading" class="space-y-4">
-      <USkeleton class="h-64 w-full" />
+      <USkeleton class="h-64 w-full"/>
     </div>
 
     <!-- Carousel with data -->
@@ -14,30 +14,32 @@
         :items="products"
         :ui="{
         item: 'basis-[66%] sm:basis-[60%] md:basis-[40%] ps-0 sm:ps-2 pe-2 sm:pe-4',
-        wrapper: 'justify-start'
+
       }"
     >
-      <UCard :ui="{ root: 'rounded-none mb-2', header: 'p-0 sm:px-0', body:'p-2 sm:p-4' }">
-        <template #header>
-          <div class="relative w-full aspect-[380/288] bg-gray-100">
-            <!-- Actual image -->
-            <NuxtImg
-                :src="item.img"
-                :class="[
+      <NuxtLink to="/categories/kids">
+        <UCard :ui="{ root: 'rounded-none mb-2', header: 'p-0 sm:px-0', body:'p-2 sm:p-4' }">
+          <template #header>
+            <div class="relative w-full aspect-[380/288] bg-gray-100">
+              <!-- Actual image -->
+              <NuxtImg
+                  :src="item.img"
+                  :class="[
                 'w-full h-full object-cover transition-opacity duration-300',
               ]"
-                :alt="item.name"
-                width="380"
-                height="288"
-                sizes="xs:60vw sm:40vw md:40vw"
-                loading="lazy"
-                format="webp"
-            />
-          </div>
-        </template>
+                  :alt="item.name"
+                  width="380"
+                  height="288"
+                  sizes="xs:60vw sm:40vw md:40vw"
+                  loading="lazy"
+                  format="webp"
+              />
+            </div>
+          </template>
 
-        <p class="text-sm">{{ item.description }}</p>
-      </UCard>
+          <p class="text-sm">{{ item.description }}</p>
+        </UCard>
+      </NuxtLink>
     </UCarousel>
   </div>
 </template>

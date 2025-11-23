@@ -35,6 +35,8 @@
               v-model="shippingAddress"
               v-model:selected-shipping-method="selectedShippingMethod"
               :shipping-methods="shippingMethods"
+              :saved-addresses="addresses"
+              :show-saved-addresses="loggedIn"
               @next="handleNext"
               @previous="handlePrevious"
           />
@@ -45,6 +47,8 @@
             <CheckoutBillingAddressForm
                 v-model="billingAddress"
                 v-model:same-as-shipping="sameAsShipping"
+                :saved-addresses="addresses"
+                :show-saved-addresses="loggedIn"
             />
 
             <!-- Payment Method -->
@@ -99,10 +103,28 @@
 
 const toast = useToast()
 const router = useRouter()
+const { loggedIn } = useAuth()
+const { user } = useUserSession()
+const { addresses, fetchAddresses, createAddress } = useAddresses()
 const cart = inject('cart')
 const { cartItems } = cart
 const { initiatePayment } = usePayment()
 const { createOrder } = useOrders()
+
+// Fetch saved addresses on mount if user is logged in
+onMounted(async () => {
+  if (loggedIn.value) {
+    await fetchAddresses()
+  }
+  if (!cartItems.value || cartItems.value.length === 0) {
+    toast.add({
+      title: 'Cart is empty',
+      description: 'Add some products before checkout',
+      color: 'warning'
+    })
+    router.push('/shop')
+  }
+})
 
 // Stepper steps configuration
 const steps = [
@@ -144,7 +166,8 @@ const shippingAddress = ref({
   city: '',
   state: '',
   zipCode: '',
-  country: 'US'
+  country: 'US',
+  phone: ''
 })
 
 // Billing Address
@@ -156,7 +179,8 @@ const billingAddress = ref({
   city: '',
   state: '',
   zipCode: '',
-  country: 'US'
+  country: 'US',
+  phone: ''
 })
 
 const sameAsShipping = ref(true)
@@ -382,18 +406,6 @@ const handlePlaceOrder = async () => {
     processingOrder.value = false
   }
 }
-
-// Redirect if cart is empty
-onMounted(() => {
-  if (!cartItems.value || cartItems.value.length === 0) {
-    toast.add({
-      title: 'Cart is empty',
-      description: 'Add some products before checkout',
-      color: 'warning'
-    })
-    router.push('/shop')
-  }
-})
 
 // SEO
 useSeoMeta({

@@ -18,11 +18,11 @@ export default defineEventHandler(async (event) => {
             }
         })
 
-        return response?.data
+        return {
+            success: true,
+            data: response?.data || []
+        }
     } catch (error: any) {
-
-
-
         throw createError({
             statusCode: error.statusCode || 500,
             message: error.data?.message || 'Failed to fetch addresses'

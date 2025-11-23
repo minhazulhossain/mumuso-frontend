@@ -13,13 +13,19 @@ export default defineEventHandler(async (event) => {
         const id = getRouterParam(event, 'id')
         const body = await readBody(event)
 
-        return await $fetch(`${backendUrl}user/addresses/${id}`, {
+        const response = await $fetch(`${backendUrl}user/addresses/${id}`, {
             method: 'PUT',
             headers: {
                 Authorization: `Bearer ${session.user.token}`
             },
             body
         })
+
+        return {
+            success: true,
+            data: response?.data || response,
+            message: 'Address updated successfully'
+        }
     } catch (error: any) {
         throw createError({
             statusCode: error.statusCode || 500,
