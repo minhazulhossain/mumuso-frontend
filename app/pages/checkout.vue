@@ -188,7 +188,7 @@ const billingAddress = ref({
 const sameAsShipping = ref(true)
 
 // Shipping Methods - Updated to use computed from API
-const selectedShippingMethod = ref('')
+const selectedShippingMethod = ref<number | null>(null)
 
 // Fetch shipping methods when shipping address country/state changes
 watch([() => shippingAddress.value.country, () => shippingAddress.value.state], async () => {
@@ -203,7 +203,7 @@ watch([() => shippingAddress.value.country, () => shippingAddress.value.state], 
 
 // Set first shipping method as default once loaded
 watch(shippingMethods, (methods) => {
-  if (methods.length > 0 && !selectedShippingMethod.value) {
+  if (methods.length > 0 && selectedShippingMethod.value === null) {
     selectedShippingMethod.value = methods[0].id
   }
 }, { immediate: true })

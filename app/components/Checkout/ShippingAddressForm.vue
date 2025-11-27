@@ -179,7 +179,7 @@
                   </div>
                   <div class="text-right ml-4">
                     <p class="font-bold text-gray-900 dark:text-white">
-                      {{ method.is_free ? 'FREE' : `$${method.price.toFixed(2)}` }}
+                      {{ method.is_free ? 'FREE' : `$${(method.price || 0).toFixed(2)}` }}
                     </p>
                   </div>
                 </div>
@@ -228,7 +228,7 @@ interface ShippingMethod {
 
 const props = defineProps<{
   modelValue: ShippingAddress
-  selectedShippingMethod: string
+  selectedShippingMethod: number | null
   shippingMethods: ShippingMethod[]
   savedAddresses?: Address[]
   showSavedAddresses?: boolean
@@ -237,7 +237,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'update:modelValue': [value: ShippingAddress]
-  'update:selectedShippingMethod': [value: string]
+  'update:selectedShippingMethod': [value: number]
   'next': []
   'previous': []
   'address-selected': [address: Address]
