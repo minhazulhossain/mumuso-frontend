@@ -232,6 +232,7 @@ const breadcrumbLinks = [
 
 // Computed
 const shippingCost = computed(() => {
+  if (!Array.isArray(shippingMethods.value)) return 0
   const method = shippingMethods.value.find(m => m.id === selectedShippingMethod.value)
   return method?.price || 0
 })

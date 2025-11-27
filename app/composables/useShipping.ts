@@ -34,11 +34,13 @@ export const useShipping = () => {
         body: location
       })
 
-      shippingMethods.value = response.data || []
-      return shippingMethods.value
+      const methods = Array.isArray(response?.data) ? response.data : (Array.isArray(response) ? response : [])
+      shippingMethods.value = methods
+      return methods
     } catch (err: any) {
       error.value = err.data?.message || err.message || 'Failed to fetch shipping methods'
       console.error('Shipping methods fetch error:', err)
+      shippingMethods.value = []
       return []
     } finally {
       loading.value = false
@@ -67,9 +69,9 @@ export const useShipping = () => {
   }
 
   return {
-    loading: readonly(loading),
-    error: readonly(error),
-    shippingMethods: readonly(shippingMethods),
+    loading,
+    error,
+    shippingMethods,
     fetchMethodsByLocation,
     calculateShippingCost
   }
