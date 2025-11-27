@@ -123,11 +123,69 @@
         <!-- Shipping Method -->
         <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
           <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Shipping Method</h3>
-          <URadioGroup
-              :model-value="selectedShippingMethod"
-              @update:model-value="$emit('update:selectedShippingMethod', $event)"
-              :options="shippingMethodOptions"
-          />
+
+          <!-- Loading State -->
+          <div v-if="loading" class="space-y-3">
+            <USkeleton class="h-20" />
+            <USkeleton class="h-20" />
+            <USkeleton class="h-20" />
+          </div>
+
+          <!-- No Methods Available -->
+          <div v-else-if="shippingMethods.length === 0" class="rounded-lg border border-yellow-200 bg-yellow-50 dark:border-yellow-900 dark:bg-yellow-900/20 p-4">
+            <p class="text-sm text-yellow-800 dark:text-yellow-200">No shipping methods available. Please try again later.</p>
+          </div>
+
+          <!-- Shipping Methods Grid -->
+          <div v-else class="space-y-3">
+            <div
+                v-for="method in shippingMethods"
+                :key="method.id"
+                class="relative cursor-pointer"
+                @click="$emit('update:selectedShippingMethod', method.id)"
+            >
+              <input
+                  type="radio"
+                  :id="`shipping-${method.id}`"
+                  :value="method.id"
+                  :model-value="selectedShippingMethod"
+                  class="sr-only"
+              />
+              <label
+                  :for="`shipping-${method.id}`"
+                  class="block p-4 rounded-lg border-2 transition-all"
+                  :class="selectedShippingMethod === method.id
+                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                    : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 bg-white dark:bg-gray-800'"
+              >
+                <div class="flex items-start justify-between">
+                  <div class="flex-1">
+                    <div class="flex items-center gap-3">
+                      <div class="flex items-center justify-center w-5 h-5 rounded-full border-2"
+                          :class="selectedShippingMethod === method.id
+                            ? 'border-blue-500 bg-blue-500'
+                            : 'border-gray-300 dark:border-gray-600'"
+                      >
+                        <div v-if="selectedShippingMethod === method.id" class="w-2 h-2 bg-white rounded-full"></div>
+                      </div>
+                      <div>
+                        <p class="font-semibold text-gray-900 dark:text-white">{{ method.name }}</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ method.description }}</p>
+                        <p v-if="method.estimated_days" class="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                          {{ method.estimated_days }}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="text-right ml-4">
+                    <p class="font-bold text-gray-900 dark:text-white">
+                      {{ method.is_free ? 'FREE' : `$${method.price.toFixed(2)}` }}
+                    </p>
+                  </div>
+                </div>
+              </label>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -159,10 +217,13 @@ interface ShippingAddress {
 }
 
 interface ShippingMethod {
-  id: string
+  id: number
   name: string
-  description: string
+  description?: string
   price: number
+  is_free: boolean
+  calculation_type: 'fixed' | 'per_item' | 'per_weight'
+  taxable: boolean
 }
 
 const props = defineProps<{
@@ -171,6 +232,7 @@ const props = defineProps<{
   shippingMethods: ShippingMethod[]
   savedAddresses?: Address[]
   showSavedAddresses?: boolean
+  loading?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -229,15 +291,6 @@ const states = [
   { label: 'North Carolina', value: 'NC' },
   { label: 'Michigan', value: 'MI' }
 ]
-
-// Format shipping methods for URadioGroup
-const shippingMethodOptions = computed(() => {
-  return props.shippingMethods.map(method => ({
-    value: method.id,
-    label: method.name,
-    description: `${method.description} - ${method.price === 0 ? 'FREE' : `$${method.price.toFixed(2)}`}`
-  }))
-})
 
 const updateField = (field: keyof ShippingAddress, value: any) => {
   emit('update:modelValue', {

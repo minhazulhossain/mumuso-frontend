@@ -37,6 +37,7 @@
               :shipping-methods="shippingMethods"
               :saved-addresses="addresses"
               :show-saved-addresses="loggedIn"
+              :loading="shippingLoading"
               @next="handleNext"
               @previous="handlePrevious"
           />
@@ -110,8 +111,9 @@ const cart = inject('cart')
 const { cartItems } = cart
 const { initiatePayment } = usePayment()
 const { createOrder } = useOrders()
+const { shippingMethods, fetchMethodsByLocation, loading: shippingLoading } = useShipping()
 
-// Fetch saved addresses on mount if user is logged in
+// Fetch saved addresses on mount
 onMounted(async () => {
   if (loggedIn.value) {
     await fetchAddresses()
@@ -185,29 +187,26 @@ const billingAddress = ref({
 
 const sameAsShipping = ref(true)
 
-// Shipping Methods
-const shippingMethods = [
-  {
-    id: 'standard',
-    name: 'Standard Shipping',
-    description: '5-7 business days',
-    price: 0
-  },
-  {
-    id: 'express',
-    name: 'Express Shipping',
-    description: '2-3 business days',
-    price: 12.99
-  },
-  {
-    id: 'overnight',
-    name: 'Overnight Shipping',
-    description: 'Next business day',
-    price: 24.99
-  }
-]
+// Shipping Methods - Updated to use computed from API
+const selectedShippingMethod = ref('')
 
-const selectedShippingMethod = ref('standard')
+// Fetch shipping methods when shipping address country/state changes
+watch([() => shippingAddress.value.country, () => shippingAddress.value.state], async () => {
+  if (shippingAddress.value.country) {
+    await fetchMethodsByLocation({
+      country: shippingAddress.value.country,
+      state: shippingAddress.value.state,
+      postal_code: shippingAddress.value.zipCode
+    })
+  }
+})
+
+// Set first shipping method as default once loaded
+watch(shippingMethods, (methods) => {
+  if (methods.length > 0 && !selectedShippingMethod.value) {
+    selectedShippingMethod.value = methods[0].id
+  }
+}, { immediate: true })
 
 // Payment
 const selectedPaymentMethod = ref('sslcommerz')
@@ -233,7 +232,7 @@ const breadcrumbLinks = [
 
 // Computed
 const shippingCost = computed(() => {
-  const method = shippingMethods.find(m => m.id === selectedShippingMethod.value)
+  const method = shippingMethods.value.find(m => m.id === selectedShippingMethod.value)
   return method?.price || 0
 })
 
