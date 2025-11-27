@@ -1,5 +1,9 @@
 <template>
-  <USlideover v-model="localCartOpen" title="Mini Cart" description="mini-cart">
+  <USlideover
+      :close="{ onClick: () => emit('close', false) }"
+      v-model="localCartOpen"
+      title="Shopping Cart"
+      >
     <UButton
         icon="i-heroicons-shopping-cart"
         variant="ghost"
@@ -10,21 +14,21 @@
         </UBadge>
       </template>
     </UButton>
-    <template #content>
+    <template #body>
       <UCard class="flex flex-col h-full">
-        <template #header>
-          <div class="flex items-center justify-between">
-            <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
-              Shopping Cart ({{ cartItemsCount }})
-            </h2>
-            <UButton
-                color="secondary"
-                variant="ghost"
-                icon="i-heroicons-x-mark"
-                @click="isCartOpen = false"
-            />
-          </div>
-        </template>
+<!--        <template #header>-->
+<!--          <div class="flex items-center justify-between">-->
+<!--            <h2 class="text-xl font-semibold text-gray-900 dark:text-white">-->
+<!--              Shopping Cart ({{ cartItemsCount }})-->
+<!--            </h2>-->
+<!--            <UButton-->
+<!--                color="secondary"-->
+<!--                variant="ghost"-->
+<!--                icon="i-heroicons-x-mark"-->
+<!--                @click="isCartOpen = false"-->
+<!--            />-->
+<!--          </div>-->
+<!--        </template>-->
 
         <!-- Loading State -->
         <div v-if="isLoading" class="flex items-center justify-center py-12">
@@ -54,7 +58,7 @@
                 @click="localCartOpen = false"
             >
               <NuxtImg
-                  :src="item.variation?.images?.thumb || item.product?.image || 'https://placehold.co/60x60'"
+                  :src="item.variation?.images?.thumb || item.product?.featured_image_url || 'https://placehold.co/60x60'"
                   :alt="item.variation?.name || item.product?.name || 'Product'"
                   class="w-20 h-20 object-cover"
                   width="80"
@@ -242,6 +246,8 @@ const {
   checkout
 } = cart
 
+const emit = defineEmits<{ close: [boolean] }>()
+
 const { loggedIn } = useAuth()
 const checkoutLoading = ref(false)
 
@@ -264,10 +270,10 @@ const localCartOpen = computed({
 
 // Watch route changes and auto-close cart on all navigation
 watch(() => route.path, (newPath) => {
-  // Always close cart when navigating away from current page
-  if (isCartOpen.value) {
-    isCartOpen.value = false
-  }
+
+  // if (isCartOpen.value) {
+  //   isCartOpen.value = false
+  // }
 })
 
 // Helper to get item price (after discount)

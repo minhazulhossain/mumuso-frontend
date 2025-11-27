@@ -28,6 +28,7 @@
       <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Cart Items (Left Side - 2 columns) -->
         <div class="lg:col-span-2 space-y-4">
+
           <div
               v-for="item in cartItems"
               :key="`${item.slug}-${item.variation_id || 'default'}`"
@@ -37,7 +38,7 @@
               <!-- Product Image -->
               <NuxtLink :to="`/shop/product/${item.product.slug}`" class="flex-shrink-0">
                 <NuxtImg
-                    :src="item.variation?.images?.thumb || item.product.image || 'https://placehold.co/120x120'"
+                    :src="item.variation?.images?.thumb || item.product.featured_image_url || 'https://placehold.co/120x120'"
                     :alt="item.variation?.name || item.product.name"
                     class="w-24 h-24 object-cover rounded-lg hover:opacity-90 transition-opacity"
                     width="120"
