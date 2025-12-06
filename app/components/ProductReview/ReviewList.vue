@@ -36,6 +36,7 @@
 
 <script setup lang="ts">
 import type { Review } from '#shared/types/review'
+import ReviewCard from "./ReviewCard.vue";
 
 const props = defineProps<{
   reviews: Review[]

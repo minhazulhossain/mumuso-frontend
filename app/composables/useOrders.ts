@@ -1,4 +1,5 @@
 import type { Ref } from 'vue'
+import { formatOrderData, validateOrderData, type OrderFormData } from '#shared/utils/order-formatter'
 
 export const useOrders = () => {
     const loading = useState('orders-loading', () => false)
@@ -6,15 +7,27 @@ export const useOrders = () => {
 
     /**
      * Create a new order
+     * Formats and validates order data according to API specifications
      */
-    const createOrder = async (orderData: any) => {
+    const createOrder = async (orderData: OrderFormData) => {
         loading.value = true
         error.value = null
 
         try {
+            // Validate order data
+            const validation = validateOrderData(orderData)
+            if (!validation.valid) {
+                error.value = validation.errors.join('; ')
+                console.error('Order validation errors:', validation.errors)
+                return null
+            }
+
+            // Format order data for API
+            const formattedData = formatOrderData(orderData)
+
             const response = await $fetch('/api/orders', {
                 method: 'POST',
-                body: orderData
+                body: formattedData
             })
 
             if (!response?.success) {

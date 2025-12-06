@@ -1,4 +1,4 @@
-import type { Settings, BrandingSettings, SiteSettings, SEOSettings, FooterSettings } from '#shared/types'
+// import type { Settings, BrandingSettings, SiteSettings, SEOSettings, FooterSettings } from '#shared/types'
 
 export const useSettings = () => {
     const config = useRuntimeConfig()

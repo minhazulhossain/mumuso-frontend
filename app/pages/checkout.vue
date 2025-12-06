@@ -22,16 +22,9 @@
         <!-- Left Side - Forms (2 columns) -->
         <div class="lg:col-span-2">
 
-          <!-- Step 1: Contact Information -->
-          <CheckoutContactInformationForm
-              v-if="currentStep === 1"
-              v-model="contactInfo"
-              @next="handleNext"
-          />
-
           <!-- Step 2: Shipping Information -->
           <CheckoutShippingAddressForm
-              v-if="currentStep === 2"
+              v-if="currentStep === 1"
               v-model="shippingAddress"
               v-model:selected-shipping-method="selectedShippingMethod"
               :shipping-methods="shippingMethods"
@@ -43,7 +36,7 @@
           />
 
           <!-- Step 3: Payment Information -->
-          <div v-if="currentStep === 3" class="space-y-6">
+          <div v-if="currentStep === 2" class="space-y-6">
             <!-- Billing Address -->
             <CheckoutBillingAddressForm
                 v-model="billingAddress"
@@ -92,7 +85,7 @@
           <CheckoutOrderSummary
               :cart-items="cartItems || []"
               :shipping-cost="shippingCost"
-              :tax-rate="10"
+              :tax-rate="0"
           />
         </div>
       </div>
@@ -132,18 +125,12 @@ onMounted(async () => {
 const steps = [
   {
     value: 1,
-    title: 'Contact',
-    description: 'Your contact information',
-    icon: 'i-heroicons-envelope'
-  },
-  {
-    value: 2,
     title: 'Shipping',
     description: 'Delivery address',
     icon: 'i-heroicons-truck'
   },
   {
-    value: 3,
+    value: 2,
     title: 'Payment',
     description: 'Payment details',
     icon: 'i-heroicons-credit-card'
@@ -153,11 +140,11 @@ const steps = [
 const currentStep = ref(1)
 
 // Contact Information
-const contactInfo = ref({
-  email: '',
-  phone: '',
-  subscribeNewsletter: false
-})
+// const contactInfo = ref({
+//   email: '',
+//   phone: '',
+//   subscribeNewsletter: false
+// })
 
 // Shipping Address
 const shippingAddress = ref({
@@ -234,34 +221,34 @@ const breadcrumbLinks = [
 const shippingCost = computed(() => {
   if (!Array.isArray(shippingMethods.value)) return 0
   const method = shippingMethods.value.find(m => m.id === selectedShippingMethod.value)
-  return method?.price || 0
+  return method?.cost || 0
 })
 
 // Validation functions
+// const validateStep1 = () => {
+//   if (!contactInfo.value.email || !contactInfo.value.phone) {
+//     toast.add({
+//       title: 'Missing information',
+//       description: 'Please fill in all required fields',
+//       color: 'error'
+//     })
+//     return false
+//   }
+//
+//   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+//   if (!emailRegex.test(contactInfo.value.email)) {
+//     toast.add({
+//       title: 'Invalid email',
+//       description: 'Please enter a valid email address',
+//       color: 'error'
+//     })
+//     return false
+//   }
+//
+//   return true
+// }
+
 const validateStep1 = () => {
-  if (!contactInfo.value.email || !contactInfo.value.phone) {
-    toast.add({
-      title: 'Missing information',
-      description: 'Please fill in all required fields',
-      color: 'error'
-    })
-    return false
-  }
-
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  if (!emailRegex.test(contactInfo.value.email)) {
-    toast.add({
-      title: 'Invalid email',
-      description: 'Please enter a valid email address',
-      color: 'error'
-    })
-    return false
-  }
-
-  return true
-}
-
-const validateStep2 = () => {
   if (!shippingAddress.value.firstName || !shippingAddress.value.lastName ||
       !shippingAddress.value.address1 || !shippingAddress.value.city ||
       !shippingAddress.value.state || !shippingAddress.value.zipCode) {
@@ -275,7 +262,7 @@ const validateStep2 = () => {
   return true
 }
 
-const validateStep3 = () => {
+const validateStep2 = () => {
   if (!agreedToTerms.value) {
     toast.add({
       title: 'Terms required',
@@ -314,7 +301,7 @@ const handleNext = () => {
     isValid = validateStep2()
   }
 
-  if (isValid && currentStep.value < 3) {
+  if (isValid && currentStep.value < 2) {
     currentStep.value++
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
@@ -328,7 +315,7 @@ const handlePrevious = () => {
 }
 
 const handlePlaceOrder = async () => {
-  if (!validateStep3()) {
+  if (!validateStep2()) {
     return
   }
 
@@ -337,7 +324,7 @@ const handlePlaceOrder = async () => {
   try {
     // Step 1: Create order object
     const order = {
-      contact: contactInfo.value,
+      // contact: contactInfo.value,
       shipping: shippingAddress.value,
       billing: sameAsShipping.value ? shippingAddress.value : billingAddress.value,
       shippingMethod: selectedShippingMethod.value,

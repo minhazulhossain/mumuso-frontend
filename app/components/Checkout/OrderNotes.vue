@@ -6,6 +6,7 @@
     <UTextarea
         :model-value="modelValue"
         @update:model-value="$emit('update:modelValue', $event)"
+        class="w-full"
         placeholder="Add any special instructions for your order..."
         :rows="4"
     />

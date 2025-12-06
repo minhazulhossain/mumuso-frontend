@@ -27,88 +27,6 @@
           </button>
         </div>
 
-        <!-- Credit Card Form -->
-        <div v-if="selectedPaymentMethod === 'card'" class="space-y-4 pt-4">
-        <UFormField label="Card Number" required>
-          <UInput
-              :model-value="modelValue.cardNumber"
-              @update:model-value="updateField('cardNumber', $event)"
-              placeholder="1234 5678 9012 3456"
-              size="lg"
-              icon="i-heroicons-credit-card"
-              maxlength="19"
-          />
-        </UFormField>
-
-        <UFormField label="Cardholder Name" required>
-          <UInput
-              :model-value="modelValue.cardName"
-              @update:model-value="updateField('cardName', $event)"
-              placeholder="John Doe"
-              size="lg"
-          />
-        </UFormField>
-
-        <div class="grid grid-cols-2 gap-4">
-          <UFormField label="Expiry Date" required>
-            <UInput
-                :model-value="modelValue.expiryDate"
-                @update:model-value="updateField('expiryDate', $event)"
-                placeholder="MM/YY"
-                size="lg"
-                maxlength="5"
-            />
-          </UFormField>
-
-          <UFormField label="CVV" required>
-            <UInput
-                :model-value="modelValue.cvv"
-                @update:model-value="updateField('cvv', $event)"
-                type="password"
-                placeholder="123"
-                size="lg"
-                maxlength="4"
-            />
-          </UFormField>
-        </div>
-
-        <div class="flex items-center gap-2">
-          <UCheckbox
-              :model-value="modelValue.saveCard"
-              @update:model-value="updateField('saveCard', $event)"
-          />
-          <label class="text-sm text-gray-600 dark:text-gray-400">
-            Save card for future purchases
-          </label>
-        </div>
-        </div>
-
-        <!-- PayPal Notice -->
-        <div v-if="selectedPaymentMethod === 'paypal'" class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-          <div class="flex items-start gap-3">
-            <UIcon name="i-heroicons-information-circle" class="text-blue-500 text-xl mt-0.5"/>
-            <div>
-              <p class="font-medium text-blue-900 dark:text-blue-100">PayPal Checkout</p>
-              <p class="text-sm text-blue-700 dark:text-blue-300 mt-1">
-                You will be redirected to PayPal to complete your purchase securely.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Apple Pay Notice -->
-        <div v-if="selectedPaymentMethod === 'apple'" class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-          <div class="flex items-start gap-3">
-            <UIcon name="i-heroicons-information-circle" class="text-gray-500 text-xl mt-0.5"/>
-            <div>
-              <p class="font-medium text-gray-900 dark:text-white">Apple Pay</p>
-              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                Complete your purchase quickly and securely with Apple Pay.
-              </p>
-            </div>
-          </div>
-        </div>
-
         <!-- Cash on Delivery Notice -->
         <div v-if="selectedPaymentMethod === 'cash'" class="p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
           <div class="flex items-start gap-3">
@@ -210,29 +128,11 @@ const paymentMethods = [
     iconColor: 'text-green-600'
   },
   {
-    id: 'card',
-    name: 'Credit Card',
-    icon: 'i-heroicons-credit-card',
-    iconColor: 'text-blue-500'
-  },
-  {
     id: 'cash',
     name: 'Cash on Delivery',
     icon: 'i-heroicons-banknotes',
     iconColor: 'text-yellow-600'
   },
-  {
-    id: 'paypal',
-    name: 'PayPal',
-    icon: 'i-heroicons-wallet',
-    iconColor: 'text-blue-600'
-  },
-  {
-    id: 'apple',
-    name: 'Apple Pay',
-    icon: 'i-heroicons-device-phone-mobile',
-    iconColor: 'text-gray-900 dark:text-white'
-  }
 ]
 
 const updateField = (field: keyof PaymentInfo, value: any) => {

@@ -2,7 +2,7 @@
   <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
     <div class="flex items-center justify-between mb-6">
       <h2 class="text-xl font-bold text-gray-900 dark:text-white">Shipping Address</h2>
-      <UBadge color="primary" variant="soft">Step 2 of 3</UBadge>
+      <UBadge color="primary" variant="soft">Step 1 of 2</UBadge>
     </div>
 
     <div class="space-y-6">
@@ -34,6 +34,7 @@
                 :model-value="modelValue.firstName"
                 @update:model-value="updateField('firstName', $event)"
                 size="lg"
+                class="w-full"
                 placeholder="John"
             />
           </UFormField>
@@ -42,6 +43,7 @@
             <UInput
                 :model-value="modelValue.lastName"
                 @update:model-value="updateField('lastName', $event)"
+                class="w-full"
                 size="lg"
                 placeholder="Doe"
             />
@@ -50,6 +52,7 @@
 
         <UFormField label="Address Line 1" required>
           <UInput
+              class="w-full"
               :model-value="modelValue.address1"
               @update:model-value="updateField('address1', $event)"
               size="lg"
@@ -60,6 +63,7 @@
         <UFormField label="Address Line 2" hint="Apartment, suite, etc. (optional)">
           <UInput
               :model-value="modelValue.address2"
+              class="w-full"
               @update:model-value="updateField('address2', $event)"
               size="lg"
               placeholder="Apt 4B"
@@ -72,6 +76,7 @@
                 :model-value="modelValue.city"
                 @update:model-value="updateField('city', $event)"
                 size="lg"
+                class="w-full"
                 placeholder="New York"
             />
           </UFormField>
@@ -85,6 +90,7 @@
                 placeholder="Select state"
                 value-attribute="value"
                 option-attribute="label"
+                class="w-full"
             />
           </UFormField>
 
@@ -93,6 +99,7 @@
                 :model-value="modelValue.zipCode"
                 @update:model-value="updateField('zipCode', $event)"
                 size="lg"
+                class="w-full"
                 placeholder="10001"
             />
           </UFormField>
@@ -104,10 +111,11 @@
               @update:model-value="updateField('country', $event)"
               :items="countries"
               size="lg"
+
               placeholder="Select country"
               value-attribute="value"
               option-attribute="label"
-              class="w-50"
+              class="w-full"
           />
         </UFormField>
 
@@ -116,6 +124,7 @@
               :model-value="modelValue.phone"
               @update:model-value="updateField('phone', $event)"
               size="lg"
+              class="w-full"
               placeholder="+1 (555) 123-4567"
           />
         </UFormField>
@@ -123,14 +132,12 @@
         <!-- Shipping Method -->
         <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
           <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Shipping Method</h3>
-
           <!-- Loading State -->
           <div v-if="loading" class="space-y-3">
             <USkeleton class="h-20" />
             <USkeleton class="h-20" />
             <USkeleton class="h-20" />
           </div>
-
           <!-- No Methods Available -->
           <div v-else-if="shippingMethods.length === 0" class="rounded-lg border border-yellow-200 bg-yellow-50 dark:border-yellow-900 dark:bg-yellow-900/20 p-4">
             <p class="text-sm text-yellow-800 dark:text-yellow-200">No shipping methods available. Please try again later.</p>
@@ -169,7 +176,7 @@
                         <div v-if="selectedShippingMethod === method.id" class="w-2 h-2 bg-white rounded-full"></div>
                       </div>
                       <div>
-                        <p class="font-semibold text-gray-900 dark:text-white">{{ method.name }}</p>
+                        <p class="font-semibold text-gray-900 dark:text-white">{{ method.title }}</p>
                         <p class="text-sm text-gray-500 dark:text-gray-400">{{ method.description }}</p>
                         <p v-if="method.estimated_days" class="text-xs text-gray-400 dark:text-gray-500 mt-1">
                           {{ method.estimated_days }}
@@ -179,7 +186,7 @@
                   </div>
                   <div class="text-right ml-4">
                     <p class="font-bold text-gray-900 dark:text-white">
-                      {{ method.is_free ? 'FREE' : `$${(method.price || 0).toFixed(2)}` }}
+                      {{ method.is_free ? 'FREE' : `$${(method.cost || 0).toFixed(2)}` }}
                     </p>
                   </div>
                 </div>
@@ -276,7 +283,7 @@ const countries = [
   { label: 'United Kingdom', value: 'UK' },
   { label: 'Australia', value: 'AU' },
   { label: 'Germany', value: 'DE' },
-  { label: 'France', value: 'FR' }
+  { label: 'France', value: 'FR' },
 ]
 
 const states = [
@@ -293,9 +300,15 @@ const states = [
 ]
 
 const updateField = (field: keyof ShippingAddress, value: any) => {
+  // Handle select menu objects - extract the value property
+  let fieldValue = value
+  if (value && typeof value === 'object' && 'value' in value) {
+    fieldValue = value.value
+  }
+
   emit('update:modelValue', {
     ...props.modelValue,
-    [field]: value
+    [field]: fieldValue
   })
 }
 </script>

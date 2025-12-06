@@ -10,8 +10,9 @@
           class="flex gap-3 pb-4 border-b border-gray-200 dark:border-gray-700 last:border-0"
       >
         <div class="relative">
+
           <NuxtImg
-              :src="item.product.image ?? 'https://placehold.co/80x80'"
+              :src="item.product.images?.featured?.thumb ?? 'https://placehold.co/80x80'"
               :alt="item.product.name"
               class="w-16 h-16 object-cover rounded-lg"
               width="64"
@@ -19,19 +20,14 @@
               loading="lazy"
               format="webp"
           />
-          <UBadge
-              color="primary"
-              class="absolute -top-2 -right-2 text-xs"
-          >
-            {{ item.quantity }}
-          </UBadge>
+
         </div>
         <div class="flex-1 min-w-0">
           <p class="font-medium text-sm text-gray-900 dark:text-white truncate">
             {{ item.product.name }}
           </p>
           <p class="text-sm text-gray-500 dark:text-gray-400">
-            ${{ parseFloat(item.product.price).toFixed(2) }} × {{ item.quantity }}
+            ${{ parseFloat(item?.product?.price).toFixed(2) }} × {{ item.quantity }}
           </p>
         </div>
         <div class="text-right">
@@ -86,17 +82,6 @@
       </div>
     </div>
 
-    <!-- Accepted Payment Methods -->
-    <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-      <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">Accepted Payment Methods</p>
-      <div class="flex gap-2 flex-wrap">
-        <UBadge color="gray" variant="soft" size="sm">Visa</UBadge>
-        <UBadge color="gray" variant="soft" size="sm">Mastercard</UBadge>
-        <UBadge color="gray" variant="soft" size="sm">Amex</UBadge>
-        <UBadge color="gray" variant="soft" size="sm">PayPal</UBadge>
-        <UBadge color="gray" variant="soft" size="sm">Apple Pay</UBadge>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -117,7 +102,7 @@ const props = defineProps<{
   taxRate?: number
 }>()
 
-const taxRate = props.taxRate || 10
+const taxRate = props.taxRate || 0
 
 // Computed values
 const subtotal = computed(() => {
