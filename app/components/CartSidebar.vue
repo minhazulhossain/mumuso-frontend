@@ -3,6 +3,7 @@
       :close="{ onClick: () => emit('close', false) }"
       v-model="localCartOpen"
       title="Shopping Cart"
+      :ui="{ body: 'sm:p-0 rounded-none' }"
       >
     <UButton
         icon="i-heroicons-shopping-cart"
@@ -15,20 +16,8 @@
       </template>
     </UButton>
     <template #body>
-      <UCard class="flex flex-col h-full">
-<!--        <template #header>-->
-<!--          <div class="flex items-center justify-between">-->
-<!--            <h2 class="text-xl font-semibold text-gray-900 dark:text-white">-->
-<!--              Shopping Cart ({{ cartItemsCount }})-->
-<!--            </h2>-->
-<!--            <UButton-->
-<!--                color="secondary"-->
-<!--                variant="ghost"-->
-<!--                icon="i-heroicons-x-mark"-->
-<!--                @click="isCartOpen = false"-->
-<!--            />-->
-<!--          </div>-->
-<!--        </template>-->
+      <UCard class="flex flex-col h-full" :ui="{ root: 'rounded-none', footer: '' }">
+
 
         <!-- Loading State -->
         <div v-if="isLoading" class="flex items-center justify-center py-12">
@@ -185,7 +174,7 @@
                 <span>-${{ cartSavings?.toFixed(2) }}</span>
               </div>
               <!-- Final Total -->
-              <div class="flex justify-between items-center text-lg font-semibold pt-2 border-t border-gray-200 dark:border-gray-700">
+              <div class="flex justify-between items-center text-lg font-semibold">
                 <span class="text-gray-900 dark:text-white">Total:</span>
                 <span class="text-primary-500">${{ cartTotal?.toFixed(2) }}</span>
               </div>
@@ -271,9 +260,9 @@ const localCartOpen = computed({
 // Watch route changes and auto-close cart on all navigation
 watch(() => route.path, (newPath) => {
 
-  // if (isCartOpen.value) {
-  //   isCartOpen.value = false
-  // }
+  if (isCartOpen.value) {
+    isCartOpen.value = false
+  }
 })
 
 // Helper to get item price (after discount)

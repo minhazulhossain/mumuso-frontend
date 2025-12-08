@@ -1,5 +1,7 @@
 <template>
-  <ShopLayoutPage :title="category?.name" :sub-title="category?.description" :loading-content="pending"/>
+  <ShopLayoutPage :title="category?.name"
+                  :hide-category-filter="true"
+                  :sub-title="category?.description" :loading-content="pending"/>
 </template>
 <script setup lang="ts">
 

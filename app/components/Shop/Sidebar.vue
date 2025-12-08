@@ -16,7 +16,7 @@
       </div>
 
       <!-- Category Filter -->
-      <div class="mb-6">
+      <div v-if="!hideCategoryFilter" class="mb-6">
         <label class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
           Category
         </label>
@@ -206,14 +206,13 @@
           Clear All Filters
         </UButton>
       </div>
-
       <!-- Active Filters Summary -->
       <div v-if="hasActiveFilters" class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
         <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
           Active Filters ({{ activeFilterCount }})
         </p>
         <div class="space-y-1 text-xs text-gray-600 dark:text-gray-400">
-          <div v-if="localFilters.category && localFilters.category !== 'all'">
+          <div v-if="!hideCategoryFilter && localFilters.category && localFilters.category !== 'all'">
             • Category: {{ getCategoryLabel(localFilters.category) }}
           </div>
           <div v-if="localFilters.featured !== undefined">
@@ -252,6 +251,7 @@ interface Filters {
 
 const props = defineProps<{
   filters?: Filters
+  hideCategoryFilter?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -296,9 +296,10 @@ const quickPriceRanges = [
 
 // Category options
 const categoryOptions = computed(() => {
+
   const categories = getAllCategories.value.map((cat: Category) => ({
     value: cat.slug,
-    label: cat.name,
+    label: cat?.label,
     icon: 'i-heroicons-tag'
   }))
   return [
@@ -330,7 +331,7 @@ const displayMaxPrice = computed(() => {
 // Computed
 const hasActiveFilters = computed(() => {
   return (
-      (localFilters.value.category && localFilters.value.category !== 'all') ||
+      (!props.hideCategoryFilter && localFilters.value.category && localFilters.value.category !== 'all') ||
       localFilters.value.featured !== undefined ||
       localFilters.value.in_stock !== undefined ||
       localFilters.value.min_price ||
@@ -341,7 +342,7 @@ const hasActiveFilters = computed(() => {
 
 const activeFilterCount = computed(() => {
   let count = 0
-  if (localFilters.value.category && localFilters.value.category !== 'all') count++
+  if (!props.hideCategoryFilter && localFilters.value.category && localFilters.value.category !== 'all') count++
   if (localFilters.value.featured !== undefined) count++
   if (localFilters.value.in_stock !== undefined) count++
   if (localFilters.value.min_price || localFilters.value.max_price) count++

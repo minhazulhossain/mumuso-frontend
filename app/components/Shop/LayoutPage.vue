@@ -12,6 +12,7 @@
             v-model:filters="activeFilters"
             @apply-filters="applyFilters"
             @clear-filters="clearAllFilters"
+            :hide-category-filter="hideCategoryFilter"
         />
 
         <!-- Products Grid -->
@@ -253,8 +254,10 @@
 <script setup lang="ts">
 const props = defineProps<{
   title?: string
-  subTitle?: string,
-  loadingContent ?: boolean
+  subTitle?: string
+  loadingContent?: boolean
+  hideCategoryFilter?: boolean
+  initialCategory?: string
 }>()
 
 const {
@@ -272,7 +275,7 @@ const searchQuery = ref('')
 const sortBy = ref('featured')
 const viewMode = ref<'grid' | 'list'>('grid')
 const activeFilters = ref<any>({
-  category: 'all',
+  category: props.initialCategory || 'all',
   featured: undefined,
   in_stock: undefined,
   min_price: undefined,
