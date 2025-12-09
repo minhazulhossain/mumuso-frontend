@@ -18,7 +18,12 @@
       "Bash(npm install:*)",
       "Bash(git push:*)",
       "Bash(npm outdated:*)",
-      "Bash(tee:*)"
+      "Bash(tee:*)",
+      "Bash(php -l:*)",
+      "Bash(php artisan migrate:*)",
+      "Bash(php artisan migrate:status:*)",
+      "Bash(php artisan tinker:*)",
+      "Bash(mysql:*)"
     ],
     "deny": [],
     "ask": []

@@ -30,6 +30,7 @@
               :shipping-methods="shippingMethods"
               :saved-addresses="addresses"
               :show-saved-addresses="loggedIn"
+              :show-email="!loggedIn"
               :loading="shippingLoading"
               @next="handleNext"
               @previous="handlePrevious"
@@ -150,6 +151,7 @@ const currentStep = ref(1)
 const shippingAddress = ref({
   firstName: '',
   lastName: '',
+  email: '',
   address1: '',
   address2: '',
   city: '',
@@ -259,6 +261,29 @@ const validateStep1 = () => {
     })
     return false
   }
+
+  // Only validate email for guest users
+  if (!loggedIn.value) {
+    if (!shippingAddress.value.email) {
+      toast.add({
+        title: 'Email required',
+        description: 'Please enter your email address',
+        color: 'error'
+      })
+      return false
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(shippingAddress.value.email)) {
+      toast.add({
+        title: 'Invalid email',
+        description: 'Please enter a valid email address',
+        color: 'error'
+      })
+      return false
+    }
+  }
+
   return true
 }
 
@@ -322,17 +347,52 @@ const handlePlaceOrder = async () => {
   processingOrder.value = true
 
   try {
-    // Step 1: Create order object
+    const billingAddr = sameAsShipping.value ? shippingAddress.value : billingAddress.value
+
+    console.log('User session:', user.value)
+    console.log('Is logged in:', loggedIn.value)
+    console.log('User ID:', user.value?.id)
+
+    // Step 1: Create order object matching server expectations
     const order = {
-      // contact: contactInfo.value,
+      // User info (only send for guest checkout, logged-in users have email in session)
+      ...(loggedIn.value ? {
+        user_id: user.value?.id
+      } : {
+        user: {
+          first_name: shippingAddress.value.firstName,
+          last_name: shippingAddress.value.lastName,
+          email: shippingAddress.value.email || user.value?.email || '',
+          phone: shippingAddress.value.phone
+        }
+      }),
       shipping: shippingAddress.value,
-      billing: sameAsShipping.value ? shippingAddress.value : billingAddress.value,
-      shippingMethod: selectedShippingMethod.value,
+      billing: billingAddr,
+      sameAsShipping: sameAsShipping.value,
+      contact: {
+        email: shippingAddress.value.email || '',
+        phone: shippingAddress.value.phone || ''
+      },
       paymentMethod: selectedPaymentMethod.value,
-      items: cartItems.value,
-      orderNotes: orderNotes.value,
-      shippingCost: shippingCost.value,
+      orderNotes: orderNotes.value || '',
+      shippingCost: shippingCost.value || 0,
+      items: cartItems.value && cartItems.value.length > 0 ? cartItems.value.map((item: any) => {
+        // Get product_id from multiple possible sources
+        const productId = item.product?.id || item.product_id || item.id
+        // Get price - prioritize pricing info, then variation, then product, then item price
+        const price = item.pricing?.final_price || item.variation?.price || item.product?.price || item.price
+
+        return {
+          product_id: productId,
+          quantity: item.quantity,
+          unit_price: price || 0
+        }
+      }) : []
     }
+
+    console.log('Final order object to send:', order)
+    console.log('Order user_id:', order.user_id)
+    console.log('Order user:', order.user)
 
     // Step 1: Create order in backend
     const orderResponse = await createOrder(order)

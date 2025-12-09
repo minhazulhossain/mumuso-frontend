@@ -33,21 +33,50 @@ export interface OrderFormData {
   status?: string
   payment_status?: string
   payment_method?: string
+  paymentMethod?: string
   currency?: string
   notes?: string
+  orderNotes?: string
   tax_amount?: number
   shipping_amount?: number
+  shippingCost?: number
   discount_amount?: number
-  billing_address: AddressInput
+  billing_address?: AddressInput
+  billing?: any
   shipping_address?: AddressInput
+  shipping?: any
+  contact?: any
+  sameAsShipping?: boolean
   items: OrderItemInput[]
+  [key: string]: any
 }
 
 /**
  * Format order data for API submission
  * Ensures all required fields are present and properly formatted
+ *
+ * Handles two formats:
+ * 1. Old format: billing_address, shipping_address (server transforms)
+ * 2. New format: billing, shipping (passed through as-is to server)
  */
 export const formatOrderData = (data: OrderFormData): OrderFormData => {
+  // If using new format with shipping/billing (server will transform), pass through
+  if (data.shipping && data.billing) {
+    return {
+      ...(data.user_id && { user_id: data.user_id }),
+      ...(data.user && { user: data.user }),
+      shipping: data.shipping,
+      billing: data.billing,
+      sameAsShipping: data.sameAsShipping,
+      contact: data.contact,
+      paymentMethod: data.paymentMethod,
+      orderNotes: data.orderNotes,
+      shippingCost: data.shippingCost,
+      items: data.items
+    }
+  }
+
+  // Otherwise use old format with address transformation
   return {
     // User information
     ...(data.user_id && { user_id: data.user_id }),
@@ -66,7 +95,7 @@ export const formatOrderData = (data: OrderFormData): OrderFormData => {
     ...(data.discount_amount !== undefined && { discount_amount: parseFloat(String(data.discount_amount)).toFixed(2) }),
 
     // Addresses (required)
-    billing_address: formatAddress(data.billing_address),
+    ...(data.billing_address && { billing_address: formatAddress(data.billing_address) }),
     ...(data.shipping_address && { shipping_address: formatAddress(data.shipping_address) }),
 
     // Items (required)
@@ -105,28 +134,26 @@ const formatAddress = (address: AddressInput): AddressInput => {
 export const validateOrderData = (data: OrderFormData): { valid: boolean; errors: string[] } => {
   const errors: string[] = []
 
-  // Check user information
-  if (!data.user_id && !data.user) {
-    errors.push('Either user_id or user information is required')
-  }
-
-  if (data.user) {
-    if (!data.user.first_name) errors.push('User first name is required')
-    if (!data.user.last_name) errors.push('User last name is required')
-    if (!data.user.email) errors.push('User email is required')
-  }
-
-  // Check addresses
-  if (!data.billing_address) {
+  // Check addresses - handle both old and new format
+  const billingAddr = data.billing_address || data.billing
+  if (!billingAddr) {
     errors.push('Billing address is required')
   } else {
-    if (!data.billing_address.first_name) errors.push('Billing first name is required')
-    if (!data.billing_address.last_name) errors.push('Billing last name is required')
-    if (!data.billing_address.address_line_1) errors.push('Billing address line 1 is required')
-    if (!data.billing_address.city) errors.push('Billing city is required')
-    if (!data.billing_address.state) errors.push('Billing state is required')
-    if (!data.billing_address.postal_code) errors.push('Billing postal code is required')
-    if (!data.billing_address.country) errors.push('Billing country is required')
+    const firstName = billingAddr.first_name || billingAddr.firstName
+    const lastName = billingAddr.last_name || billingAddr.lastName
+    const address1 = billingAddr.address_line_1 || billingAddr.address1
+    const city = billingAddr.city
+    const state = billingAddr.state
+    const postalCode = billingAddr.postal_code || billingAddr.zipCode
+    const country = billingAddr.country
+
+    if (!firstName) errors.push('Billing first name is required')
+    if (!lastName) errors.push('Billing last name is required')
+    if (!address1) errors.push('Billing address line 1 is required')
+    if (!city) errors.push('Billing city is required')
+    if (!state) errors.push('Billing state is required')
+    if (!postalCode) errors.push('Billing postal code is required')
+    if (!country) errors.push('Billing country is required')
   }
 
   // Check items

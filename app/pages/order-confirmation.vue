@@ -248,12 +248,13 @@
 <script setup lang="ts">
 const route = useRoute()
 const router = useRouter()
-const { fetchOrder } = useOrders()
+const { fetchOrder, loading: composableLoading, error: composableError } = useOrders()
 
 // Order data state
 const orderData = ref(null)
-const loading = ref(true)
-const error = ref(null)
+const loading = computed(() => composableLoading.value)
+const error = computed(() => composableError.value || error_local.value)
+const error_local = ref(null)
 
 // Refs for order information (will be populated from API)
 const orderNumber = ref('')
@@ -285,13 +286,31 @@ const shippingMethod = ref('')
 const shippingDescription = ref('')
 const shipping = ref(0)
 
-// Pricing
+// Pricing - use order data if available, otherwise calculate
 const subtotal = computed(() => {
-  return orderItems.value.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0)
+  if (orderData.value?.subtotal && orderData.value.subtotal > 0) {
+    return Number(orderData.value.subtotal) || 0
+  }
+  if (orderItems.value.length > 0) {
+    return orderItems.value.reduce((sum: number, item: any) => sum + ((item.price || 0) * (item.quantity || 0)), 0)
+  }
+  return 0
 })
 
-const tax = computed(() => (subtotal.value * 10) / 100)
-const total = computed(() => subtotal.value + shipping.value + tax.value)
+const tax = computed(() => {
+  if (orderData.value?.tax_amount && orderData.value.tax_amount >= 0) {
+    return Number(orderData.value.tax_amount) || 0
+  }
+  return 0
+})
+
+const total = computed(() => {
+  if (orderData.value?.total_amount && orderData.value.total_amount > 0) {
+    return Number(orderData.value.total_amount) || 0
+  }
+  const calculated = subtotal.value + (shipping.value || 0) + tax.value
+  return calculated > 0 ? calculated : 0
+})
 
 // Methods
 const handlePrint = () => {
@@ -301,19 +320,32 @@ const handlePrint = () => {
 // Fetch order data
 const loadOrder = async () => {
   if (!route.query.order) {
-    error.value = 'No order ID provided'
-    loading.value = false
+    error_local.value = 'No order ID provided'
+    console.error('No order ID in URL query')
     return
   }
 
   try {
+    console.log('Loading order:', route.query.order)
     const order = await fetchOrder(route.query.order as string)
+    console.log('Order fetched:', order)
 
     if (order) {
       // Map order data to refs
       orderData.value = order
+      console.log('Full order object:', order)
       orderNumber.value = order.id || order.order_number || route.query.order
-      customerEmail.value = order.customer_email || order.contact?.email || ''
+      console.log('Order number:', orderNumber.value)
+      // Extract email with multiple fallbacks
+      customerEmail.value =
+        order.customer_email ||
+        order.contact?.email ||
+        order.shipping_address?.email ||
+        order.billing_address?.email ||
+        'Email not available'
+      console.log('Customer email:', customerEmail.value)
+      console.log('Customer email sources - customer_email:', order.customer_email, 'contact.email:', order.contact?.email, 'shipping email:', order.shipping_address?.email)
+      console.log('Order date string:', order.created_at)
       orderDate.value = new Date(order.created_at).toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
@@ -331,30 +363,36 @@ const loadOrder = async () => {
 
       // Map order items
       orderItems.value = order.items || []
+      console.log('Order items mapped:', orderItems.value)
 
-      // Map addresses
+      // Map addresses - handle both snake_case and camelCase field names
+      console.log('Shipping address from order:', order.shipping_address)
       if (order.shipping_address) {
+        const addr = order.shipping_address as any
         shippingAddress.value = {
-          name: `${order.shipping_address.first_name || ''} ${order.shipping_address.last_name || ''}`.trim(),
-          address1: order.shipping_address.address1 || '',
-          address2: order.shipping_address.address2 || '',
-          city: order.shipping_address.city || '',
-          state: order.shipping_address.state || '',
-          zipCode: order.shipping_address.zip_code || order.shipping_address.postal_code || '',
-          country: order.shipping_address.country || ''
+          name: `${addr.first_name || ''} ${addr.last_name || ''}`.trim(),
+          address1: addr.address1 || addr.address_line_1 || '',
+          address2: addr.address2 || addr.address_line_2 || '',
+          city: addr.city || '',
+          state: addr.state || '',
+          zipCode: addr.zip_code || addr.postal_code || addr.zipCode || '',
+          country: addr.country || ''
         }
+        console.log('Mapped shipping address:', shippingAddress.value)
       }
 
       if (order.billing_address) {
+        const addr = order.billing_address as any
         billingAddress.value = {
-          name: `${order.billing_address.first_name || ''} ${order.billing_address.last_name || ''}`.trim(),
-          address1: order.billing_address.address1 || '',
-          address2: order.billing_address.address2 || '',
-          city: order.billing_address.city || '',
-          state: order.billing_address.state || '',
-          zipCode: order.billing_address.zip_code || order.billing_address.postal_code || '',
-          country: order.billing_address.country || ''
+          name: `${addr.first_name || ''} ${addr.last_name || ''}`.trim(),
+          address1: addr.address1 || addr.address_line_1 || '',
+          address2: addr.address2 || addr.address_line_2 || '',
+          city: addr.city || '',
+          state: addr.state || '',
+          zipCode: addr.zip_code || addr.postal_code || addr.zipCode || '',
+          country: addr.country || ''
         }
+        console.log('Mapped billing address:', billingAddress.value)
       }
 
       // Map payment info
@@ -364,15 +402,14 @@ const loadOrder = async () => {
       // Map shipping info
       shippingMethod.value = order.shipping_method || 'Standard Shipping'
       shippingDescription.value = order.shipping_description || '5-7 business days'
-      shipping.value = order.shipping_cost || 0
+      shipping.value = order.shipping_cost || order.shipping_amount || 0
+      console.log('Shipping value set to:', shipping.value)
     } else {
-      error.value = 'Order not found'
+      error_local.value = 'Order not found'
     }
   } catch (err: any) {
-    error.value = err.message || 'Failed to load order'
+    error_local.value = err.message || 'Failed to load order'
     console.error('Order loading error:', err)
-  } finally {
-    loading.value = false
   }
 }
 

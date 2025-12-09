@@ -50,6 +50,17 @@
           </UFormField>
         </div>
 
+        <UFormField v-if="props.showEmail !== false" label="Email" required>
+          <UInput
+              :model-value="modelValue.email"
+              @update:model-value="updateField('email', $event)"
+              type="email"
+              size="lg"
+              class="w-full"
+              placeholder="john.doe@example.com"
+          />
+        </UFormField>
+
         <UFormField label="Address Line 1" required>
           <UInput
               class="w-full"
@@ -214,6 +225,7 @@ import type { Address } from '#shared/types/address'
 interface ShippingAddress {
   firstName: string
   lastName: string
+  email: string
   address1: string
   address2: string
   city: string
@@ -240,6 +252,7 @@ const props = defineProps<{
   savedAddresses?: Address[]
   showSavedAddresses?: boolean
   loading?: boolean
+  showEmail?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -263,6 +276,7 @@ const selectSavedAddress = (addressId: number) => {
     const formAddress: ShippingAddress = {
       firstName: address.first_name,
       lastName: address.last_name,
+      email: address.email || '',
       address1: address.address_line_1,
       address2: address.address_line_2 || '',
       city: address.city,

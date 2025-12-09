@@ -36,8 +36,17 @@ export const useOrders = () => {
 
             return response.data
         } catch (err: any) {
-            error.value = err.data?.message || err.message || 'Failed to create order'
+            // Extract validation errors if present
+            const validationErrors = err.data?.errors
+            if (validationErrors) {
+                const errorMessages = Object.values(validationErrors).flat().join('; ')
+                error.value = `Validation error: ${errorMessages}`
+                console.error('Validation errors:', validationErrors)
+            } else {
+                error.value = err.data?.message || err.message || 'Failed to create order'
+            }
             console.error('Order creation error:', err)
+            console.error('Error data:', err.data)
             return null
         } finally {
             loading.value = false
