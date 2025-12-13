@@ -36,8 +36,8 @@
         </UButton>
       </div>
 
-      <!-- Empty State -->
-      <div v-else-if="orders.length === 0" class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-12 text-center">
+      <!-- Empty State (Only when user has NO orders at all) -->
+      <div v-else-if="totalOrders === 0" class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-12 text-center">
         <div class="inline-flex items-center justify-center w-20 h-20 bg-gray-100 dark:bg-gray-700 rounded-full mb-4">
           <UIcon name="i-heroicons-shopping-bag" class="w-10 h-10 text-gray-400"/>
         </div>
@@ -48,9 +48,9 @@
         </UButton>
       </div>
 
-      <!-- Orders List -->
+      <!-- Orders List with Filters (Always show filters when user has orders) -->
       <div v-else class="space-y-6">
-        <!-- Filter & Sort (Always visible) -->
+        <!-- Filter & Sort (Always visible when user has ANY orders) -->
         <div class="flex flex-col gap-4 mb-6">
           <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
             <div class="flex gap-2 flex-wrap">
@@ -81,37 +81,26 @@
               class="w-full md:w-40"
             />
           </div>
-          <!-- Results Info (Only show if there are orders) -->
+          <!-- Results Info (Only show if there are orders in current filter) -->
           <div v-if="orders.length > 0" class="text-sm text-gray-600 dark:text-gray-400">
-            Showing {{ itemsStartIndex + 1 }} to {{ itemsEndIndex }} of {{ filteredOrders.length }} orders
+            Showing {{ itemsStartIndex + 1 }} to {{ itemsEndIndex }} of {{ totalOrders }} orders
           </div>
         </div>
 
-        <!-- Empty State for Selected Status -->
+        <!-- Empty State for Selected Status (Show when filter has no results but user has other orders) -->
         <div v-if="orders.length === 0" class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-12 text-center">
           <div class="inline-flex items-center justify-center w-20 h-20 bg-gray-100 dark:bg-gray-700 rounded-full mb-4">
             <UIcon name="i-heroicons-inbox" class="w-10 h-10 text-gray-400"/>
           </div>
-          <h2 v-if="selectedStatus !== null" class="text-xl font-semibold text-gray-900 dark:text-white mb-2">No {{ capitalizeFirstLetter(selectedStatus) }} Orders</h2>
-          <h2 v-else class="text-xl font-semibold text-gray-900 dark:text-white mb-2">No Orders Yet</h2>
-          <p v-if="selectedStatus !== null" class="text-gray-600 dark:text-gray-400 mb-6">You don't have any {{ selectedStatus }} orders yet. Try selecting a different status.</p>
-          <p v-else class="text-gray-600 dark:text-gray-400 mb-6">You haven't placed any orders yet. Start shopping to see your order history here.</p>
+          <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">No {{ capitalizeFirstLetter(selectedStatus) }} Orders</h2>
+          <p class="text-gray-600 dark:text-gray-400 mb-6">You don't have any {{ selectedStatus }} orders yet. Try selecting a different status or view all your orders.</p>
           <UButton
-            v-if="selectedStatus !== null"
             @click="selectedStatus = null; currentPage = 1"
             color="primary"
             variant="soft"
             icon="i-heroicons-arrow-left"
           >
             View All Orders
-          </UButton>
-          <UButton
-            v-else
-            to="/shop"
-            color="primary"
-            icon="i-heroicons-shopping-bag"
-          >
-            Continue Shopping
           </UButton>
         </div>
 
