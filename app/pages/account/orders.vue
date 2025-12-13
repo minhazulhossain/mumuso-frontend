@@ -277,7 +277,7 @@
             placeholder="Items per page"
             size="sm"
             class="w-full md:w-40"
-            @change="currentPage = 1"
+            @change="currentPage = 1; loadOrders()"
           />
         </div>
       </div>
@@ -481,6 +481,15 @@ const nextPage = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 }
+
+// Watch for changes in filters and reload orders
+watch(
+  [currentPage, itemsPerPage, selectedStatus],
+  () => {
+    loadOrders()
+  },
+  { immediate: false }
+)
 
 onMounted(() => {
   loadOrders()
