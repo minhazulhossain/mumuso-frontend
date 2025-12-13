@@ -4,7 +4,9 @@
       <!-- Page Header -->
       <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Order History</h1>
-        <p class="text-gray-600 dark:text-gray-400">View and manage your orders</p>
+        <p class="text-gray-600 dark:text-gray-400">
+          {{ totalOrders > 0 ? `You have ${totalOrders} ${totalOrders === 1 ? 'order' : 'orders'}` : 'View and manage your orders' }}
+        </p>
       </div>
 
       <!-- Loading State -->
@@ -38,34 +40,48 @@
       </div>
 
       <!-- Orders List -->
-      <div v-else class="space-y-4">
+      <div v-else class="space-y-6">
         <!-- Filter & Sort -->
-        <div class="flex flex-col md:flex-row gap-4 items-center justify-between mb-6">
-          <div class="flex gap-2">
-            <UButton
-              v-for="status in orderStatuses"
-              :key="status"
-              :color="selectedStatus === status ? 'primary' : 'gray'"
-              :variant="selectedStatus === status ? 'solid' : 'outline'"
+        <div class="flex flex-col gap-4 mb-6">
+          <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div class="flex gap-2 flex-wrap">
+              <UButton
+                :color="selectedStatus === null ? 'primary' : 'gray'"
+                :variant="selectedStatus === null ? 'solid' : 'outline'"
+                size="sm"
+                @click="selectedStatus = null; currentPage = 1"
+              >
+                All Orders
+              </UButton>
+              <UButton
+                v-for="status in orderStatuses"
+                :key="status"
+                :color="selectedStatus === status ? 'primary' : 'gray'"
+                :variant="selectedStatus === status ? 'solid' : 'outline'"
+                size="sm"
+                @click="selectedStatus = status; currentPage = 1"
+              >
+                {{ capitalizeFirstLetter(status) }}
+              </UButton>
+            </div>
+            <USelectMenu
+              v-model="sortBy"
+              :items="sortOptions"
+              placeholder="Sort by..."
               size="sm"
-              @click="selectedStatus = selectedStatus === status ? null : status"
-            >
-              {{ status === null ? 'All Orders' : capitalizeFirstLetter(status) }}
-            </UButton>
+              class="w-full md:w-40"
+            />
           </div>
-          <USelectMenu
-            v-model="sortBy"
-            :items="sortOptions"
-            placeholder="Sort by..."
-            size="sm"
-            class="w-full md:w-40"
-          />
+          <!-- Results Info -->
+          <div class="text-sm text-gray-600 dark:text-gray-400">
+            Showing {{ itemsStartIndex + 1 }} to {{ itemsEndIndex }} of {{ filteredOrders.length }} orders
+          </div>
         </div>
 
         <!-- Orders Grid -->
         <div class="space-y-4">
           <div
-            v-for="order in filteredOrders"
+            v-for="order in paginatedOrders"
             :key="order.id"
             class="bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-shadow"
           >
@@ -208,6 +224,62 @@
             </div>
           </div>
         </div>
+
+        <!-- Pagination -->
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+          <div class="text-sm text-gray-600 dark:text-gray-400">
+            Page {{ currentPage }} of {{ totalPages }}
+          </div>
+          <div class="flex gap-2">
+            <UButton
+              :disabled="currentPage === 1"
+              variant="outline"
+              size="sm"
+              icon="i-heroicons-chevron-left"
+              @click="previousPage"
+            >
+              Previous
+            </UButton>
+            <div class="flex items-center gap-2">
+              <span v-for="page in visiblePages" :key="page" class="text-sm">
+                <UButton
+                  v-if="page === '...'"
+                  variant="ghost"
+                  size="sm"
+                  disabled
+                >
+                  ...
+                </UButton>
+                <UButton
+                  v-else
+                  :color="currentPage === page ? 'primary' : 'gray'"
+                  :variant="currentPage === page ? 'soft' : 'outline'"
+                  size="sm"
+                  :label="`${page}`"
+                  @click="currentPage = page"
+                />
+              </span>
+            </div>
+            <UButton
+              :disabled="currentPage === totalPages"
+              variant="outline"
+              size="sm"
+              icon="i-heroicons-chevron-right"
+              icon-trailing
+              @click="nextPage"
+            >
+              Next
+            </UButton>
+          </div>
+          <USelectMenu
+            v-model="itemsPerPage"
+            :items="itemsPerPageOptions"
+            placeholder="Items per page"
+            size="sm"
+            class="w-full md:w-40"
+            @change="currentPage = 1"
+          />
+        </div>
       </div>
     </UContainer>
   </div>
@@ -229,6 +301,8 @@ const selectedStatus = ref<string | null>(null)
 const expandedOrder = ref<number | null>(null)
 const payingOrderId = ref<number | null>(null)
 const sortBy = ref('newest')
+const currentPage = ref(1)
+const itemsPerPage = ref(5)
 
 const orderStatuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled']
 const sortOptions = [
@@ -237,6 +311,14 @@ const sortOptions = [
   { label: 'Highest Price', value: 'highest' },
   { label: 'Lowest Price', value: 'lowest' }
 ]
+const itemsPerPageOptions = [
+  { label: '5 per page', value: 5 },
+  { label: '10 per page', value: 10 },
+  { label: '15 per page', value: 15 },
+  { label: '20 per page', value: 20 }
+]
+
+const totalOrders = computed(() => orders.value.length)
 
 const filteredOrders = computed(() => {
   let filtered = orders.value
@@ -249,15 +331,63 @@ const filteredOrders = computed(() => {
   // Sort
   switch (sortBy.value) {
     case 'oldest':
-      return filtered.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+      filtered = filtered.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+      break
     case 'highest':
-      return filtered.sort((a, b) => b.total_amount - a.total_amount)
+      filtered = filtered.sort((a, b) => b.total_amount - a.total_amount)
+      break
     case 'lowest':
-      return filtered.sort((a, b) => a.total_amount - b.total_amount)
+      filtered = filtered.sort((a, b) => a.total_amount - b.total_amount)
+      break
     case 'newest':
     default:
-      return filtered.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      filtered = filtered.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
   }
+
+  return filtered
+})
+
+const totalPages = computed(() => Math.ceil(filteredOrders.value.length / itemsPerPage.value))
+
+const itemsStartIndex = computed(() => (currentPage.value - 1) * itemsPerPage.value)
+const itemsEndIndex = computed(() => Math.min(itemsStartIndex.value + itemsPerPage.value, filteredOrders.value.length))
+
+const paginatedOrders = computed(() => {
+  return filteredOrders.value.slice(itemsStartIndex.value, itemsEndIndex.value)
+})
+
+const visiblePages = computed(() => {
+  const pages: (number | string)[] = []
+  const maxVisible = 5
+
+  if (totalPages.value <= maxVisible) {
+    for (let i = 1; i <= totalPages.value; i++) {
+      pages.push(i)
+    }
+  } else {
+    pages.push(1)
+
+    if (currentPage.value > 3) {
+      pages.push('...')
+    }
+
+    const start = Math.max(2, currentPage.value - 1)
+    const end = Math.min(totalPages.value - 1, currentPage.value + 1)
+
+    for (let i = start; i <= end; i++) {
+      if (!pages.includes(i)) {
+        pages.push(i)
+      }
+    }
+
+    if (currentPage.value < totalPages.value - 2) {
+      pages.push('...')
+    }
+
+    pages.push(totalPages.value)
+  }
+
+  return pages
 })
 
 const formatDate = (dateString: string) => {
@@ -339,6 +469,20 @@ const retryPayment = async (orderId: number) => {
     })
   } finally {
     payingOrderId.value = null
+  }
+}
+
+const previousPage = () => {
+  if (currentPage.value > 1) {
+    currentPage.value--
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+}
+
+const nextPage = () => {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 }
 
