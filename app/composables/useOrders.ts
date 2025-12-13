@@ -87,11 +87,20 @@ export const useOrders = () => {
         try {
             const response = await $fetch('/api/orders')
 
-            if (!response?.success) {
-                throw new Error(response?.message || 'Failed to fetch orders')
+            // Handle different response formats
+            if (response?.data && Array.isArray(response.data)) {
+                return response.data
             }
 
-            return response.data || []
+            if (Array.isArray(response)) {
+                return response
+            }
+
+            if (response?.success && response?.data) {
+                return response.data
+            }
+
+            return response || []
         } catch (err: any) {
             error.value = err.data?.message || err.message || 'Failed to fetch orders'
             console.error('Orders fetch error:', err)

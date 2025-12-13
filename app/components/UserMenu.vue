@@ -49,6 +49,11 @@ const items = ref<DropdownMenuItem[][]>([
       to: '/account'
     },
     {
+      label: 'Orders',
+      icon: 'i-lucide-shopping-bag',
+      to: '/account/orders'
+    },
+    {
       label: 'Billing',
       icon: 'i-lucide-credit-card'
     },
@@ -56,10 +61,6 @@ const items = ref<DropdownMenuItem[][]>([
       label: 'Settings',
       icon: 'i-lucide-cog',
       kbds: [',']
-    },
-    {
-      label: 'Keyboard shortcuts',
-      icon: 'i-lucide-monitor'
     }
   ],
   [
