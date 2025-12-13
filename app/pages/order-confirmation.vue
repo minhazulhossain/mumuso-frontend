@@ -1,84 +1,84 @@
 <template>
-  <div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
+  <div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
     <UContainer class="max-w-4xl">
       <!-- Loading State -->
-      <div v-if="loading" class="text-center py-16">
-        <UIcon name="i-heroicons-arrow-path" class="text-4xl text-primary-500 mb-4 animate-spin inline-block"/>
-        <p class="text-gray-600 dark:text-gray-400 mt-4">Loading your order details...</p>
+      <div v-if="loading" class="text-center py-12">
+        <UIcon name="i-heroicons-arrow-path" class="text-3xl text-primary-500 mb-2 animate-spin inline-block"/>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">Loading your order details...</p>
       </div>
 
       <!-- Error State -->
-      <div v-else-if="error" class="text-center py-16">
-        <UIcon name="i-heroicons-exclamation-triangle" class="text-4xl text-red-500 mb-4"/>
-        <p class="text-red-600 dark:text-red-400 mb-4">{{ error }}</p>
-        <UButton to="/shop" color="primary">Continue Shopping</UButton>
+      <div v-else-if="error" class="text-center py-12">
+        <UIcon name="i-heroicons-exclamation-triangle" class="text-3xl text-red-500 mb-2"/>
+        <p class="text-sm text-red-600 dark:text-red-400 mb-2">{{ error }}</p>
+        <UButton to="/shop" color="primary" size="sm">Continue Shopping</UButton>
       </div>
 
       <!-- Success Message -->
-      <div v-else class="text-center mb-8">
-        <div class="inline-flex items-center justify-center w-20 h-20 bg-green-100 dark:bg-green-900/20 rounded-full mb-4">
-          <UIcon name="i-heroicons-check-circle" class="text-5xl text-green-500"/>
+      <div v-else class="text-center mb-4">
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full mb-2">
+          <UIcon name="i-heroicons-check-circle" class="text-4xl text-green-500"/>
         </div>
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-1">
           Order Confirmed!
         </h1>
-        <p class="text-lg text-gray-600 dark:text-gray-400">
+        <p class="text-sm text-gray-600 dark:text-gray-400">
           Thank you for your purchase. Your order has been received.
         </p>
       </div>
 
       <!-- Order Details Card -->
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8 mb-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-6 border-b border-gray-200 dark:border-gray-700">
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-4">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 pb-4 border-b border-gray-200 dark:border-gray-700">
           <div>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Order Number</p>
-            <p class="text-xl font-bold text-gray-900 dark:text-white">{{ orderNumber }}</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mb-0.5">Order Number</p>
+            <p class="text-sm font-bold text-gray-900 dark:text-white">{{ orderNumber }}</p>
           </div>
           <div>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Order Date</p>
-            <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ orderDate }}</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mb-0.5">Order Date</p>
+            <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ orderDate }}</p>
           </div>
           <div>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Estimated Delivery</p>
-            <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ estimatedDelivery }}</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mb-0.5">Est. Delivery</p>
+            <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ estimatedDelivery }}</p>
           </div>
           <div>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Total Amount</p>
-            <p class="text-xl font-bold text-primary-500">${{ total.toFixed(2) }}</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mb-0.5">Total Amount</p>
+            <p class="text-sm font-bold text-primary-500">${{ total.toFixed(2) }}</p>
           </div>
         </div>
 
         <!-- Confirmation Email Notice -->
-        <div class="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-          <div class="flex items-start gap-3">
-            <UIcon name="i-heroicons-envelope" class="text-blue-500 text-xl mt-0.5"/>
+        <div class="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+          <div class="flex items-start gap-2">
+            <UIcon name="i-heroicons-envelope" class="text-blue-500 text-lg mt-0.5 flex-shrink-0"/>
             <div>
-              <p class="font-medium text-blue-900 dark:text-blue-100">Confirmation Email Sent</p>
-              <p class="text-sm text-blue-700 dark:text-blue-300 mt-1">
-                We've sent a confirmation email to <strong>{{ customerEmail }}</strong> with your order details and tracking information.
+              <p class="text-sm font-medium text-blue-900 dark:text-blue-100">Confirmation Email Sent</p>
+              <p class="text-xs text-blue-700 dark:text-blue-300 mt-0.5">
+                We've sent a confirmation to <strong>{{ customerEmail }}</strong>.
               </p>
             </div>
           </div>
         </div>
 
         <!-- Payment Status Warning (if unpaid) -->
-        <div v-if="paymentStatus === 'unpaid'" class="mt-6 p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
-          <div class="flex items-start gap-3">
-            <UIcon name="i-heroicons-exclamation-triangle" class="text-amber-500 text-xl mt-0.5"/>
+        <div v-if="paymentStatus === 'unpaid'" class="mt-3 p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
+          <div class="flex items-start gap-2">
+            <UIcon name="i-heroicons-exclamation-triangle" class="text-amber-500 text-lg mt-0.5 flex-shrink-0"/>
             <div class="flex-1">
-              <p class="font-medium text-amber-900 dark:text-amber-100">Payment Pending</p>
-              <p class="text-sm text-amber-700 dark:text-amber-300 mt-1">
-                Your order has been created successfully, but payment is still pending. Please complete payment to proceed.
+              <p class="text-sm font-medium text-amber-900 dark:text-amber-100">Payment Pending</p>
+              <p class="text-xs text-amber-700 dark:text-amber-300 mt-0.5">
+                Payment is still pending. Please complete payment to proceed.
               </p>
               <UButton
                   @click="handleRetryPayment"
                   :loading="retryPaymentLoading"
-                  class="mt-3"
-                  size="sm"
+                  class="mt-2"
+                  size="xs"
                   color="amber"
                   icon="i-heroicons-credit-card"
               >
-                Complete Payment Now
+                Complete Payment
               </UButton>
             </div>
           </div>
@@ -86,30 +86,27 @@
       </div>
 
       <!-- Order Items -->
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8 mb-6">
-        <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Order Items</h2>
-        <div class="space-y-4">
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-4">
+        <h2 class="text-sm font-bold text-gray-900 dark:text-white mb-3">Order Items</h2>
+        <div class="space-y-3">
           <div
               v-for="item in orderItems"
               :key="item.id"
-              class="flex gap-4 pb-4 border-b border-gray-200 dark:border-gray-700 last:border-0"
+              class="flex gap-3 pb-3 border-b border-gray-200 dark:border-gray-700 last:border-0"
           >
             <img
                 :src="item.image"
                 :alt="item.name"
-                class="w-20 h-20 object-cover rounded-lg"
+                class="w-16 h-16 object-cover rounded-lg flex-shrink-0"
             />
-            <div class="flex-1">
-              <p class="font-semibold text-gray-900 dark:text-white">{{ item.name }}</p>
-              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                Quantity: {{ item.quantity }}
-              </p>
-              <p class="text-sm text-gray-500 dark:text-gray-400">
-                ${{ item.price.toFixed(2) }} each
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-semibold text-gray-900 dark:text-white truncate">{{ item.name }}</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                Qty: {{ item.quantity }} × ${{ item.price.toFixed(2) }}
               </p>
             </div>
-            <div class="text-right">
-              <p class="font-bold text-gray-900 dark:text-white">
+            <div class="text-right flex-shrink-0">
+              <p class="text-sm font-bold text-gray-900 dark:text-white">
                 ${{ (item.price * item.quantity).toFixed(2) }}
               </p>
             </div>
@@ -117,7 +114,7 @@
         </div>
 
         <!-- Price Summary -->
-        <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700 space-y-2">
+        <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700 space-y-1 text-sm">
           <div class="flex justify-between text-gray-600 dark:text-gray-400">
             <span>Subtotal</span>
             <span>${{ subtotal.toFixed(2) }}</span>
@@ -130,7 +127,7 @@
             <span>Tax</span>
             <span>${{ tax.toFixed(2) }}</span>
           </div>
-          <div class="flex justify-between text-xl font-bold text-gray-900 dark:text-white pt-2 border-t border-gray-200 dark:border-gray-700">
+          <div class="flex justify-between font-bold text-gray-900 dark:text-white pt-2 border-t border-gray-200 dark:border-gray-700">
             <span>Total</span>
             <span class="text-primary-500">${{ total.toFixed(2) }}</span>
           </div>
@@ -138,14 +135,14 @@
       </div>
 
       <!-- Shipping & Billing Info -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <!-- Shipping Address -->
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-          <div class="flex items-center gap-2 mb-4">
-            <UIcon name="i-heroicons-truck" class="text-primary-500 text-xl"/>
-            <h3 class="text-lg font-bold text-gray-900 dark:text-white">Shipping Address</h3>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+          <div class="flex items-center gap-2 mb-3">
+            <UIcon name="i-heroicons-truck" class="text-primary-500 text-lg"/>
+            <h3 class="text-sm font-bold text-gray-900 dark:text-white">Shipping Address</h3>
           </div>
-          <div class="text-gray-600 dark:text-gray-400 space-y-1">
+          <div class="text-gray-600 dark:text-gray-400 space-y-0.5 text-xs">
             <p class="font-medium text-gray-900 dark:text-white">{{ shippingAddress.name }}</p>
             <p>{{ shippingAddress.address1 }}</p>
             <p v-if="shippingAddress.address2">{{ shippingAddress.address2 }}</p>
@@ -155,12 +152,12 @@
         </div>
 
         <!-- Billing Address -->
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-          <div class="flex items-center gap-2 mb-4">
-            <UIcon name="i-heroicons-credit-card" class="text-primary-500 text-xl"/>
-            <h3 class="text-lg font-bold text-gray-900 dark:text-white">Billing Address</h3>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+          <div class="flex items-center gap-2 mb-3">
+            <UIcon name="i-heroicons-credit-card" class="text-primary-500 text-lg"/>
+            <h3 class="text-sm font-bold text-gray-900 dark:text-white">Billing Address</h3>
           </div>
-          <div class="text-gray-600 dark:text-gray-400 space-y-1">
+          <div class="text-gray-600 dark:text-gray-400 space-y-0.5 text-xs">
             <p class="font-medium text-gray-900 dark:text-white">{{ billingAddress.name }}</p>
             <p>{{ billingAddress.address1 }}</p>
             <p v-if="billingAddress.address2">{{ billingAddress.address2 }}</p>
@@ -171,96 +168,96 @@
       </div>
 
       <!-- Payment & Shipping Method -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <!-- Payment Method -->
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-          <div class="flex items-center gap-2 mb-4">
-            <UIcon name="i-heroicons-wallet" class="text-primary-500 text-xl"/>
-            <h3 class="text-lg font-bold text-gray-900 dark:text-white">Payment Method</h3>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+          <div class="flex items-center gap-2 mb-3">
+            <UIcon name="i-heroicons-wallet" class="text-primary-500 text-lg"/>
+            <h3 class="text-sm font-bold text-gray-900 dark:text-white">Payment Method</h3>
           </div>
-          <div class="text-gray-600 dark:text-gray-400">
+          <div class="text-gray-600 dark:text-gray-400 text-xs">
             <p class="font-medium text-gray-900 dark:text-white">{{ paymentMethod }}</p>
-            <p v-if="cardLast4" class="text-sm mt-1">
+            <p v-if="cardLast4" class="text-xs mt-0.5">
               Card ending in ••{{ cardLast4 }}
             </p>
           </div>
         </div>
 
         <!-- Shipping Method -->
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-          <div class="flex items-center gap-2 mb-4">
-            <UIcon name="i-heroicons-cube" class="text-primary-500 text-xl"/>
-            <h3 class="text-lg font-bold text-gray-900 dark:text-white">Shipping Method</h3>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+          <div class="flex items-center gap-2 mb-3">
+            <UIcon name="i-heroicons-cube" class="text-primary-500 text-lg"/>
+            <h3 class="text-sm font-bold text-gray-900 dark:text-white">Shipping Method</h3>
           </div>
-          <div class="text-gray-600 dark:text-gray-400">
+          <div class="text-gray-600 dark:text-gray-400 text-xs">
             <p class="font-medium text-gray-900 dark:text-white">{{ shippingMethod }}</p>
-            <p class="text-sm mt-1">{{ shippingDescription }}</p>
+            <p class="text-xs mt-0.5">{{ shippingDescription }}</p>
           </div>
         </div>
       </div>
 
       <!-- Next Steps -->
-      <div class="bg-gradient-to-r from-primary-500 to-primary-600 rounded-lg shadow-sm p-8 text-white mb-6">
-        <h2 class="text-2xl font-bold mb-4">What's Next?</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div class="flex gap-3">
+      <div class="bg-gradient-to-r from-primary-500 to-primary-600 rounded-lg shadow-sm p-4 text-white mb-4">
+        <h2 class="text-lg font-bold mb-3">What's Next?</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div class="flex gap-2">
             <div class="flex-shrink-0">
-              <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                <span class="font-bold text-lg">1</span>
+              <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                <span class="font-bold text-sm">1</span>
               </div>
             </div>
             <div>
-              <h3 class="font-semibold mb-1">Order Processing</h3>
-              <p class="text-sm text-white/90">We're preparing your order for shipment</p>
+              <h3 class="text-sm font-semibold mb-0.5">Order Processing</h3>
+              <p class="text-xs text-white/90">Preparing for shipment</p>
             </div>
           </div>
-          <div class="flex gap-3">
+          <div class="flex gap-2">
             <div class="flex-shrink-0">
-              <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                <span class="font-bold text-lg">2</span>
+              <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                <span class="font-bold text-sm">2</span>
               </div>
             </div>
             <div>
-              <h3 class="font-semibold mb-1">Shipping Notification</h3>
-              <p class="text-sm text-white/90">You'll receive tracking info via email</p>
+              <h3 class="text-sm font-semibold mb-0.5">Shipping Notification</h3>
+              <p class="text-xs text-white/90">Tracking info via email</p>
             </div>
           </div>
-          <div class="flex gap-3">
+          <div class="flex gap-2">
             <div class="flex-shrink-0">
-              <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                <span class="font-bold text-lg">3</span>
+              <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                <span class="font-bold text-sm">3</span>
               </div>
             </div>
             <div>
-              <h3 class="font-semibold mb-1">Delivery</h3>
-              <p class="text-sm text-white/90">Enjoy your purchase!</p>
+              <h3 class="text-sm font-semibold mb-0.5">Delivery</h3>
+              <p class="text-xs text-white/90">Enjoy your purchase!</p>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Action Buttons -->
-      <div class="flex flex-col sm:flex-row gap-4 justify-center">
-        <UButton to="/" size="lg" variant="soft" icon="i-heroicons-home">
-          Back to Home
+      <div class="flex flex-col sm:flex-row gap-2 justify-center mb-4">
+        <UButton to="/" size="sm" variant="soft" icon="i-heroicons-home">
+          Home
         </UButton>
-        <UButton to="/shop" size="lg" variant="soft" icon="i-heroicons-shopping-bag">
-          Continue Shopping
+        <UButton to="/shop" size="sm" variant="soft" icon="i-heroicons-shopping-bag">
+          Shop
         </UButton>
         <UButton
             @click="handlePrint"
-            size="lg"
+            size="sm"
             color="secondary"
             icon="i-heroicons-printer"
         >
-          Print Order
+          Print
         </UButton>
       </div>
 
       <!-- Support -->
-      <div class="text-center mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
-        <p class="text-gray-600 dark:text-gray-400 mb-2">Need help with your order?</p>
-        <UButton to="/support" variant="link" icon="i-heroicons-question-mark-circle">
+      <div class="text-center mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <p class="text-xs text-gray-600 dark:text-gray-400 mb-2">Need help?</p>
+        <UButton to="/support" variant="link" size="sm" icon="i-heroicons-question-mark-circle">
           Contact Support
         </UButton>
       </div>

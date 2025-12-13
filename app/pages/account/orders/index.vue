@@ -2,19 +2,19 @@
   <div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
     <UContainer>
       <!-- Breadcrumb Navigation -->
-      <nav class="flex items-center gap-2 mb-8" aria-label="Breadcrumb">
-        <ULink to="/" class="text-primary-600 dark:text-primary-400 hover:underline text-sm">Home</ULink>
-        <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 text-gray-400"/>
-        <ULink to="/account" class="text-primary-600 dark:text-primary-400 hover:underline text-sm">Account</ULink>
-        <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 text-gray-400"/>
-        <span class="text-gray-900 dark:text-white text-sm font-medium">Orders</span>
+      <nav class="flex items-center gap-2 mb-4" aria-label="Breadcrumb">
+        <ULink to="/" class="text-primary-600 dark:text-primary-400 hover:underline text-xs">Home</ULink>
+        <UIcon name="i-heroicons-chevron-right" class="w-3 h-3 text-gray-400"/>
+        <ULink to="/account" class="text-primary-600 dark:text-primary-400 hover:underline text-xs">Account</ULink>
+        <UIcon name="i-heroicons-chevron-right" class="w-3 h-3 text-gray-400"/>
+        <span class="text-gray-900 dark:text-white text-xs font-medium">Orders</span>
       </nav>
 
       <!-- Page Header -->
-      <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Order History</h1>
-        <p class="text-gray-600 dark:text-gray-400">
-          {{ totalOrders > 0 ? `You have ${totalOrders} ${totalOrders === 1 ? 'order' : 'orders'}` : 'View and manage your orders' }}
+      <div class="mb-4">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-1">Order History</h1>
+        <p class="text-sm text-gray-600 dark:text-gray-400">
+          {{ totalOrders > 0 ? `${totalOrders} ${totalOrders === 1 ? 'order' : 'orders'}` : 'View and manage your orders' }}
         </p>
       </div>
 
@@ -105,155 +105,83 @@
         </div>
 
         <!-- Orders Grid -->
-        <div class="space-y-4">
+        <div class="space-y-2">
           <div
             v-for="order in paginatedOrders"
             :key="order.id"
-            class="bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+            class="bg-white dark:bg-gray-800 rounded-md shadow-sm hover:shadow-md transition-shadow"
           >
-            <!-- Order Header -->
-            <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-              <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+            <!-- Order Header (Compact) -->
+            <div class="p-3 border-b border-gray-200 dark:border-gray-700">
+              <div class="grid grid-cols-1 md:grid-cols-5 gap-3 items-center">
                 <div>
-                  <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Order Number</p>
-                  <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ order.order_number }}</p>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">Order #</p>
+                  <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ order.order_number }}</p>
                 </div>
                 <div>
-                  <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Date</p>
-                  <p class="text-lg font-semibold text-gray-900 dark:text-white">
+                  <p class="text-xs text-gray-500 dark:text-gray-400">Date</p>
+                  <p class="text-sm font-medium text-gray-900 dark:text-white">
                     {{ formatDate(order.created_at) }}
                   </p>
                 </div>
                 <div>
-                  <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Total</p>
-                  <p class="text-lg font-semibold text-primary-600 dark:text-primary-400">
+                  <p class="text-xs text-gray-500 dark:text-gray-400">Amount</p>
+                  <p class="text-sm font-semibold text-primary-600 dark:text-primary-400">
                     ${{ order.total_amount.toFixed(2) }}
                   </p>
                 </div>
                 <div>
-                  <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Status</p>
-                  <div class="flex gap-2 flex-wrap">
-                    <UBadge :color="getStatusColor(order.status)" variant="subtle">
+                  <p class="text-xs text-gray-500 dark:text-gray-400">Status</p>
+                  <div class="flex gap-1 flex-wrap">
+                    <UBadge :color="getStatusColor(order.status)" variant="subtle" size="xs">
                       {{ capitalizeFirstLetter(order.status) }}
                     </UBadge>
-                    <UBadge :color="getPaymentStatusColor(order.payment_status)" variant="subtle">
+                    <UBadge :color="getPaymentStatusColor(order.payment_status)" variant="subtle" size="xs">
                       {{ capitalizeFirstLetter(order.payment_status) }}
                     </UBadge>
                   </div>
                 </div>
-              </div>
-            </div>
-
-            <!-- Order Items -->
-            <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-              <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-4">Items ({{ order.items.length }})</h3>
-              <div class="space-y-3">
-                <div
-                  v-for="item in order.items.slice(0, 2)"
-                  :key="item.id"
-                  class="flex gap-4"
-                >
-                  <div v-if="item.image" class="flex-shrink-0">
-                    <NuxtImg
-                      :src="item.image"
-                      :alt="item.name"
-                      class="w-12 h-12 object-cover rounded-lg"
-                      width="48"
-                      height="48"
-                      loading="lazy"
-                      format="webp"
-                    />
-                  </div>
-                  <div class="flex-1">
-                    <p class="text-sm font-medium text-gray-900 dark:text-white">{{ item.name }}</p>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">
-                      Qty: {{ item.quantity }} × ${{ item.price.toFixed(2) }}
-                    </p>
-                  </div>
-                  <div class="text-right">
-                    <p class="text-sm font-semibold text-gray-900 dark:text-white">
-                      ${{ (item.price * item.quantity).toFixed(2) }}
-                    </p>
-                  </div>
-                </div>
-                <div v-if="order.items.length > 2" class="pt-2 border-t border-gray-200 dark:border-gray-700">
-                  <button
-                    @click="expandedOrder = expandedOrder === order.id ? null : order.id"
-                    class="text-sm text-primary-600 dark:text-primary-400 hover:underline"
+                <div class="flex gap-1 w-full md:w-auto justify-end">
+                  <UButton
+                    :to="`/account/orders/${order.id}`"
+                    variant="outline"
+                    color="primary"
+                    size="xs"
+                    icon="i-heroicons-eye"
+                    class="flex-1 md:flex-none"
                   >
-                    {{ expandedOrder === order.id ? 'Show less' : `Show ${order.items.length - 2} more items` }}
-                  </button>
-                </div>
-              </div>
-
-              <!-- Expanded Items -->
-              <div v-if="expandedOrder === order.id && order.items.length > 2" class="mt-4 space-y-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-                <div
-                  v-for="item in order.items.slice(2)"
-                  :key="item.id"
-                  class="flex gap-4"
-                >
-                  <div v-if="item.image" class="flex-shrink-0">
-                    <NuxtImg
-                      :src="item.image"
-                      :alt="item.name"
-                      class="w-12 h-12 object-cover rounded-lg"
-                      width="48"
-                      height="48"
-                      loading="lazy"
-                      format="webp"
-                    />
-                  </div>
-                  <div class="flex-1">
-                    <p class="text-sm font-medium text-gray-900 dark:text-white">{{ item.name }}</p>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">
-                      Qty: {{ item.quantity }} × ${{ item.price.toFixed(2) }}
-                    </p>
-                  </div>
-                  <div class="text-right">
-                    <p class="text-sm font-semibold text-gray-900 dark:text-white">
-                      ${{ (item.price * item.quantity).toFixed(2) }}
-                    </p>
-                  </div>
+                    Details
+                  </UButton>
+                  <UButton
+                    v-if="order.payment_status === 'pending'"
+                    @click="retryPayment(order.id)"
+                    color="amber"
+                    size="xs"
+                    icon="i-heroicons-credit-card"
+                    :loading="payingOrderId === order.id"
+                    class="flex-1 md:flex-none"
+                  >
+                    Pay
+                  </UButton>
                 </div>
               </div>
             </div>
 
-            <!-- Order Footer -->
-            <div class="p-6 flex flex-col md:flex-row items-center justify-between gap-4">
-              <div class="text-sm text-gray-600 dark:text-gray-400">
-                Payment: <span class="font-medium text-gray-900 dark:text-white">{{ order.payment_method }}</span>
-              </div>
-              <div class="flex gap-2 w-full md:w-auto">
-                <UButton
-                  :to="`/order-confirmation?order=${order.id}`"
-                  variant="outline"
-                  color="primary"
-                  size="sm"
-                  icon="i-heroicons-eye"
-                  class="flex-1 md:flex-none"
-                >
-                  View Details
-                </UButton>
-                <UButton
-                  v-if="order.payment_status === 'pending'"
-                  @click="retryPayment(order.id)"
-                  color="amber"
-                  size="sm"
-                  icon="i-heroicons-credit-card"
-                  :loading="payingOrderId === order.id"
-                  class="flex-1 md:flex-none"
-                >
-                  Pay Now
-                </UButton>
-              </div>
+            <!-- Order Items (Compact) -->
+            <div v-if="order.items.length > 0" class="px-3 py-2 border-b border-gray-200 dark:border-gray-700 text-xs">
+              <p class="text-gray-600 dark:text-gray-400">
+                {{ order.items.length }} item{{ order.items.length > 1 ? 's' : '' }}:
+                <span class="text-gray-900 dark:text-white font-medium">
+                  {{ order.items.map(i => i.name).slice(0, 2).join(', ') }}{{ order.items.length > 2 ? '...' : '' }}
+                </span>
+              </p>
             </div>
           </div>
         </div>
 
         <!-- Pagination (Only show if there are orders) -->
-        <div v-if="orders.length > 0" class="flex flex-col md:flex-row items-center justify-between gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
-          <div class="text-sm text-gray-600 dark:text-gray-400">
+        <div v-if="orders.length > 0" class="flex flex-col md:flex-row items-center justify-between gap-2 pt-3 border-t border-gray-200 dark:border-gray-700">
+          <div class="text-xs text-gray-600 dark:text-gray-400">
             Page {{ currentPage }} of {{ totalPages }}
           </div>
           <div class="flex gap-2">
