@@ -26,7 +26,11 @@
       "Bash(mysql:*)",
       "Bash(php artisan:*)",
       "Bash(curl:*)",
-      "Bash(php:*)"
+      "Bash(php:*)",
+      "Bash(tasklist:*)",
+      "Bash(findstr:*)",
+      "Bash(taskkill:*)",
+      "Bash(killall:*)"
     ],
     "deny": [],
     "ask": []

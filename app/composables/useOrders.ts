@@ -125,7 +125,7 @@ export const useOrders = () => {
                 meta: {
                     current_page: 1,
                     last_page: 1,
-                    per_page,
+                    per_page: perPage,
                     total: 0,
                     from: 0,
                     to: 0
