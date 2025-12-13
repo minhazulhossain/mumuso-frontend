@@ -24,8 +24,8 @@ const transformAddressForBackend = (frontendAddress: any) => {
 }
 
 export default defineEventHandler(async (event) => {
+  const config = useRuntimeConfig()
   const session = await getUserSession(event)
-  const backendUrl = process.env.BACKEND_API_BASE || 'https://mumusoadmin.coderdrivelab.com/api/v1/'
 
   try {
     const body = await readBody(event)
@@ -62,13 +62,17 @@ export default defineEventHandler(async (event) => {
       ...(body.contact?.phone && { phone: body.contact.phone }),
       ...(body.paymentMethod && { payment_method: body.paymentMethod }),
       ...(body.orderNotes && { notes: body.orderNotes }),
-      ...(body.shippingCost !== undefined && { shipping_amount: body.shippingCost })
+      ...(body.shippingCost !== undefined && { shipping_amount: body.shippingCost }),
+
+      // Coupon/Discount fields
+      ...(body.discount_amount !== undefined && body.discount_amount > 0 && { discount_amount: body.discount_amount }),
+      ...(body.coupon_code && { coupon_code: body.coupon_code })
     }
 
     console.log('Transformed order:', JSON.stringify(transformedOrder, null, 2))
 
     // Forward order creation to backend
-    const response = await $fetch(`${backendUrl}orders`, {
+    const response = await $fetch(`${config.public.apiBase}orders`, {
       method: 'POST',
       headers: session?.user?.token ? {
         'Authorization': `Bearer ${session.user.token}`

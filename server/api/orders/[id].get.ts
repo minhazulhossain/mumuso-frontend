@@ -1,6 +1,6 @@
 export default defineEventHandler(async (event) => {
+  const config = useRuntimeConfig()
   const session = await getUserSession(event)
-  const backendUrl = process.env.BACKEND_API_BASE || 'https://mumusoadmin.coderdrivelab.com/api/v1/'
   const orderId = getRouterParam(event, 'id')
 
   if (!orderId) {
@@ -13,16 +13,12 @@ export default defineEventHandler(async (event) => {
   try {
     // Fetch order from backend
     // Include auth token if user is logged in
-    const response = await $fetch(`${backendUrl}orders/${orderId}`, {
+    return await $fetch(`${config.public.apiBase}orders/${orderId}`, {
       headers: session?.user?.token ? {
         'Authorization': `Bearer ${session.user.token}`
       } : {}
     })
 
-    return {
-      success: true,
-      data: response
-    }
   } catch (error: any) {
     console.error('Order fetch error:', error)
     throw createError({
