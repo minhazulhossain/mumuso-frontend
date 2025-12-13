@@ -50,8 +50,8 @@
 
       <!-- Orders List -->
       <div v-else class="space-y-6">
-        <!-- Filter & Sort (Only show if there are orders) -->
-        <div v-if="orders.length > 0" class="flex flex-col gap-4 mb-6">
+        <!-- Filter & Sort (Always visible) -->
+        <div class="flex flex-col gap-4 mb-6">
           <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
             <div class="flex gap-2 flex-wrap">
               <UButton
@@ -81,26 +81,37 @@
               class="w-full md:w-40"
             />
           </div>
-          <!-- Results Info -->
-          <div class="text-sm text-gray-600 dark:text-gray-400">
+          <!-- Results Info (Only show if there are orders) -->
+          <div v-if="orders.length > 0" class="text-sm text-gray-600 dark:text-gray-400">
             Showing {{ itemsStartIndex + 1 }} to {{ itemsEndIndex }} of {{ filteredOrders.length }} orders
           </div>
         </div>
 
         <!-- Empty State for Selected Status -->
-        <div v-else-if="selectedStatus !== null" class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-12 text-center">
+        <div v-if="orders.length === 0" class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-12 text-center">
           <div class="inline-flex items-center justify-center w-20 h-20 bg-gray-100 dark:bg-gray-700 rounded-full mb-4">
             <UIcon name="i-heroicons-inbox" class="w-10 h-10 text-gray-400"/>
           </div>
-          <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">No {{ capitalizeFirstLetter(selectedStatus) }} Orders</h2>
-          <p class="text-gray-600 dark:text-gray-400 mb-6">You don't have any {{ selectedStatus }} orders yet.</p>
+          <h2 v-if="selectedStatus !== null" class="text-xl font-semibold text-gray-900 dark:text-white mb-2">No {{ capitalizeFirstLetter(selectedStatus) }} Orders</h2>
+          <h2 v-else class="text-xl font-semibold text-gray-900 dark:text-white mb-2">No Orders Yet</h2>
+          <p v-if="selectedStatus !== null" class="text-gray-600 dark:text-gray-400 mb-6">You don't have any {{ selectedStatus }} orders yet. Try selecting a different status.</p>
+          <p v-else class="text-gray-600 dark:text-gray-400 mb-6">You haven't placed any orders yet. Start shopping to see your order history here.</p>
           <UButton
+            v-if="selectedStatus !== null"
             @click="selectedStatus = null; currentPage = 1"
             color="primary"
             variant="soft"
             icon="i-heroicons-arrow-left"
           >
             View All Orders
+          </UButton>
+          <UButton
+            v-else
+            to="/shop"
+            color="primary"
+            icon="i-heroicons-shopping-bag"
+          >
+            Continue Shopping
           </UButton>
         </div>
 
