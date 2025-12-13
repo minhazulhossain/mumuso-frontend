@@ -1,6 +1,15 @@
 <template>
   <div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
     <UContainer>
+      <!-- Breadcrumb Navigation -->
+      <nav class="flex items-center gap-2 mb-8" aria-label="Breadcrumb">
+        <ULink to="/" class="text-primary-600 dark:text-primary-400 hover:underline text-sm">Home</ULink>
+        <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 text-gray-400"/>
+        <ULink to="/account" class="text-primary-600 dark:text-primary-400 hover:underline text-sm">Account</ULink>
+        <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 text-gray-400"/>
+        <span class="text-gray-900 dark:text-white text-sm font-medium">Orders</span>
+      </nav>
+
       <!-- Page Header -->
       <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Order History</h1>
@@ -41,8 +50,8 @@
 
       <!-- Orders List -->
       <div v-else class="space-y-6">
-        <!-- Filter & Sort -->
-        <div class="flex flex-col gap-4 mb-6">
+        <!-- Filter & Sort (Only show if there are orders) -->
+        <div v-if="orders.length > 0" class="flex flex-col gap-4 mb-6">
           <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
             <div class="flex gap-2 flex-wrap">
               <UButton
@@ -76,6 +85,23 @@
           <div class="text-sm text-gray-600 dark:text-gray-400">
             Showing {{ itemsStartIndex + 1 }} to {{ itemsEndIndex }} of {{ filteredOrders.length }} orders
           </div>
+        </div>
+
+        <!-- Empty State for Selected Status -->
+        <div v-else-if="selectedStatus !== null" class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-12 text-center">
+          <div class="inline-flex items-center justify-center w-20 h-20 bg-gray-100 dark:bg-gray-700 rounded-full mb-4">
+            <UIcon name="i-heroicons-inbox" class="w-10 h-10 text-gray-400"/>
+          </div>
+          <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">No {{ capitalizeFirstLetter(selectedStatus) }} Orders</h2>
+          <p class="text-gray-600 dark:text-gray-400 mb-6">You don't have any {{ selectedStatus }} orders yet.</p>
+          <UButton
+            @click="selectedStatus = null; currentPage = 1"
+            color="primary"
+            variant="soft"
+            icon="i-heroicons-arrow-left"
+          >
+            View All Orders
+          </UButton>
         </div>
 
         <!-- Orders Grid -->
@@ -225,8 +251,8 @@
           </div>
         </div>
 
-        <!-- Pagination -->
-        <div class="flex flex-col md:flex-row items-center justify-between gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+        <!-- Pagination (Only show if there are orders) -->
+        <div v-if="orders.length > 0" class="flex flex-col md:flex-row items-center justify-between gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
           <div class="text-sm text-gray-600 dark:text-gray-400">
             Page {{ currentPage }} of {{ totalPages }}
           </div>
