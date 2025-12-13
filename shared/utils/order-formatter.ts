@@ -41,6 +41,7 @@ export interface OrderFormData {
   shipping_amount?: number
   shippingCost?: number
   discount_amount?: number
+  coupon_code?: string | null
   billing_address?: AddressInput
   billing?: any
   shipping_address?: AddressInput
@@ -72,6 +73,8 @@ export const formatOrderData = (data: OrderFormData): OrderFormData => {
       paymentMethod: data.paymentMethod,
       orderNotes: data.orderNotes,
       shippingCost: data.shippingCost,
+      ...(data.discount_amount !== undefined && { discount_amount: data.discount_amount }),
+      ...(data.coupon_code && { coupon_code: data.coupon_code }),
       items: data.items
     }
   }
@@ -93,6 +96,7 @@ export const formatOrderData = (data: OrderFormData): OrderFormData => {
     ...(data.tax_amount !== undefined && { tax_amount: parseFloat(String(data.tax_amount)).toFixed(2) }),
     ...(data.shipping_amount !== undefined && { shipping_amount: parseFloat(String(data.shipping_amount)).toFixed(2) }),
     ...(data.discount_amount !== undefined && { discount_amount: parseFloat(String(data.discount_amount)).toFixed(2) }),
+    ...(data.coupon_code && { coupon_code: data.coupon_code }),
 
     // Addresses (required)
     ...(data.billing_address && { billing_address: formatAddress(data.billing_address) }),

@@ -165,6 +165,14 @@
           <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm sticky top-4">
             <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Order Summary</h2>
 
+            <!-- Coupon Input -->
+            <div class="mb-6">
+              <CouponInput
+                :amount="subtotal"
+                @coupon="watchCouponChanges"
+              />
+            </div>
+
             <!-- Applied Discounts Section -->
             <div v-if="appliedDiscounts && appliedDiscounts.length > 0" class="mb-6 pb-6 border-b border-gray-200 dark:border-gray-700">
               <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
@@ -210,6 +218,15 @@
                   Discount Savings
                 </span>
                 <span class="font-medium">-${{ cartSavings.toFixed(2) }}</span>
+              </div>
+
+              <!-- Coupon Discount -->
+              <div v-if="appliedCoupon.discount > 0" class="flex justify-between text-green-600 dark:text-green-400">
+                <span class="flex items-center gap-1">
+                  <UIcon name="i-heroicons-tag" class="text-sm" />
+                  Coupon ({{ appliedCoupon.code }})
+                </span>
+                <span class="font-medium">-${{ appliedCoupon.discount.toFixed(2) }}</span>
               </div>
 
               <!-- Shipping -->
@@ -309,6 +326,21 @@ const taxRate = 10 // 10% tax
 const freeShippingThreshold = 50
 const shippingRate = 5.99
 
+// Coupon state
+const appliedCoupon = ref({
+  code: '',
+  discount: 0
+})
+
+// Watch for coupon changes from CouponInput component
+const watchCouponChanges = (couponData: { code: string; discount: number }) => {
+  appliedCoupon.value = {
+    code: couponData.code,
+    discount: couponData.discount
+  }
+  console.log('Coupon updated in cart:', couponData)
+}
+
 // Computed values - use backend discount data
 const subtotal = computed(() => {
   // Use cart total which already includes backend discounts
@@ -320,11 +352,14 @@ const shipping = computed(() => {
 })
 
 const tax = computed(() => {
-  return calculateTax(subtotal.value, taxRate)
+  // Tax is calculated on subtotal minus coupon discount
+  const taxableAmount = Math.max(0, subtotal.value - appliedCoupon.value.discount)
+  return calculateTax(taxableAmount, taxRate)
 })
 
 const total = computed(() => {
-  return calculateOrderTotal(subtotal.value, shipping.value, tax.value)
+  const subtotalAfterCoupon = Math.max(0, subtotal.value - appliedCoupon.value.discount)
+  return calculateOrderTotal(subtotalAfterCoupon, shipping.value, tax.value)
 })
 
 // Methods

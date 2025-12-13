@@ -60,6 +60,29 @@
             </div>
           </div>
         </div>
+
+        <!-- Payment Status Warning (if unpaid) -->
+        <div v-if="paymentStatus === 'unpaid'" class="mt-6 p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
+          <div class="flex items-start gap-3">
+            <UIcon name="i-heroicons-exclamation-triangle" class="text-amber-500 text-xl mt-0.5"/>
+            <div class="flex-1">
+              <p class="font-medium text-amber-900 dark:text-amber-100">Payment Pending</p>
+              <p class="text-sm text-amber-700 dark:text-amber-300 mt-1">
+                Your order has been created successfully, but payment is still pending. Please complete payment to proceed.
+              </p>
+              <UButton
+                  @click="handleRetryPayment"
+                  :loading="retryPaymentLoading"
+                  class="mt-3"
+                  size="sm"
+                  color="amber"
+                  icon="i-heroicons-credit-card"
+              >
+                Complete Payment Now
+              </UButton>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Order Items -->
@@ -248,13 +271,17 @@
 <script setup lang="ts">
 const route = useRoute()
 const router = useRouter()
+const toast = useToast()
 const { fetchOrder, loading: composableLoading, error: composableError } = useOrders()
+const { initiatePayment } = usePayment()
 
 // Order data state
 const orderData = ref(null)
 const loading = computed(() => composableLoading.value)
 const error = computed(() => composableError.value || error_local.value)
 const error_local = ref(null)
+const paymentStatus = ref<string | null>(null)
+const retryPaymentLoading = ref(false)
 
 // Refs for order information (will be populated from API)
 const orderNumber = ref('')
@@ -317,6 +344,35 @@ const handlePrint = () => {
   window.print()
 }
 
+// Retry payment for unpaid orders
+const handleRetryPayment = async () => {
+  if (!orderNumber.value) return
+
+  retryPaymentLoading.value = true
+  try {
+    const paymentResponse = await initiatePayment(parseInt(orderNumber.value))
+
+    if (!paymentResponse) {
+      toast.add({
+        title: 'Payment Error',
+        description: 'Failed to initiate payment. Please try again.',
+        color: 'error'
+      })
+      return
+    }
+    // User will be automatically redirected to SSLCommerz payment gateway
+  } catch (err: any) {
+    console.error('Payment retry error:', err)
+    toast.add({
+      title: 'Error',
+      description: err.message || 'Failed to initiate payment',
+      color: 'error'
+    })
+  } finally {
+    retryPaymentLoading.value = false
+  }
+}
+
 // Fetch order data
 const loadOrder = async () => {
   if (!route.query.order) {
@@ -325,8 +381,12 @@ const loadOrder = async () => {
     return
   }
 
+  // Capture payment status from URL
+  paymentStatus.value = route.query.paymentStatus as string || null
+
   try {
     console.log('Loading order:', route.query.order)
+    console.log('Payment status:', paymentStatus.value)
     const order = await fetchOrder(route.query.order as string)
     console.log('Order fetched:', order)
 

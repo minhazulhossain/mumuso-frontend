@@ -212,6 +212,12 @@ const orderNotes = ref('')
 const agreedToTerms = ref(false)
 const processingOrder = ref(false)
 
+// Coupon state
+const appliedCoupon = ref({
+  code: '',
+  discount: 0
+})
+
 // Breadcrumb
 const breadcrumbLinks = [
   { label: 'Home', to: '/' },
@@ -376,6 +382,8 @@ const handlePlaceOrder = async () => {
       paymentMethod: selectedPaymentMethod.value,
       orderNotes: orderNotes.value || '',
       shippingCost: shippingCost.value || 0,
+      discount_amount: appliedCoupon.value.discount || 0,
+      coupon_code: appliedCoupon.value.code || null,
       items: cartItems.value && cartItems.value.length > 0 ? cartItems.value.map((item: any) => {
         // Get product_id from multiple possible sources
         const productId = item.product?.id || item.product_id || item.id
@@ -408,17 +416,22 @@ const handlePlaceOrder = async () => {
 
     const orderId = orderResponse.id
 
+    // Clear cart after successful order creation
+    await cart.clearCart()
+
     // Step 2: Handle payment based on selected method
     if (selectedPaymentMethod.value === 'sslcommerz') {
       // Initiate SSLCommerz payment gateway
       const paymentResponse = await initiatePayment(orderId)
 
       if (!paymentResponse) {
+        // Payment initiation failed - show order created with payment unpaid status
         toast.add({
-          title: 'Payment Error',
-          description: 'Failed to initiate payment. Please try again.',
-          color: 'error'
+          title: 'Order Created',
+          description: `Order #${orderId} created but payment initiation failed. You can pay later.`,
+          color: 'warning'
         })
+        await router.push(`/order-confirmation?order=${orderId}&paymentStatus=unpaid`)
         return
       }
       // User will be automatically redirected to SSLCommerz payment gateway

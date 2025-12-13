@@ -23,7 +23,10 @@
       "Bash(php artisan migrate:*)",
       "Bash(php artisan migrate:status:*)",
       "Bash(php artisan tinker:*)",
-      "Bash(mysql:*)"
+      "Bash(mysql:*)",
+      "Bash(php artisan:*)",
+      "Bash(curl:*)",
+      "Bash(php:*)"
     ],
     "deny": [],
     "ask": []
