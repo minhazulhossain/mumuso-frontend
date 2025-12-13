@@ -36,8 +36,8 @@
         </UButton>
       </div>
 
-      <!-- Empty State (Only when user has NO orders at all) -->
-      <div v-else-if="totalOrders === 0" class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-12 text-center">
+      <!-- Empty State (Only when user has NO orders at all AND no status filter selected) -->
+      <div v-else-if="totalOrders === 0 && selectedStatus === null" class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-12 text-center">
         <div class="inline-flex items-center justify-center w-20 h-20 bg-gray-100 dark:bg-gray-700 rounded-full mb-4">
           <UIcon name="i-heroicons-shopping-bag" class="w-10 h-10 text-gray-400"/>
         </div>
