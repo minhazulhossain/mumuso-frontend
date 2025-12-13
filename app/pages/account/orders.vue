@@ -319,43 +319,27 @@ const itemsPerPageOptions = [
   { label: '20 per page', value: 20 }
 ]
 
-const totalOrders = computed(() => orders.value.length)
-
-const filteredOrders = computed(() => {
-  let filtered = orders.value
-
-  // Filter by status
-  if (selectedStatus.value) {
-    filtered = filtered.filter(order => order.status === selectedStatus.value)
-  }
-
-  // Sort
-  switch (sortBy.value) {
-    case 'oldest':
-      filtered = filtered.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
-      break
-    case 'highest':
-      filtered = filtered.sort((a, b) => b.total_amount - a.total_amount)
-      break
-    case 'lowest':
-      filtered = filtered.sort((a, b) => a.total_amount - b.total_amount)
-      break
-    case 'newest':
-    default:
-      filtered = filtered.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-  }
-
-  return filtered
+const paginationMeta = ref({
+  current_page: 1,
+  last_page: 1,
+  per_page: 10,
+  total: 0,
+  from: 0,
+  to: 0
 })
 
-const totalPages = computed(() => Math.ceil(filteredOrders.value.length / itemsPerPage.value))
+const totalOrders = computed(() => paginationMeta.value.total)
 
-const itemsStartIndex = computed(() => (currentPage.value - 1) * itemsPerPage.value)
-const itemsEndIndex = computed(() => Math.min(itemsStartIndex.value + itemsPerPage.value, filteredOrders.value.length))
+// Orders are already filtered and paginated by backend
+const filteredOrders = computed(() => orders.value)
 
-const paginatedOrders = computed(() => {
-  return filteredOrders.value.slice(itemsStartIndex.value, itemsEndIndex.value)
-})
+const totalPages = computed(() => paginationMeta.value.last_page || 1)
+
+const itemsStartIndex = computed(() => (paginationMeta.value.from || 1) - 1)
+const itemsEndIndex = computed(() => paginationMeta.value.to || paginationMeta.value.per_page)
+
+// Orders are already paginated by backend, use as-is
+const paginatedOrders = computed(() => orders.value)
 
 const visiblePages = computed(() => {
   const pages: (number | string)[] = []
@@ -439,10 +423,19 @@ const loadOrders = async () => {
   loading.value = true
   error.value = null
   try {
-    const result = await fetchOrders()
-    // Orders are already filtered by the backend for the current user
-    orders.value = result || []
-    console.log(`[Orders Page] Loaded ${orders.value.length} orders for user`)
+    const result = await fetchOrders(currentPage.value, itemsPerPage.value, {
+      status: selectedStatus.value
+    })
+
+    // Orders are already filtered and paginated by backend
+    orders.value = result.data || []
+    paginationMeta.value = result.meta
+
+    console.log(`[Orders Page] Loaded ${orders.value.length} orders for user`, {
+      page: result.meta?.current_page,
+      total: result.meta?.total,
+      perPage: result.meta?.per_page
+    })
   } catch (err: any) {
     error.value = err.message || 'Failed to load orders'
     console.error('[Orders Page] Error loading orders:', err)

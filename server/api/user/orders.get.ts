@@ -1,8 +1,8 @@
 /**
  * Fetch orders for the authenticated user
- * GET /api/user/orders
+ * GET /api/user/orders?per_page=10&page=1&sort_by=created_at&sort_order=desc&status=pending
  *
- * Returns only the authenticated user's orders from the backend
+ * Returns only the authenticated user's orders from the backend with pagination
  */
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
@@ -17,91 +17,65 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    console.log(`[User Orders API] Fetching orders for user ID: ${session.user.id}`)
+    // Get query parameters for pagination and filtering
+    const query = getQuery(event)
+    const page = query.page || 1
+    const perPage = query.per_page || 10
+    const sortBy = query.sort_by || 'created_at'
+    const sortOrder = query.sort_order || 'desc'
+    const status = query.status || null
+    const paymentStatus = query.payment_status || null
+
+    console.log(`[User Orders API] Fetching orders for user ID: ${session.user.id}`, {
+      page,
+      perPage,
+      sortBy,
+      sortOrder,
+      status,
+      paymentStatus
+    })
+
+    // Build query string for backend
+    const params = new URLSearchParams({
+      page: String(page),
+      per_page: String(perPage),
+      sort_by: String(sortBy),
+      sort_order: String(sortOrder)
+    })
+
+    if (status) params.append('status', String(status))
+    if (paymentStatus) params.append('payment_status', String(paymentStatus))
 
     // Call backend endpoint that returns only authenticated user's orders
-    const response = await $fetch(`${config.public.apiBase}users/${session.user.id}/orders`, {
+    const response = await $fetch(`${config.public.apiBase}user/orders?${params.toString()}`, {
       headers: {
         'Authorization': `Bearer ${session.user.token}`,
         'Accept': 'application/json'
       }
     })
 
-    console.log(`[User Orders API] Received response`)
+    console.log(`[User Orders API] Received response with meta:`, response?.meta)
 
-    // Handle various response formats
-    if (response?.data && Array.isArray(response.data)) {
-      console.log(`[User Orders API] Response format: data array with ${response.data.length} orders`)
-      return {
-        success: true,
-        data: response.data
-      }
-    }
-
-    if (Array.isArray(response)) {
-      console.log(`[User Orders API] Response format: direct array with ${response.length} orders`)
-      return {
-        success: true,
-        data: response
-      }
-    }
-
-    if (response?.success === false) {
-      throw new Error(response?.message || 'Backend returned error')
-    }
-
-    // If response has data property
-    if (response?.data) {
-      const dataArray = Array.isArray(response.data) ? response.data : [response.data]
-      console.log(`[User Orders API] Response format: wrapped data with ${dataArray.length} orders`)
-      return {
-        success: true,
-        data: dataArray
-      }
-    }
-
-    console.log(`[User Orders API] Response format: unknown, returning as-is`)
+    // Backend returns paginated response with meta information
     return {
       success: true,
-      data: Array.isArray(response) ? response : []
+      data: response?.data || [],
+      meta: response?.meta || {
+        current_page: 1,
+        last_page: 1,
+        per_page: perPage,
+        total: 0,
+        from: 0,
+        to: 0
+      }
     }
   } catch (error: any) {
     console.error(`[User Orders API] Error: ${error.message}`)
-
-    // If backend doesn't have user-specific endpoint, try generic orders endpoint
-    if (error.statusCode === 404) {
-      console.log(`[User Orders API] User-specific endpoint not found, trying generic endpoint`)
-      try {
-        const fallbackResponse = await $fetch(`${config.public.apiBase}orders`, {
-          headers: {
-            'Authorization': `Bearer ${session.user.token}`,
-            'Accept': 'application/json'
-          }
-        })
-
-        if (fallbackResponse?.data && Array.isArray(fallbackResponse.data)) {
-          return {
-            success: true,
-            data: fallbackResponse.data
-          }
-        }
-
-        return {
-          success: true,
-          data: Array.isArray(fallbackResponse) ? fallbackResponse : []
-        }
-      } catch (fallbackError: any) {
-        console.error(`[User Orders API] Fallback also failed: ${fallbackError.message}`)
-        throw createError({
-          statusCode: fallbackError.statusCode || 500,
-          message: fallbackError.data?.message || 'Failed to fetch orders'
-        })
-      }
-    }
+    console.error(`[User Orders API] Status: ${error.statusCode}`)
 
     throw createError({
       statusCode: error.statusCode || 500,
-      message: error.data?.message || 'Failed to fetch orders'
+      message: error.data?.message || error.message || 'Failed to fetch orders'
     })
   }
 })

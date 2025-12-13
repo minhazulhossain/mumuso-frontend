@@ -78,41 +78,59 @@ export const useOrders = () => {
     }
 
     /**
-     * Fetch all orders for the current logged-in user
+     * Fetch orders for the current logged-in user with pagination
      * Uses user-specific endpoint for better performance
      */
-    const fetchOrders = async () => {
+    const fetchOrders = async (page: number = 1, perPage: number = 10, filters: any = {}) => {
         loading.value = true
         error.value = null
 
         try {
+            // Build query parameters
+            const params = new URLSearchParams({
+                page: String(page),
+                per_page: String(perPage)
+            })
+
+            if (filters.sortBy) params.append('sort_by', filters.sortBy)
+            if (filters.sortOrder) params.append('sort_order', filters.sortOrder)
+            if (filters.status) params.append('status', filters.status)
+            if (filters.payment_status) params.append('payment_status', filters.payment_status)
+
             // Use user-specific endpoint that only returns user's orders
-            const response = await $fetch('/api/user/orders')
+            const response = await $fetch(`/api/user/orders?${params.toString()}`)
 
-            console.log('[useOrders] Response received:', response)
+            console.log('[useOrders] Response received:', {
+                data_count: response?.data?.length,
+                meta: response?.meta
+            })
 
-            // Handle different response formats
-            if (response?.data && Array.isArray(response.data)) {
-                console.log('[useOrders] Returning data array with', response.data.length, 'orders')
-                return response.data
+            // Return both data and metadata for pagination
+            return {
+                data: response?.data || [],
+                meta: response?.meta || {
+                    current_page: 1,
+                    last_page: 1,
+                    per_page: perPage,
+                    total: 0,
+                    from: 0,
+                    to: 0
+                }
             }
-
-            if (Array.isArray(response)) {
-                console.log('[useOrders] Returning direct array with', response.length, 'orders')
-                return response
-            }
-
-            if (response?.success && response?.data) {
-                console.log('[useOrders] Returning wrapped data with', response.data.length, 'orders')
-                return response.data
-            }
-
-            console.log('[useOrders] Returning response as-is')
-            return response || []
         } catch (err: any) {
             error.value = err.data?.message || err.message || 'Failed to fetch orders'
             console.error('[useOrders] Error fetching orders:', err)
-            return []
+            return {
+                data: [],
+                meta: {
+                    current_page: 1,
+                    last_page: 1,
+                    per_page,
+                    total: 0,
+                    from: 0,
+                    to: 0
+                }
+            }
         } finally {
             loading.value = false
         }
