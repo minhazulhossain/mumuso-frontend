@@ -78,32 +78,40 @@ export const useOrders = () => {
     }
 
     /**
-     * Fetch all orders for the current user
+     * Fetch all orders for the current logged-in user
+     * Uses user-specific endpoint for better performance
      */
     const fetchOrders = async () => {
         loading.value = true
         error.value = null
 
         try {
-            const response = await $fetch('/api/orders')
+            // Use user-specific endpoint that only returns user's orders
+            const response = await $fetch('/api/user/orders')
+
+            console.log('[useOrders] Response received:', response)
 
             // Handle different response formats
             if (response?.data && Array.isArray(response.data)) {
+                console.log('[useOrders] Returning data array with', response.data.length, 'orders')
                 return response.data
             }
 
             if (Array.isArray(response)) {
+                console.log('[useOrders] Returning direct array with', response.length, 'orders')
                 return response
             }
 
             if (response?.success && response?.data) {
+                console.log('[useOrders] Returning wrapped data with', response.data.length, 'orders')
                 return response.data
             }
 
+            console.log('[useOrders] Returning response as-is')
             return response || []
         } catch (err: any) {
             error.value = err.data?.message || err.message || 'Failed to fetch orders'
-            console.error('Orders fetch error:', err)
+            console.error('[useOrders] Error fetching orders:', err)
             return []
         } finally {
             loading.value = false

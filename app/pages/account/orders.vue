@@ -440,33 +440,12 @@ const loadOrders = async () => {
   error.value = null
   try {
     const result = await fetchOrders()
-    let allOrders = result || []
-
-    // Filter orders to only show logged-in user's orders
-    // Check by user_id or customer email
-    if (user.value?.id) {
-      console.log('Logged-in user ID:', user.value.id)
-      console.log('Total orders from API:', allOrders.length)
-
-      // Filter by user_id if available
-      const userOrders = allOrders.filter((order: any) => {
-        return order.user_id === user.value.id ||
-               order.customer_id === user.value.id ||
-               order.user?.id === user.value.id
-      })
-
-      console.log('Orders after user filter:', userOrders.length)
-      orders.value = userOrders.length > 0 ? userOrders : allOrders
-    } else {
-      orders.value = allOrders
-    }
-
-    if (orders.value.length === 0 && allOrders.length > 0) {
-      console.warn('No orders found for current user. Showing all orders.')
-    }
+    // Orders are already filtered by the backend for the current user
+    orders.value = result || []
+    console.log(`[Orders Page] Loaded ${orders.value.length} orders for user`)
   } catch (err: any) {
     error.value = err.message || 'Failed to load orders'
-    console.error('Error loading orders:', err)
+    console.error('[Orders Page] Error loading orders:', err)
   } finally {
     loading.value = false
   }
