@@ -470,10 +470,10 @@ const handleAddToCart = async () => {
   }
 }
 
-const handleWishlist = () => {
+const handleWishlist = async () => {
   if (!product.value) return
 
-  const isAdded = toggleWishlist(product.value)
+  const isAdded = await toggleWishlist(product.value)
 
   if (isAdded) {
     toast.add({

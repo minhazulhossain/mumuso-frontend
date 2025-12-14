@@ -121,8 +121,8 @@ const formatDate = (dateString: string) => {
 }
 
 // Handle remove from wishlist
-const handleRemove = (item: WishlistItem) => {
-  removeFromWishlist(item.slug)
+const handleRemove = async (item: WishlistItem) => {
+  await removeFromWishlist(item.slug)
   toast.add({
     title: 'Removed from wishlist',
     description: `${item.name} has been removed`,
@@ -146,9 +146,9 @@ const handleAddToCart = async (item: WishlistItem) => {
 }
 
 // Handle clear all
-const handleClearAll = () => {
+const handleClearAll = async () => {
   if (confirm('Are you sure you want to clear your entire wishlist?')) {
-    clearWishlist()
+    await clearWishlist()
     toast.add({
       title: 'Wishlist cleared',
       description: 'All items have been removed from your wishlist',
