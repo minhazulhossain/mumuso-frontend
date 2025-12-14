@@ -18,13 +18,14 @@
       <div v-else-if="posts.length" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
         <UCard
           v-for="post in posts"
-          :key="post.id"
+          :key="post.slug"
           class="hover:shadow-xl transition-shadow cursor-pointer"
           @click="navigateTo(`/blog/${post.slug}`)"
         >
           <template #header>
             <img
-              :src="post.image"
+              v-if="post.image_url"
+              :src="post.image_url"
               :alt="post.title"
               class="w-full h-48 object-cover"
             />
@@ -34,20 +35,14 @@
             <h3 class="text-xl font-bold text-gray-900 dark:text-white line-clamp-2">
               {{ post.title }}
             </h3>
-            
+
             <p class="text-gray-600 dark:text-gray-400 line-clamp-3">
-              {{ post.excerpt }}
+              {{ post.short_description }}
             </p>
 
-            <div class="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
-              <div class="flex items-center gap-2">
-                <UAvatar :src="post.author.avatar" size="xs" />
-                <span class="text-sm text-gray-600 dark:text-gray-400">{{ post.author.name }}</span>
-              </div>
-              <div class="flex items-center gap-1 text-sm text-gray-500">
-                <UIcon name="i-heroicons-clock" />
-                {{ post.readTime }} min
-              </div>
+            <div class="flex items-center gap-1 text-sm text-gray-500 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <UIcon name="i-heroicons-calendar" />
+              {{ formatDate(post.created_at) }}
             </div>
           </div>
         </UCard>
@@ -81,6 +76,14 @@ const { data, pending } = await useAsyncData(
 const posts = computed(() => data.value?.posts || [])
 const total = computed(() => data.value?.total || 0)
 const totalPages = computed(() => data.value?.totalPages || 1)
+
+const formatDate = (date: string) => {
+  return new Date(date).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  })
+}
 
 useHead({
   title: () => `${categoryName.value} | Tech Blog`,

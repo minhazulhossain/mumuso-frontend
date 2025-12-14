@@ -17,45 +17,38 @@
 
       <!-- Hero Image -->
       <img
-        :src="post.image"
+        v-if="post?.image_url"
+        :src="post.image_url"
         :alt="post.title"
         class="w-full h-96 object-cover rounded-lg mb-8"
       />
 
       <!-- Article Header -->
       <header class="mb-8">
-        <UBadge color="primary" variant="subtle" class="mb-4">
-          {{ post.category }}
+        <UBadge v-if="post?.categories?.[0]" color="primary" variant="subtle" class="mb-4">
+          {{ post.categories[0].name }}
         </UBadge>
-        
+
         <h1 class="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-          {{ post.title }}
+          {{ post?.title }}
         </h1>
 
         <div class="flex items-center gap-6 text-gray-600 dark:text-gray-400">
-          <div class="flex items-center gap-2">
-            <UAvatar :src="post.author.avatar" size="sm" />
-            <span>{{ post.author.name }}</span>
-          </div>
           <div class="flex items-center gap-1">
             <UIcon name="i-heroicons-calendar" />
-            <span>{{ formatDate(post.publishedAt) }}</span>
-          </div>
-          <div class="flex items-center gap-1">
-            <UIcon name="i-heroicons-clock" />
-            <span>{{ post.readTime }} min read</span>
+            <span>{{ formatDate(post?.created_at) }}</span>
           </div>
         </div>
 
         <!-- Tags -->
         <div class="flex gap-2 mt-4">
           <UBadge
-            v-for="tag in post.tags"
-            :key="tag"
+            v-for="tag in post?.tags || []"
+            :key="tag.slug"
             color="gray"
             variant="subtle"
           >
-            #{{ tag }}
+            #{{ tag.name }}
           </UBadge>
         </div>
       </header>
@@ -63,7 +56,7 @@
       <!-- Article Content -->
       <div
         class="prose prose-lg dark:prose-invert max-w-none mb-12"
-        v-html="post.content"
+        v-html="post?.description"
       />
 
       <!-- Similar Posts -->
@@ -79,34 +72,35 @@
         <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <UCard
             v-for="similarPost in similarPosts"
-            :key="similarPost.id"
+            :key="similarPost.slug"
             class="hover:shadow-lg transition-shadow cursor-pointer"
             @click="navigateTo(`/blog/${similarPost.slug}`)"
           >
             <template #header>
               <img
-                :src="similarPost.image"
+                v-if="similarPost.image_url"
+                :src="similarPost.image_url"
                 :alt="similarPost.title"
                 class="w-full h-40 object-cover"
               />
             </template>
 
             <div class="space-y-2">
-              <UBadge color="primary" variant="subtle">
-                {{ similarPost.category }}
+              <UBadge v-if="similarPost.categories?.[0]" color="primary" variant="subtle">
+                {{ similarPost.categories[0].name }}
               </UBadge>
-              
+
               <h3 class="text-lg font-bold text-gray-900 dark:text-white line-clamp-2">
                 {{ similarPost.title }}
               </h3>
-              
+
               <p class="text-gray-600 dark:text-gray-400 line-clamp-2 text-sm">
-                {{ similarPost.excerpt }}
+                {{ similarPost.short_description }}
               </p>
 
               <div class="flex items-center gap-1 text-sm text-gray-500">
-                <UIcon name="i-heroicons-clock" />
-                {{ similarPost.readTime }} min
+                <UIcon name="i-heroicons-calendar" />
+                {{ formatDate(similarPost.created_at) }}
               </div>
             </div>
           </UCard>
@@ -127,11 +121,11 @@ const { data: post, pending } = await useAsyncData(
 
 const { data: similarPostsData, pending: similarPostsPending } = await useAsyncData(
   `similar-${route.params.slug}`,
-  () => fetchPosts(post.value?.category, 1, 4)
+  () => fetchPosts(post.value?.categories?.[0]?.slug, 1)
 )
 
-const similarPosts = computed(() => 
-  similarPostsData.value?.posts.filter(p => p.id !== post.value?.id).slice(0, 2) || []
+const similarPosts = computed(() =>
+  similarPostsData.value?.posts.filter((p: any) => p.slug !== post.value?.slug).slice(0, 2) || []
 )
 
 const formatDate = (date: string) => {

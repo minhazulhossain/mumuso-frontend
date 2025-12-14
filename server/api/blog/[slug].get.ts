@@ -1,21 +1,22 @@
-import { posts } from '../_posts';
-
 export default defineEventHandler(async (event) => {
+  const config = useRuntimeConfig()
   const slug = getRouterParam(event, 'slug')
 
-  // Mock data - replace with actual database call
-//   const allPosts = posts;
-
-  await new Promise(resolve => setTimeout(resolve, 400))
-
-  const post = posts.find(p => p.slug === slug)
-  
-  if (!post) {
+  if (!slug) {
     throw createError({
-      statusCode: 404,
-      message: 'Post not found'
+      statusCode: 400,
+      message: 'Slug is required'
     })
   }
 
-  return post
+  try {
+    const response = await $fetch(`${config.public.apiBase}blog/${slug}`)
+    return response.data || response
+  } catch (error: any) {
+    console.error('[Blog API] Error fetching post:', error)
+    throw createError({
+      statusCode: error.statusCode || 404,
+      message: error.data?.message || error.message || 'Post not found'
+    })
+  }
 })

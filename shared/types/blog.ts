@@ -11,20 +11,18 @@ export interface BlogQueryParams {
 }
 
 /**
- * Blog post data
+ * Blog post data (matches backend Laravel API response)
  */
 export interface BlogPost {
-    id: string | number
-    title: string
     slug: string
-    excerpt?: string
-    content: string
-    featured_image?: string
-    author?: string
-    category?: string
-    published_at?: string
+    title: string
+    description: string
+    short_description: string
+    is_featured: boolean
     created_at: string
-    updated_at: string
+    image_url?: string
+    categories?: BlogCategory[]
+    tags?: any[]
 }
 
 /**

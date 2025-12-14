@@ -1,11 +1,14 @@
-export default defineEventHandler(async () => {
-  await new Promise(resolve => setTimeout(resolve, 300))
-  
-  return [
-    { name: 'Tutorial', count: 15 },
-    { name: 'Vue', count: 12 },
-    { name: 'Backend', count: 8 },
-    { name: 'DevOps', count: 6 },
-    { name: 'Testing', count: 5 }
-  ]
+export default defineEventHandler(async (event) => {
+  const config = useRuntimeConfig()
+
+  try {
+    const response = await $fetch(`${config.public.apiBase}blog/categories`)
+    return response.data || []
+  } catch (error: any) {
+    console.error('[Blog Categories API] Error fetching categories:', error)
+    throw createError({
+      statusCode: error.statusCode || 500,
+      message: error.data?.message || error.message || 'Failed to fetch categories'
+    })
+  }
 })

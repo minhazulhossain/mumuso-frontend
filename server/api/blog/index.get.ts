@@ -1,30 +1,31 @@
 export default defineEventHandler(async (event) => {
+  const config = useRuntimeConfig()
   const query = getQuery(event)
-  const backendUrl = process.env.BACKEND_API_BASE || 'https://mumusoadmin.coderdrivelab.com/api/v1/'
 
   try {
-    const response = await $fetch(`${backendUrl}blog`, {
-      query: {
-        per_page: query._limit || 9,
-        page: query._page || 1,
-        search: query.search,
-        category: query.category // if you add category support later
-      }
-    })
+    const params = new URLSearchParams()
+    params.append('per_page', String(query._limit || 9))
+    params.append('page', String(query._page || 1))
+    
+    if (query.search) params.append('search', String(query.search))
+    if (query.category) params.append('category', String(query.category))
 
-    // Transform Laravel pagination to match your frontend format
+    const queryStr = params.toString()
+    const response = await $fetch(`${config.public.apiBase}blog?${queryStr}`)
+
     return {
-      posts: response.data,
-      total: response.meta.total,
-      page: response.meta.current_page,
-      totalPages: response.meta.last_page,
-      perPage: response.meta.per_page
+      posts: response.data || [],
+      total: response.meta?.total || 0,
+      page: response.meta?.current_page || 1,
+      totalPages: response.meta?.last_page || 1,
+      perPage: response.meta?.per_page || 9,
+      meta: response.meta
     }
-  } catch (error) {
-    console.log(error)
+  } catch (error: any) {
+    console.error('[Blog API] Error fetching posts:', error)
     throw createError({
       statusCode: error.statusCode || 500,
-      message: error.message || 'Failed to fetch blog posts'
+      message: error.data?.message || error.message || 'Failed to fetch blog posts'
     })
   }
 })

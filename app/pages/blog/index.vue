@@ -32,12 +32,12 @@
           </UButton>
           <UButton
               v-for="cat in categories"
-              :key="cat.name"
-              :variant="selectedCategory === cat.name ? 'solid' : 'outline'"
+              :key="cat.slug"
+              :variant="selectedCategory === cat.slug ? 'solid' : 'outline'"
               color="primary"
-              @click="filterByCategory(cat.name)"
+              @click="filterByCategory(cat.slug)"
           >
-            {{ cat.name }} ({{ cat.count }})
+            {{ cat.name }} ({{ cat.blogs_count }})
           </UButton>
         </div>
       </div>
@@ -65,8 +65,8 @@
           </template>
 
           <div class="space-y-3">
-            <UBadge color="primary" variant="subtle">
-              {{ post.category }}
+            <UBadge v-if="post.categories?.[0]" color="primary" variant="subtle">
+              {{ post.categories[0].name }}
             </UBadge>
 
             <h3 class="text-xl font-bold text-gray-900 dark:text-white line-clamp-2">
@@ -74,17 +74,13 @@
             </h3>
 
             <p class="text-gray-600 dark:text-gray-400 line-clamp-3">
-              {{ post.excerpt }}
+              {{ post.short_description }}
             </p>
 
             <div class="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
-              <div class="flex items-center gap-2">
-<!--                <UAvatar :src="post.author.avatar" size="xs" />-->
-<!--                <span class="text-sm text-gray-600 dark:text-gray-400">{{ post.author.name }}</span>-->
-              </div>
-              <div class="flex items-center gap-1 text-sm text-gray-500">
-                <UIcon name="i-heroicons-clock" />
-                {{ post.readTime }} min
+              <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                <UIcon name="i-heroicons-calendar" />
+                {{ formatDate(post.created_at) }}
               </div>
             </div>
           </div>
@@ -150,6 +146,14 @@ const handleSearch = () => {
     currentPage.value = 1 // Reset to first page on search
     refresh()
   }, 500)
+}
+
+const formatDate = (date: string) => {
+  return new Date(date).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  })
 }
 
 useHead({
