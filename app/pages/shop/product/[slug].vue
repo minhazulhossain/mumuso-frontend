@@ -497,10 +497,10 @@ const handleImageError = (event: Event) => {
   target.src = 'https://placehold.co/600x600'
 }
 
-// Initialize wishlist on client
+// Initialize wishlist on client (in case it wasn't loaded by plugin)
 onMounted(async () => {
   try {
-    initWishlist()
+    await initWishlist()
   } catch (err) {
     console.error('Failed to initialize wishlist:', err)
   }

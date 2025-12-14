@@ -102,9 +102,18 @@
 import type { WishlistItem } from '#shared/types'
 
 const toast = useToast()
-const { wishlistItems, wishlistCount, removeFromWishlist, clearWishlist } = useWishlist()
+const { wishlistItems, wishlistCount, removeFromWishlist, clearWishlist, initWishlist } = useWishlist()
 const cart = inject('cart')
 const { addToCart } = cart
+
+// Initialize wishlist when page mounts
+onMounted(async () => {
+  try {
+    await initWishlist()
+  } catch (err) {
+    console.error('Failed to initialize wishlist:', err)
+  }
+})
 
 // Format date
 const formatDate = (dateString: string) => {
