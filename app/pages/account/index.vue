@@ -50,8 +50,10 @@
               </div>
 
               <div class="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-                <p>{{ address.street }}</p>
-                <p>{{ address.city }}, {{ address.state }} {{ address.zip }}</p>
+                <p>{{ address.first_name }} {{ address.last_name }}</p>
+                <p>{{ address.address_line_1 }}</p>
+                <p v-if="address.address_line_2">{{ address.address_line_2 }}</p>
+                <p>{{ address.city }}, {{ address.state }} {{ address.postal_code }}</p>
                 <p>{{ address.country }}</p>
                 <p v-if="address.phone" class="flex items-center gap-1">
                   <UIcon name="i-heroicons-phone" class="size-4"/>
@@ -100,6 +102,8 @@
                 <USelectMenu
                     v-model="form.type"
                     :items="addressTypeItems"
+                    value-attribute="value"
+                    option-attribute="label"
                     placeholder="Select address type"
                     icon="i-heroicons-tag"
                     size="lg"
@@ -184,6 +188,8 @@
                 <USelectMenu
                     v-model="form.country"
                     :items="countries"
+                    value-attribute="value"
+                    option-attribute="label"
                     placeholder="Country"
                     icon="i-heroicons-globe-alt"
                     size="lg"
@@ -297,9 +303,9 @@
             <div v-if="deletingAddress" class="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4">
               <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Address Details:</h3>
               <div class="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-                <p class="font-medium">{{ deletingAddress.type }} - {{ deletingAddress.label }}</p>
-                <p>{{ deletingAddress.street }}</p>
-                <p>{{ deletingAddress.city }}, {{ deletingAddress.state }} {{ deletingAddress.zip }}</p>
+                <p class="font-medium">{{ deletingAddress.first_name }} {{ deletingAddress.last_name }}</p>
+                <p>{{ deletingAddress.address_line_1 }}</p>
+                <p>{{ deletingAddress.city }}, {{ deletingAddress.state }} {{ deletingAddress.postal_code }}</p>
               </div>
             </div>
           </div>
@@ -395,17 +401,18 @@ const countries = ref([
 ]);
 
 const form = reactive({
-  type: addressTypeItems.value[0],
-  label: '',
+  type: 'home',
   first_name: '',
   last_name: '',
   address_line_1: '',
+  address_line_2: '',
   city: '',
   state: '',
   postal_code: '',
-  country: countries.value[0],
+  country: 'BD',
   phone: '',
-  is_default: false
+  is_default: false,
+  notes: ''
 })
 
 defineShortcuts({
@@ -438,15 +445,18 @@ const getDropdownItems = (address: any) => [
 const handleEdit = (address: any) => {
   editingAddress.value = address
   Object.assign(form, {
-    type: addressTypeItems.value[0],
-    label: address.label || '',
-    street: address.street,
-    city: address.city,
-    state: address.state,
-    zip: address.zip,
-    country: countries.value[0],
+    type: address.type || 'home',
+    first_name: address.first_name || '',
+    last_name: address.last_name || '',
+    address_line_1: address.address_line_1 || '',
+    address_line_2: address.address_line_2 || '',
+    city: address.city || '',
+    state: address.state || '',
+    postal_code: address.postal_code || '',
+    country: address.country || 'BD',
     phone: address.phone || '',
-    is_default: address.is_default
+    is_default: address.is_default || false,
+    notes: address.notes || ''
   })
   isAddModalOpen.value = true
 }
@@ -534,15 +544,18 @@ const closeModal = () => {
   isAddModalOpen.value = false
   editingAddress.value = null
   Object.assign(form, {
-    type: 'Home',
-    label: '',
-    street: '',
+    type: 'home',
+    first_name: '',
+    last_name: '',
+    address_line_1: '',
+    address_line_2: '',
     city: '',
     state: '',
-    zip: '',
-    country: '',
+    postal_code: '',
+    country: 'BD',
     phone: '',
-    is_default: false
+    is_default: false,
+    notes: ''
   })
 }
 </script>
