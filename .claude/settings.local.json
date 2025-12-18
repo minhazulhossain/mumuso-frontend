@@ -31,7 +31,10 @@
       "Bash(findstr:*)",
       "Bash(taskkill:*)",
       "Bash(killall:*)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "Bash(ngrok update:*)",
+      "Bash(kill:*)",
+      "Bash(netstat:*)"
     ],
     "deny": [],
     "ask": []

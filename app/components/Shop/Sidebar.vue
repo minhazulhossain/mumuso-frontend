@@ -1,18 +1,30 @@
 <template>
   <aside class="lg:w-64 flex-shrink-0">
-    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm lg:sticky lg:top-4">
+    <div class="p-6" :class="isMobile ? 'bg-transparent' : 'bg-white dark:bg-gray-800 rounded-lg shadow-sm lg:sticky lg:top-4'">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Filters</h2>
-        <UButton
-            v-if="hasActiveFilters"
-            size="xs"
-            color="secondary"
-            variant="ghost"
-            icon="i-heroicons-x-mark"
-            @click="handleClearFilters"
-        >
-          Clear
-        </UButton>
+        <h2 v-if="!isMobile" class="text-lg font-semibold text-gray-900 dark:text-white">Filters</h2>
+        <div class="flex gap-2">
+          <!-- Close Button (Mobile only) -->
+          <UButton
+              v-if="isMobile"
+              size="xs"
+              color="secondary"
+              variant="ghost"
+              icon="i-heroicons-x-mark"
+              @click="emit('close-mobile')"
+          />
+          <!-- Clear Filters -->
+          <UButton
+              v-if="hasActiveFilters"
+              size="xs"
+              color="secondary"
+              variant="ghost"
+              icon="i-heroicons-x-mark"
+              @click="handleClearFilters"
+          >
+            Clear
+          </UButton>
+        </div>
       </div>
 
       <!-- Category Filter -->
@@ -252,12 +264,14 @@ interface Filters {
 const props = defineProps<{
   filters?: Filters
   hideCategoryFilter?: boolean
+  isMobile?: boolean
 }>()
 
 const emit = defineEmits<{
   'apply-filters': [filters: Filters]
   'clear-filters': []
   'update:filters': [filters: Filters]
+  'close-mobile': []
 }>()
 
 const { getAllCategories, products } = useProducts()
@@ -420,6 +434,11 @@ const handleApplyFilters = () => {
 
   emit('apply-filters', filtersToApply)
   emit('update:filters', filtersToApply)
+
+  // Close mobile filters after applying
+  if (props.isMobile) {
+    emit('close-mobile')
+  }
 }
 
 const handleClearFilters = () => {

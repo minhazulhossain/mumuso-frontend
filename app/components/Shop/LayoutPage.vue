@@ -6,13 +6,33 @@
         <p class="text-gray-600 dark:text-gray-400">{{ subTitle }}</p>
       </div>
 
+      <!-- Mobile Filter Slide Over -->
+      <USlideover v-model:open="showMobileFilters" side="left" title="Filters">
+        <!-- Trigger Button (hidden, shown via search controls) -->
+        <template #default />
+
+        <!-- Slide Over Content -->
+        <template #content>
+          <ShopSidebar
+              v-model:filters="activeFilters"
+              @apply-filters="applyFilters"
+              @clear-filters="clearAllFilters"
+              @close-mobile="showMobileFilters = false"
+              :hide-category-filter="hideCategoryFilter"
+              :is-mobile="true"
+          />
+        </template>
+      </USlideover>
+
       <div class="flex flex-col lg:flex-row gap-8">
-        <!-- Filters Sidebar -->
+        <!-- Filters Sidebar - Visible on desktop only -->
         <ShopSidebar
+            v-show="isLargeScreen"
             v-model:filters="activeFilters"
             @apply-filters="applyFilters"
             @clear-filters="clearAllFilters"
             :hide-category-filter="hideCategoryFilter"
+            :is-mobile="false"
         />
 
         <!-- Products Grid -->
@@ -27,12 +47,25 @@
                   class="flex-1"
                   @update:model-value="debouncedSearch"
               />
-              <USelect
-                  v-model="sortBy"
-                  :items="sortOptions"
-                  class="sm:w-48"
-                  @update:model-value="loadProducts"
-              />
+              <div class="flex gap-2">
+                <!-- Filter Toggle Button (Mobile only) -->
+                <UButton
+                    v-if="!isLargeScreen"
+                    @click="showMobileFilters = !showMobileFilters"
+                    :variant="showMobileFilters ? 'solid' : 'soft'"
+                    color="primary"
+                    icon="i-heroicons-funnel"
+                    size="sm"
+                >
+                  Filters
+                </UButton>
+                <USelect
+                    v-model="sortBy"
+                    :items="sortOptions"
+                    class="sm:w-48"
+                    @update:model-value="loadProducts"
+                />
+              </div>
             </div>
 
             <!-- Active Filters Display -->
@@ -274,6 +307,8 @@ const router = useRouter()
 const searchQuery = ref('')
 const sortBy = ref('featured')
 const viewMode = ref<'grid' | 'list'>('grid')
+const showMobileFilters = ref(false)
+const windowWidth = ref(0)
 const activeFilters = ref<any>({
   category: props.initialCategory || 'all',
   featured: undefined,
@@ -294,6 +329,8 @@ const sortOptions = [
 ]
 
 // Computed
+const isLargeScreen = computed(() => windowWidth.value >= 1024)
+
 const hasActiveFilters = computed(() => {
   return (
       (activeFilters.value.category && activeFilters.value.category !== 'all') ||
@@ -425,6 +462,27 @@ const debouncedSearch = () => {
     loadProducts()
   }, 500)
 }
+
+// Window resize handler for responsive sidebar
+const handleWindowResize = () => {
+  windowWidth.value = typeof window !== 'undefined' ? window.innerWidth : 0
+  // Auto-close mobile filters when resizing to large screen
+  if (isLargeScreen.value) {
+    showMobileFilters.value = false
+  }
+}
+
+onMounted(() => {
+  // Set initial window width
+  windowWidth.value = typeof window !== 'undefined' ? window.innerWidth : 0
+  // Add resize listener
+  window.addEventListener('resize', handleWindowResize)
+})
+
+onBeforeUnmount(() => {
+  // Clean up resize listener
+  window.removeEventListener('resize', handleWindowResize)
+})
 
 // Initialize from URL params
 const initializeFromUrl = () => {
