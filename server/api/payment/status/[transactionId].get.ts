@@ -1,6 +1,5 @@
 export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig()
-    const session = await getUserSession(event)
 
     try {
         const transactionId = getRouterParam(event, 'transactionId')
@@ -12,23 +11,12 @@ export default defineEventHandler(async (event) => {
             })
         }
 
-        // Prepare headers - only add auth if user is logged in
-        const headers: any = {
-            'Content-Type': 'application/json'
-        }
-
-        // Add authorization header if user is authenticated
-        if (session?.user?.token) {
-            headers.Authorization = `Bearer ${session.user.token}`
-        }
-
         console.log('[Payment Status] Fetching status for transaction:', transactionId)
         console.log('[Payment Status] Calling backend:', config.public.apiBase + `payments/status/${transactionId}`)
 
-        // Call backend's payment status endpoint
+        // Call backend's payment status endpoint (public endpoint)
         const response = await $fetch(`${config.public.apiBase}payments/status/${transactionId}`, {
-            method: 'GET',
-            headers
+            method: 'GET'
         })
 
         console.log('[Payment Status] Backend response:', response)
