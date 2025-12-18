@@ -6,6 +6,9 @@ export default defineEventHandler(async (event) => {
         const body = await readBody(event)
         const { order_id } = body
 
+        console.log('[Payment Initiate] Request body:', body)
+        console.log('[Payment Initiate] User session:', session?.user?.id)
+
         if (!order_id) {
             throw createError({
                 statusCode: 400,
@@ -23,36 +26,29 @@ export default defineEventHandler(async (event) => {
             headers.Authorization = `Bearer ${session.user.token}`
         }
 
-        try {
-            // Try to get payment initiation from backend
-            const response = await $fetch(`${config.public.apiBase}payment/initiate`, {
-                method: 'POST',
-                headers,
-                body
-            })
-            return response
-        } catch (backendError: any) {
-            // If backend doesn't have the endpoint, create a test payment URL
-            // This is a temporary solution until backend implements payment/initiate
-            console.warn('Backend payment endpoint not available, generating test payment URL')
+        console.log('[Payment Initiate] Calling backend:', config.public.apiBase + 'payments/initiate')
+        console.log('[Payment Initiate] Headers:', { ...headers, Authorization: headers.Authorization ? '***' : 'none' })
 
-            // Generate a test SSLCommerz-like gateway URL for development/testing
-            const gatewayUrl = `https://sandbox.sslcommerz.com/gwprocess/v4/gw.jsp?sessionkey=TEST_SESSION_${order_id}_${Date.now()}`
+        // Call backend's payment initiation endpoint
+        const response = await $fetch(`${config.public.apiBase}payments/initiate`, {
+            method: 'POST',
+            headers,
+            body
+        })
 
-            return {
-                success: true,
-                data: {
-                    gateway_url: gatewayUrl,
-                    transaction_id: `TXN_${order_id}_${Date.now()}`,
-                    message: 'Payment gateway initiated (test mode)'
-                }
-            }
-        }
+        console.log('[Payment Initiate] Backend response:', response)
+        return response
     } catch (error: any) {
-        console.error('Payment initiate error:', error)
+        console.error('[Payment Initiate] Error caught:', {
+            message: error.message,
+            statusCode: error.statusCode,
+            data: error.data,
+            url: error.url,
+            response: error.response
+        })
         throw createError({
             statusCode: error.statusCode || 500,
-            message: error.data?.message || 'Failed to initiate payment'
+            message: error.data?.message || error.message || 'Failed to initiate payment'
         })
     }
 })

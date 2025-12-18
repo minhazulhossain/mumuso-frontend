@@ -1,4 +1,4 @@
-import type { PaymentInitiateRequest, PaymentInitiateResponse, PaymentStatusResponse } from '#shared/types'
+import type {PaymentInitiateRequest, PaymentInitiateResponse, PaymentStatusResponse} from '#shared/types'
 
 export const usePayment = () => {
     const loading = useState('payment-loading', () => false)
@@ -44,8 +44,7 @@ export const usePayment = () => {
         error.value = null
 
         try {
-            const response = await $fetch<PaymentStatusResponse>(`/api/payment/status/${transactionId}`)
-            return response
+            return await $fetch<PaymentStatusResponse>(`/api/payment/status/${transactionId}`)
         } catch (err: any) {
             error.value = err.data?.message || 'Failed to fetch payment status'
             console.error('Payment status error:', err)
