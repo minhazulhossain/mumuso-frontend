@@ -108,6 +108,13 @@
               <span>Subtotal</span>
               <span>${{ subtotal.toFixed(2) }}</span>
             </div>
+            <div v-if="couponCode" class="flex justify-between text-green-600 dark:text-green-400">
+              <span class="flex items-center gap-1">
+                <UIcon name="i-heroicons-check-circle" class="w-4 h-4"/>
+                Coupon: <span class="font-medium">{{ couponCode }}</span>
+              </span>
+              <span>-${{ discount.toFixed(2) }}</span>
+            </div>
             <div class="flex justify-between text-gray-600 dark:text-gray-400">
               <span>Shipping</span>
               <span>{{ shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}` }}</span>
@@ -247,6 +254,8 @@ const cardLast4 = ref('')
 const shippingMethod = ref('')
 const shippingDescription = ref('')
 const shipping = ref(0)
+const couponCode = ref('')
+const discount = ref(0)
 
 // Pricing
 const subtotal = computed(() => {
@@ -387,6 +396,10 @@ const loadOrder = async () => {
       shippingMethod.value = order.shipping_method || 'Standard Shipping'
       shippingDescription.value = order.shipping_description || '5-7 business days'
       shipping.value = order.shipping_cost || order.shipping_amount || 0
+
+      // Map coupon & discount info
+      couponCode.value = order.coupon_code || ''
+      discount.value = order.discount_amount || 0
     } else {
       error_local.value = 'Order not found'
     }

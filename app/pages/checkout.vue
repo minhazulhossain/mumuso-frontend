@@ -82,7 +82,16 @@
         </div>
 
         <!-- Right Side - Order Summary (1 column) -->
-        <div class="lg:col-span-1">
+        <div class="lg:col-span-1 space-y-4">
+          <!-- Coupon Input -->
+          <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+            <CouponInput
+                :amount="cartTotal"
+                @coupon="handleCouponApplied"
+            />
+          </div>
+
+          <!-- Order Summary -->
           <CheckoutOrderSummary
               :cart-items="cartItems || []"
               :shipping-cost="shippingCost"
@@ -226,6 +235,14 @@ const breadcrumbLinks = [
 ]
 
 // Computed
+const cartTotal = computed(() => {
+  if (!cartItems.value || cartItems.value.length === 0) return 0
+  return cartItems.value.reduce((total: number, item: any) => {
+    const price = item.pricing?.final_price || item.variation?.price || item.product?.price || item.price || 0
+    return total + (price * (item.quantity || 0))
+  }, 0)
+})
+
 const shippingCost = computed(() => {
   if (!Array.isArray(shippingMethods.value)) return 0
   const method = shippingMethods.value.find(m => m.id === selectedShippingMethod.value)
@@ -345,6 +362,23 @@ const handlePrevious = () => {
   }
 }
 
+const handleCouponApplied = (couponData: { code: string; discount: number }) => {
+  console.log('[Checkout] handleCouponApplied received event:', {
+    couponData,
+    timestamp: new Date().toISOString()
+  })
+
+  appliedCoupon.value = {
+    code: couponData.code,
+    discount: couponData.discount
+  }
+
+  console.log('[Checkout] appliedCoupon updated:', {
+    appliedCoupon: appliedCoupon.value,
+    timestamp: new Date().toISOString()
+  })
+}
+
 const handlePlaceOrder = async () => {
   if (!validateStep2()) {
     return
@@ -398,9 +432,20 @@ const handlePlaceOrder = async () => {
       }) : []
     }
 
-    console.log('Final order object to send:', order)
-    console.log('Order user_id:', order.user_id)
-    console.log('Order user:', order.user)
+    console.log('[Checkout] Final coupon state before order creation:', {
+      appliedCoupon: appliedCoupon.value,
+      timestamp: new Date().toISOString()
+    })
+
+    console.log('[Checkout] Final order object to send:', {
+      user_id: order.user_id,
+      user: order.user,
+      coupon_code: order.coupon_code,
+      discount_amount: order.discount_amount,
+      items_count: order.items?.length,
+      shipping_cost: order.shippingCost,
+      timestamp: new Date().toISOString()
+    })
 
     // Step 1: Create order in backend
     const orderResponse = await createOrder(order)

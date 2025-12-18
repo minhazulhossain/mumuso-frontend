@@ -139,6 +139,10 @@
                     <UBadge :color="getPaymentStatusColor(order.payment_status)" variant="subtle" size="xs">
                       {{ capitalizeFirstLetter(order.payment_status) }}
                     </UBadge>
+                    <UBadge v-if="order.coupon_code" color="green" variant="subtle" size="xs">
+                      <UIcon name="i-heroicons-check-circle" class="w-3 h-3 mr-0.5"/>
+                      {{ order.coupon_code }}
+                    </UBadge>
                   </div>
                 </div>
                 <div class="flex gap-1 w-full md:w-auto justify-end">

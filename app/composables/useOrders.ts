@@ -25,9 +25,24 @@ export const useOrders = () => {
             // Format order data for API
             const formattedData = formatOrderData(orderData)
 
+            console.log('[useOrders] Formatted data before API call:', {
+                coupon_code: formattedData.coupon_code,
+                discount_amount: formattedData.discount_amount,
+                user_id: formattedData.user_id,
+                user: formattedData.user,
+                timestamp: new Date().toISOString()
+            })
+
             const response = await $fetch('/api/orders', {
                 method: 'POST',
                 body: formattedData
+            })
+
+            console.log('[useOrders] API response:', {
+                success: response?.success,
+                order_id: response?.data?.id,
+                order_coupon_code: response?.data?.coupon_code,
+                timestamp: new Date().toISOString()
             })
 
             if (!response?.success) {

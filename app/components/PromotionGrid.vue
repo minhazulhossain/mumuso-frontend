@@ -7,7 +7,7 @@
 
     <!-- Carousel with data -->
     <UCarousel
-        v-else
+        v-else-if="products && products.length > 0"
         v-slot="{ item }"
         loop
         wheel-gestures
@@ -96,32 +96,21 @@ const loading = ref(false)
 const products = ref<Product[]>(fallbackProducts)
 const loadedImages = ref<Record<string, boolean>>({})
 
-// Fetch products from API
-const fetchProducts = async () => {
-  loading.value = true
-  try {
-    // Replace with your actual API endpoint
-    // const { data } = await useFetch<Product[]>('/api/products/featured')
-    // products.value = data.value || fallbackProducts
-
-    // Simulating API call
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    products.value = fallbackProducts
-  } catch (error) {
-    console.error('Error fetching products:', error)
-    // Keep fallback data on error
-    products.value = fallbackProducts
-  } finally {
-    loading.value = false
-  }
-}
-
 const handleImageLoad = (src: string) => {
   loadedImages.value[src] = true
 }
 
-// Uncomment when API is ready
-// onMounted(() => {
-//   fetchProducts()
-// })
+// Fetch promotional products on mount
+onMounted(async () => {
+  loading.value = true
+  try {
+    const { data: fetchedProducts } = await useFetch<{data: Product[]}>('/api/products?featured=true&limit=6')
+    products.value = fetchedProducts.value?.data || fallbackProducts
+  } catch (error) {
+    console.error('Error fetching promotional products:', error)
+    products.value = fallbackProducts
+  } finally {
+    loading.value = false
+  }
+})
 </script>

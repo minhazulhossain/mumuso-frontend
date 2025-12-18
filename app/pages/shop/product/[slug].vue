@@ -11,9 +11,9 @@
       <SingleProductSkeleton v-if="loading"/>
 
       <!-- Error State -->
-      <div v-else-if="error" class="text-center py-16">
+      <div v-else-if="displayError" class="text-center py-16">
         <UIcon name="i-heroicons-exclamation-triangle" class="text-4xl text-red-500 mb-4"/>
-        <p class="text-red-600 dark:text-red-400">{{ error }}</p>
+        <p class="text-red-600 dark:text-red-400">{{ displayError }}</p>
         <UButton to="/shop" color="primary" class="mt-4">Browse Products</UButton>
       </div>
 
@@ -291,7 +291,7 @@
 
 const route = useRoute()
 const toast = useToast()
-const {fetchProduct, fetchProducts, loading, error} = useProducts()
+const {fetchProduct, error: fetchError} = useProducts()
 const cart = inject('cart')
 const {addToCart, toggleCart} = cart
 const {isInWishlist, toggleWishlist, initWishlist} = useWishlist()
@@ -307,7 +307,8 @@ const selectedVariationId = ref<number | null>(null)
 const selectedVariation = ref<ProductVariation | null>(null)
 
 // Fetch product on server and client
-const { data: asyncProduct, pending } = await useAsyncData(
+// Using pending from useAsyncData as the single source of truth for loading state
+const { data: asyncProduct, pending: loading, error } = await useAsyncData(
   `product-${route.params.slug}`,
   () => fetchProduct(route.params.slug as string),
   {
@@ -315,6 +316,9 @@ const { data: asyncProduct, pending } = await useAsyncData(
     watch: [() => route.params.slug]
   }
 )
+
+// Use error from useAsyncData if available, otherwise from useProducts
+const displayError = computed(() => error.value || fetchError.value)
 
 // Sync async data to product ref and reset state when route changes
 watch(() => route.params.slug, () => {

@@ -7,7 +7,7 @@
 
     <!-- Carousel with data -->
     <UCarousel
-        v-else
+        v-else-if="categories && categories.length > 0"
         v-slot="{ item }"
         loop
         :slides-to-scroll="slidesToScroll"
@@ -17,7 +17,7 @@
         dot: 'w-10 h-2 data-[state=active]:bg-success-600 data-[state=active]:w-20'
       }"
     >
-      <NuxtLink :to="`/categories/${item?.slug}`">
+      <NuxtLink :to="`/categories/${item.slug}`">
         <UCard variant="soft" :ui="{ root: 'bg-transparent ring-0', header: 'p-0 sm:px-0 border-0', body:'p-0 sm:p-0 text-center' }" >
           <template #header>
             <div class="relative w-full aspect-[50/50] rounded-full">
@@ -46,9 +46,8 @@
 <script setup lang="ts">
 
 const { fetchFeaturedCategories } = useContent()
-const { data: categories, pending } = await fetchFeaturedCategories()
+const { data: categories, pending: loading } = await fetchFeaturedCategories()
 
-const loading = ref(false)
 const isMobile = ref(false)
 const isTablet = ref(false)
 

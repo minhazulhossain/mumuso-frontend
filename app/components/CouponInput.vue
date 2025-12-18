@@ -104,12 +104,28 @@ const applyCoupon = async () => {
 
   // Pass the cart amount to validation
   const amount = props.amount || 0
-  console.log('Validating coupon with amount:', amount)
+  console.log('[CouponInput] Validating coupon:', {
+    code: inputCode.value,
+    amount,
+    timestamp: new Date().toISOString()
+  })
 
   const result = await validateCoupon(inputCode.value, amount)
 
+  console.log('[CouponInput] Validation result:', {
+    valid: result.valid,
+    message: result.message,
+    couponState: couponState.value,
+    timestamp: new Date().toISOString()
+  })
+
   if (result.valid) {
     // Emit the coupon data to parent component
+    console.log('[CouponInput] Emitting coupon event:', {
+      code: couponState.value.code,
+      discount: couponState.value.discount
+    })
+
     emit('coupon', {
       code: couponState.value.code,
       discount: couponState.value.discount

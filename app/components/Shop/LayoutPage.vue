@@ -294,7 +294,7 @@ const props = defineProps<{
 }>()
 
 const {
-  products, pagination, loading, error, fetchProducts,
+  products, pagination, error, fetchProducts,
   changePage: apiChangePage, getAllCategories
 } = useProducts()
 const cart = inject('cart')
@@ -498,7 +498,8 @@ const initializeFromUrl = () => {
 }
 
 // Fetch products on server and client
-const { pending } = await useAsyncData(async () => {
+// Using pending from useAsyncData as the single source of truth for loading state
+const { pending: loading } = await useAsyncData(async () => {
   initializeFromUrl()
   await loadProducts()
   return products.value

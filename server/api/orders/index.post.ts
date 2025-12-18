@@ -30,9 +30,17 @@ export default defineEventHandler(async (event) => {
   try {
     const body = await readBody(event)
 
-    console.log('Order request body:', JSON.stringify(body, null, 2))
-    console.log('User ID from body:', body.user_id)
-    console.log('User from body:', body.user)
+    console.log('[Server API] Order request body received:', {
+      has_coupon_code: 'coupon_code' in body,
+      coupon_code_value: body.coupon_code,
+      coupon_code_type: typeof body.coupon_code,
+      discount_amount: body.discount_amount,
+      user_id: body.user_id,
+      has_user: 'user' in body,
+      timestamp: new Date().toISOString()
+    })
+
+    console.log('[Server API] Full body:', JSON.stringify(body, null, 2))
 
     // Transform addresses to backend format
     const billingAddr = body.billing || (body.sameAsShipping && body.shipping) || null
@@ -69,9 +77,25 @@ export default defineEventHandler(async (event) => {
       ...(body.coupon_code && { coupon_code: body.coupon_code })
     }
 
-    console.log('Transformed order:', JSON.stringify(transformedOrder, null, 2))
+    console.log('[Server API] Transformed order:', {
+      has_coupon_code: 'coupon_code' in transformedOrder,
+      coupon_code: transformedOrder.coupon_code,
+      discount_amount: transformedOrder.discount_amount,
+      items_count: transformedOrder.items?.length,
+      timestamp: new Date().toISOString()
+    })
+
+    console.log('[Server API] Full transformed order:', JSON.stringify(transformedOrder, null, 2))
 
     // Forward order creation to backend
+    console.log('[Server API] Sending to backend API:', {
+      api_url: `${config.public.apiBase}orders`,
+      has_token: !!session?.user?.token,
+      coupon_code_sending: transformedOrder.coupon_code,
+      discount_amount_sending: transformedOrder.discount_amount,
+      timestamp: new Date().toISOString()
+    })
+
     const response = await $fetch(`${config.public.apiBase}orders`, {
       method: 'POST',
       headers: session?.user?.token ? {
@@ -80,21 +104,26 @@ export default defineEventHandler(async (event) => {
       body: transformedOrder
     })
 
-    console.log('Backend response:', JSON.stringify(response, null, 2))
-    console.log('Order ID from response:', response?.data?.id)
+    console.log('[Server API] Backend response received:', {
+      success: response?.success,
+      order_id: response?.data?.id,
+      order_coupon_code: response?.data?.coupon_code,
+      timestamp: new Date().toISOString()
+    })
 
     return {
       success: true,
       data: response.data || response
     }
   } catch (error: any) {
-    console.error('===== ORDER CREATION ERROR =====')
-    console.error('Full error:', error)
-    console.error('Error message:', error.message)
-    console.error('Error status:', error.statusCode)
-    console.error('Error data:', error.data)
-    console.error('Error stack:', error.stack)
-    console.error('===== END ERROR =====')
+    console.error('[Server API] ===== ORDER CREATION ERROR =====')
+    console.error('[Server API] Error message:', error.message)
+    console.error('[Server API] Error status:', error.statusCode)
+    console.error('[Server API] Error data:', error.data)
+    if (error.statusCode === 422) {
+      console.error('[Server API] Validation errors from backend:', error.data?.errors)
+    }
+    console.error('[Server API] ===== END ERROR =====')
 
     // If it's a validation error from Laravel, pass it through
     if (error.statusCode === 422 && error.data?.errors) {

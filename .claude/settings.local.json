@@ -34,7 +34,8 @@
       "Bash(pkill:*)",
       "Bash(ngrok update:*)",
       "Bash(kill:*)",
-      "Bash(netstat:*)"
+      "Bash(netstat:*)",
+      "Bash(xargs basename:*)"
     ],
     "deny": [],
     "ask": []
