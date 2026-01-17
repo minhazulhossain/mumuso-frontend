@@ -57,7 +57,7 @@
           </div>
 
           <!-- Thumbnail Gallery -->
-          <div v-if="product.images.all.length > 1" class="grid grid-cols-4 gap-2">
+          <div v-if="product.images?.all && product.images.all.length > 1" class="grid grid-cols-3 sm:grid-cols-4 gap-2">
             <button
                 v-for="image in product.images.all"
                 :key="image.id"
@@ -89,14 +89,14 @@
             <UBadge v-if="product.is_featured" color="warning" variant="soft">
               Featured
             </UBadge>
-            <UBadge :color="product.in_stock ? 'success' : 'error'" variant="soft">
-              {{ product.stock_status }}
+            <UBadge :color="currentInStock ? 'success' : 'error'" variant="soft">
+              {{ currentStockStatus }}
             </UBadge>
           </div>
 
           <!-- Product Name -->
           <div>
-            <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+            <h1 class="text-2xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-2">
               {{ product.name }}
             </h1>
             <p class="text-lg text-gray-600 dark:text-gray-400">SKU: {{ currentSku }}</p>
@@ -105,10 +105,10 @@
           <!-- Price -->
           <div class="space-y-2">
             <div class="flex items-baseline gap-4">
-              <span class="text-4xl font-bold text-primary-500">
+              <span class="text-3xl sm:text-4xl font-bold text-primary-500">
                 ${{ parseFloat(currentPrice).toFixed(2) }}
               </span>
-              <span v-if="currentComparePrice" class="text-2xl text-gray-400 line-through">
+              <span v-if="currentComparePrice" class="text-xl sm:text-2xl text-gray-400 line-through">
                 ${{ parseFloat(currentComparePrice).toFixed(2) }}
               </span>
             </div>
@@ -125,7 +125,7 @@
           </div>
 
           <!-- Stock Info -->
-          <div class="flex items-center gap-4">
+          <div class="flex flex-wrap items-center gap-3">
             <div class="flex items-center gap-2">
               <UIcon
                   :name="currentInStock ? 'i-lucide-check-circle' : 'i-lucide-x-circle'"
@@ -184,9 +184,9 @@
           </div>
 
           <!-- Quantity Selector -->
-          <div v-if="currentInStock" class="flex items-center gap-4">
-            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Quantity:</label>
-            <div class="flex items-center gap-2">
+          <div v-if="currentInStock" class="flex flex-col sm:flex-row sm:items-center gap-3">
+            <label class="text-sm font-medium text-gray-700 dark:text-gray-300 sm:whitespace-nowrap">Quantity:</label>
+            <div class="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-start">
               <UButton
                   @click="quantity = Math.max(1, quantity - 1)"
                   icon="i-heroicons-minus"
@@ -205,18 +205,18 @@
                   :ui="{ base: 'rounded-none' }"
               />
             </div>
-            <span class="text-sm text-gray-500">
+            <span class="text-sm text-gray-500 sm:ml-auto">
               Max: {{ currentStockQuantity }}
             </span>
           </div>
 
           <!-- Actions -->
-          <div class="flex gap-4 pt-4">
+          <div class="flex flex-col sm:flex-row gap-3 pt-4">
             <UButton
                 v-if="currentInStock"
                 @click="handleAddToCart"
                 size="xl"
-                class="flex-1"
+                class="w-full sm:flex-1"
                 icon="i-heroicons-shopping-cart"
                 :ui="{ base: 'rounded-none' }"
             >
@@ -233,13 +233,14 @@
             <UButton
                 v-else
                 size="xl"
-                class="flex-1"
+                class="w-full sm:flex-1"
                 disabled
             >
               Out of Stock
             </UButton>
             <UButton
                 size="xl"
+                class="w-full sm:w-auto"
                 :color="isInWishlist(product.slug) ? 'primary' : 'secondary'"
                 :variant="isInWishlist(product.slug) ? 'solid' : 'soft'"
                 :icon="isInWishlist(product.slug) ? 'i-heroicons-heart-solid' : 'i-heroicons-heart'"
@@ -335,7 +336,12 @@ watch(() => asyncProduct.value, (newProduct) => {
   if (newProduct) {
     product.value = newProduct
     relatedProducts.value = newProduct.related_products || []
-    selectedImage.value = newProduct.images.featured.medium || newProduct.images.featured.original
+    selectedImage.value =
+        newProduct.images?.featured?.medium ||
+        newProduct.images?.featured?.original ||
+        newProduct.image ||
+        newProduct.image_thumb ||
+        'https://placehold.co/600x600'
   }
 }, { immediate: true })
 
@@ -359,13 +365,27 @@ const currentStockQuantity = computed(() => {
 })
 
 const currentStockStatus = computed(() => {
-  return selectedVariation.value
-      ? selectedVariation.value.stock_status
-      : product.value?.stock_status || 'out_of_stock'
+  if (selectedVariation.value) {
+    return selectedVariation.value.stock_status
+  }
+
+  if (product.value?.stock_status) {
+    return product.value.stock_status
+  }
+
+  return product.value?.in_stock ? 'in_stock' : 'out_of_stock'
 })
 
 const currentInStock = computed(() => {
-  return currentStockStatus.value === 'in_stock'
+  if (selectedVariation.value) {
+    return selectedVariation.value.stock_status === 'in_stock'
+  }
+
+  if (product.value?.stock_status) {
+    return product.value.stock_status === 'in_stock'
+  }
+
+  return Boolean(product.value?.in_stock)
 })
 
 const currentSku = computed(() => {

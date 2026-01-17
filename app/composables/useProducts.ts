@@ -100,7 +100,6 @@ export const useProducts = () => {
 
     // Fetch single product
     const fetchProduct = async (slug: string) => {
-        loading.value = true
         error.value = null
 
         try {
@@ -112,8 +111,6 @@ export const useProducts = () => {
         } catch (err: any) {
             error.value = err.message || 'Failed to fetch product'
             throw err
-        } finally {
-            loading.value = false
         }
     }
 

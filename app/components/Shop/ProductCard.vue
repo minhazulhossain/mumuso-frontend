@@ -37,31 +37,18 @@
 
     <!-- Content -->
     <div class="p-3 space-y-2 flex-1 flex flex-col">
-      <h3 class="text-sm font-medium line-clamp-2 group-hover:text-primary-500 transition-colors">{{ product.name }}</h3>
+      <h3 class="text-sm font-medium line-clamp-2 min-h-[2.5rem] group-hover:text-primary-500 transition-colors">{{ product.name }}</h3>
 
       <!-- Price Section -->
       <div class="space-y-1 mt-auto">
         <div class="flex items-baseline gap-2">
-          <p class="text-lg font-bold text-primary-600 dark:text-primary-400">
+          <p class="text-lg font-medium text-primary-600 dark:text-primary-400">
             ${{ parseFloat(product.price).toFixed(2) }}
           </p>
           <p v-if="product.compare_price" class="text-sm text-gray-400 line-through">
             ${{ parseFloat(product.compare_price).toFixed(2) }}
           </p>
         </div>
-
-        <!-- Savings Info -->
-<!--        <p v-if="product.has_discount && product.compare_price" class="text-xs text-green-600 dark:text-green-400 font-medium">-->
-<!--          Save ${{ (parseFloat(product.compare_price) - parseFloat(product.price)).toFixed(2) }}-->
-<!--        </p>-->
-
-        <!-- Stock Info -->
-<!--        <div v-if="product.in_stock && product.stock_quantity < 10" class="flex items-center gap-1">-->
-<!--          <UIcon name="i-heroicons-exclamation-triangle" class="text-xs text-orange-500" />-->
-<!--          <span class="text-xs text-orange-600 dark:text-orange-400">-->
-<!--            Only {{ product.stock_quantity }} left-->
-<!--          </span>-->
-<!--        </div>-->
       </div>
     </div>
   </NuxtLink>

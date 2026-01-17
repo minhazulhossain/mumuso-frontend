@@ -20,12 +20,19 @@ import type { Cart } from '#shared/types'
 
 const { fetchSettings } = useSettings()
 const cart = useCart()
+const route = useRoute()
 
 const { data: settings, pending, error } = await fetchSettings()
 
 // Provide settings and cart globally to all child components
 provide('settings', settings)
 provide('cart', cart)
+
+watch(() => route.fullPath, () => {
+  if (cart.isCartOpen.value) {
+    cart.isCartOpen.value = false
+  }
+})
 
 watch(() => settings.value?.site.active, (isActive) => {
   if (isActive === false) {

@@ -43,7 +43,7 @@
         <ProductCarousel
             title="Best Selling"
             :items="products"
-            :loading="loading"
+            :loading="loading || productsPending"
         />
       </UContainer>
     </section>
@@ -58,7 +58,7 @@
         <ProductCarousel
             title="New Arrivals"
             :items="products"
-            :loading="loading"
+            :loading="loading || productsPending"
         />
       </UContainer>
     </section>
@@ -84,7 +84,7 @@
         <ProductCarousel
             title="Trending"
             :items="products"
-            :loading="loading"
+            :loading="loading || productsPending"
         />
       </UContainer>
     </section>
@@ -96,6 +96,10 @@ const { fetchHeroBanners } = useContent()
 const { data: heroBanners, pending } = await fetchHeroBanners()
 
 const { products, loading, fetchProducts } = useProducts()
+const { pending: productsPending } = await useAsyncData('home-products', async () => {
+  await fetchProducts()
+  return products.value
+})
 
 // Section references
 const categoriesSection = ref(null)
@@ -157,9 +161,7 @@ const setupScrollAnimations = () => {
   })
 }
 
-onMounted(async () => {
-  await fetchProducts()
-
+onMounted(() => {
   // Initialize section states with initial animation classes
   sectionStates.value = {
     categories: 'opacity-0 translate-y-8',

@@ -1,20 +1,23 @@
 <template>
   <USlideover
       :close="{ onClick: () => emit('close', false) }"
-      v-model="localCartOpen"
+      v-model:open="localCartOpen"
       title="Shopping Cart"
+      description="Review the items in your cart"
       :ui="{ body: 'sm:p-0 rounded-none' }"
       >
-    <UButton
-        icon="i-heroicons-shopping-cart"
-        variant="ghost"
-    >
-      <template #trailing>
-        <UBadge v-if="cartItemsCount > 0" variant="solid">
-          {{ cartItemsCount }}
-        </UBadge>
-      </template>
-    </UButton>
+    <slot>
+      <UButton
+          icon="i-heroicons-shopping-cart"
+          variant="ghost"
+      >
+        <template #trailing>
+          <UBadge v-if="cartItemsCount > 0" variant="solid">
+            {{ cartItemsCount }}
+          </UBadge>
+        </template>
+      </UButton>
+    </slot>
     <template #body>
       <UCard class="flex flex-col h-full" :ui="{ root: 'rounded-none', footer: '' }">
 

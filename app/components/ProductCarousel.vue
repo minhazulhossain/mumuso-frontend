@@ -1,8 +1,8 @@
 <template>
   <div>
     <!-- Title Bar -->
-    <div v-if="hasTitleBar" class="flex justify-between items-center mb-2 md:mb-4 px-4 md:px-0">
-      <h2 class="text-2xl font-bold">{{ title }}</h2>
+    <div v-if="hasTitleBar" class="flex justify-between items-center mb-2 md:mb-4">
+      <h2 class="text-2xl font-medium">{{ title }}</h2>
       <NuxtLink :to="viewAllUrl" class="text-sm font-medium text-primary hover:underline">
         View All
       </NuxtLink>
@@ -27,14 +27,15 @@
     <UCarousel
         v-else
         v-slot="{ item }"
+        align="start"
         :items="loading ? skeletonItems : items"
         :ui="{
-        item: 'basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5 ps-2',
+        viewport: '',
+        container: 'ms-0 items-stretch gap-2 sm:gap-3',
+        item: '!ps-0 basis-[40%] sm:basis-[calc((100%-2rem)/3)] lg:basis-[calc((100%-6rem)/5)] h-full',
         dot: 'w-2 md:w-10 h-1.5 md:h-2 rounded-full transition-all cursor-pointer bg-gray-400 hover:bg-gray-500 data-[state=active]:bg-success-600 data-[state=active]:w-3 md:data-[state=active]:w-20',
         dots: '-bottom-4 md:-bottom-7 flex gap-1 md:gap-2 justify-center'
-
       }"
-
         :dots="!loading"
         :loop="!loading && items.length > 5"
         :breakpoints="{
@@ -63,12 +64,13 @@
       </div>
 
       <!-- Actual Product -->
-      <ShopProductCard
-          v-else
-          :product="item"
-          @add-to-cart="(qty) => $emit('add-to-cart', item.string, qty)"
-          @add-to-wishlist="() => $emit('add-to-wishlist', item.string)"
-      />
+      <div v-else class="h-full">
+        <ShopProductCard
+            :product="item"
+            @add-to-cart="(qty) => $emit('add-to-cart', item.id, qty)"
+            @add-to-wishlist="() => $emit('add-to-wishlist', item.id)"
+        />
+      </div>
     </UCarousel>
   </div>
 </template>

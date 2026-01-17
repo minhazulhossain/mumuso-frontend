@@ -1,7 +1,7 @@
 <template>
-  <div class="relative w-full overflow-hidden">
+  <div class="relative w-full overflow-hidden" :class="wrapperClass" :style="wrapperStyle">
     <!-- Loading State -->
-    <div v-if="loading || !banners || banners.length === 0" :style="{ height: containerHeight }">
+    <div v-if="loading || !banners || banners.length === 0" class="w-full h-full">
       <USkeleton class="w-full h-full" />
     </div>
 
@@ -21,8 +21,7 @@
         :loop="true"
         :autoplay="autoplay ? { delay: interval || 5000, stopOnInteraction: false } : false"
         :duration="20"
-        class="w-full"
-        :style="{ height: containerHeight }"
+        class="w-full h-full"
         @select="onSlideChange"
     >
       <!-- Banner Slide -->
@@ -30,18 +29,21 @@
         <!-- Background Image -->
         <div class="relative w-full h-full bg-gray-100">
           <!-- Responsive Images -->
-          <NuxtPicture
-              :src="isMobile ? (banner.image.mobile || banner.image.desktop) : banner.image.desktop"
-              :alt="banner.title"
-              :img-attrs="{
-                class: 'w-full h-full object-cover',
-                onLoad: () => handleImageLoad(banner.id),
-                onError: () => handleImageError(banner.id)
-              }"
-              sizes="xs:100vw sm:100vw md:100vw lg:100vw"
-              loading="eager"
-              format="webp"
-          />
+          <picture>
+            <source
+                :srcset="banner.image.mobile || banner.image.desktop"
+                media="(max-width: 767px)"
+            />
+            <img
+                :src="banner.image.desktop"
+                :alt="banner.title"
+                class="w-full h-full object-cover"
+                loading="eager"
+                fetchpriority="high"
+                @load="handleImageLoad(banner.id)"
+                @error="handleImageError(banner.id)"
+            />
+          </picture>
         </div>
 
         <!-- Overlay -->
@@ -99,30 +101,14 @@ const onSlideChange = (index: number) => {
   emit('slide-change', index)
 }
 
-// Responsive height for mobile
-const containerHeight = computed(() => {
-  if (isMobile.value) {
-    return props.height === '600px' ? '400px' : props.height
-  }
-  return props.height
+const hasFixedHeight = computed(() => props.height !== 'auto')
+
+const wrapperStyle = computed(() => {
+  return hasFixedHeight.value ? { height: props.height } : {}
 })
 
-// Mobile detection
-const isMobile = ref(false)
-
-onMounted(() => {
-  isMobile.value = window.innerWidth < 768
-
-  // Update on resize
-  const handleResize = () => {
-    isMobile.value = window.innerWidth < 768
-  }
-
-  window.addEventListener('resize', handleResize)
-
-  onUnmounted(() => {
-    window.removeEventListener('resize', handleResize)
-  })
+const wrapperClass = computed(() => {
+  return hasFixedHeight.value ? '' : 'aspect-[16/6] sm:aspect-[16/5]'
 })
 
 </script>

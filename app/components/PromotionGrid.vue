@@ -1,24 +1,23 @@
 <template>
   <div>
     <!-- Loading state for entire carousel -->
-    <div v-if="loading" class="space-y-4">
-      <USkeleton class="h-64 w-full"/>
-    </div>
-
     <!-- Carousel with data -->
     <UCarousel
-        v-else-if="products && products.length > 0"
+        v-if="promoItems.length > 0"
         v-slot="{ item }"
         loop
         wheel-gestures
-        :items="products"
+        align="start"
+        :items="promoItems"
         :ui="{
-        item: 'basis-[66%] sm:basis-[60%] md:basis-[40%] ps-0 sm:ps-2 pe-2 sm:pe-4',
+        viewport: 'px-2 sm:px-4 lg:px-6',
+        container: 'ms-0 items-stretch gap-2 sm:gap-3',
+        item: '!ps-0 basis-[60%] sm:basis-[60%] md:basis-[40%] lg:basis-[calc((100%-6rem)/5)] h-full',
 
       }"
     >
       <NuxtLink to="/categories/kids">
-        <UCard :ui="{ root: 'rounded-none mb-2', header: 'p-0 sm:px-0', body:'p-2 sm:p-4' }">
+        <UCard :ui="{ root: 'rounded-none mb-2', header: 'p-0 sm:px-0', body:'p-2 sm:p-3' }">
           <template #header>
             <div class="relative w-full aspect-[380/288] bg-gray-100">
               <!-- Actual image -->
@@ -47,9 +46,12 @@
 <script setup lang="ts">
 interface Product {
   id: number
-  img: string
+  img?: string
   name: string
-  description: string
+  description?: string
+  short_description?: string
+  image?: string
+  image_thumb?: string
 }
 
 // Fallback data for development
@@ -92,25 +94,12 @@ const fallbackProducts: Product[] = [
   }
 ]
 
-const loading = ref(false)
-const products = ref<Product[]>(fallbackProducts)
-const loadedImages = ref<Record<string, boolean>>({})
-
-const handleImageLoad = (src: string) => {
-  loadedImages.value[src] = true
-}
-
-// Fetch promotional products on mount
-onMounted(async () => {
-  loading.value = true
-  try {
-    const { data: fetchedProducts } = await useFetch<{data: Product[]}>('/api/products?featured=true&limit=6')
-    products.value = fetchedProducts.value?.data || fallbackProducts
-  } catch (error) {
-    console.error('Error fetching promotional products:', error)
-    products.value = fallbackProducts
-  } finally {
-    loading.value = false
-  }
+const promoItems = computed(() => {
+  return fallbackProducts.map((item) => ({
+    id: item.id,
+    name: item.name,
+    img: item.img || '/promo/1.jpg',
+    description: item.description || ''
+  }))
 })
 </script>

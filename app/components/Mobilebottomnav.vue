@@ -72,10 +72,25 @@
         <span>Shop</span>
       </button>
 
-      <NuxtLink class="nav-item" :class="{ active: currentRoute === '/cart' }">
-        <CartSidebar/>
-        <span>Cart</span>
-      </NuxtLink>
+      <CartSidebar>
+        <button
+            type="button"
+            class="nav-item"
+            :class="{ active: currentRoute === '/cart' }"
+        >
+          <span class="cart-icon-wrapper">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="8" cy="21" r="1"></circle>
+              <circle cx="19" cy="21" r="1"></circle>
+              <path d="M2 2h3l2.4 12.6a2 2 0 0 0 2 1.6h9.6a2 2 0 0 0 2-1.6L23 6H6"></path>
+            </svg>
+            <span v-if="cartItemsCount > 0" class="cart-badge">
+              {{ cartItemsCount }}
+            </span>
+          </span>
+          <span>Cart</span>
+        </button>
+      </CartSidebar>
 
       <NuxtLink to="/account" class="nav-item" :class="{ active: currentRoute === '/account' }">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

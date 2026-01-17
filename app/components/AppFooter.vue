@@ -1,12 +1,12 @@
 <template>
-  <footer class="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800" v-if="settings">
+  <footer class="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 pb-[calc(76px+env(safe-area-inset-bottom))] md:pb-0" v-if="settings">
     <UContainer>
       <!-- Main Footer Content -->
       <div class="py-8 md:py-16">
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           <!-- Brand Section -->
-          <div class="space-y-4">
-            <div class="flex items-center space-x-3">
+          <div class="space-y-4 sm:col-span-2 lg:col-span-1 text-center sm:text-left">
+            <div class="flex items-center justify-center sm:justify-start space-x-3">
               <template v-if="settings?.branding.logo">
                 <NuxtImg
                     :src="settings.branding.logo"
@@ -33,39 +33,65 @@
                 />
               </template>
             </div>
-            <p class="text-gray-600 dark:text-gray-400 text-sm max-w-xs" v-if="settings?.footer?.description">
+            <p class="text-gray-600 dark:text-gray-400 text-sm max-w-xs mx-auto" v-if="settings?.footer?.description">
               {{ settings?.footer?.description }}
             </p>
             <div v-if="settings?.footer?.show_social" class="space-y-4">
               <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
                 Follow Us
               </h3>
-              <SocialMediaLinks icon-size="w-5 h-5" />
+              <div class="flex justify-center sm:justify-start">
+                <SocialMediaLinks icon-size="w-5 h-5" />
+              </div>
             </div>
           </div>
 
           <!-- Footer Navigation Sections -->
           <div v-for="section in footerSections" :key="section.title" class="space-y-4">
-            <h3 class="font-semibold text-gray-900 dark:text-white text-sm uppercase tracking-wider">
-              {{ section.title }}
-            </h3>
-            <ul class="space-y-3">
-              <li v-for="link in section.links" :key="link.name">
-                <NuxtLink
-                  :to="link.to"
-                  :external="link.external"
-                  :target="link.external ? '_blank' : undefined"
-                  class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm transition-colors flex items-center"
-                >
-                  {{ link.name }}
-                  <UIcon
-                    v-if="link.external"
-                    name="i-heroicons-arrow-top-right-on-square"
-                    class="w-3 h-3 ml-1"
-                  />
-                </NuxtLink>
-              </li>
-            </ul>
+            <div class="hidden sm:block">
+              <h3 class="font-semibold text-gray-900 dark:text-white text-sm uppercase tracking-wider">
+                {{ section.title }}
+              </h3>
+              <ul class="space-y-3">
+                <li v-for="link in section.links" :key="link.name">
+                  <NuxtLink
+                    :to="link.to"
+                    :external="link.external"
+                    :target="link.external ? '_blank' : undefined"
+                    class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm transition-colors flex items-center"
+                  >
+                    {{ link.name }}
+                    <UIcon
+                      v-if="link.external"
+                      name="i-heroicons-arrow-top-right-on-square"
+                      class="w-3 h-3 ml-1"
+                    />
+                  </NuxtLink>
+                </li>
+              </ul>
+            </div>
+            <details class="sm:hidden border-b border-gray-200 dark:border-gray-800 pb-3">
+              <summary class="font-semibold text-gray-900 dark:text-white text-sm uppercase tracking-wider cursor-pointer">
+                {{ section.title }}
+              </summary>
+              <ul class="space-y-3 mt-3">
+                <li v-for="link in section.links" :key="link.name">
+                  <NuxtLink
+                    :to="link.to"
+                    :external="link.external"
+                    :target="link.external ? '_blank' : undefined"
+                    class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm transition-colors flex items-center"
+                  >
+                    {{ link.name }}
+                    <UIcon
+                      v-if="link.external"
+                      name="i-heroicons-arrow-top-right-on-square"
+                      class="w-3 h-3 ml-1"
+                    />
+                  </NuxtLink>
+                </li>
+              </ul>
+            </details>
           </div>
 
           <div class="space-y-4">

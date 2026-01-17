@@ -2,5 +2,17 @@
 @import "@nuxt/ui";
 
 @theme {
-    --font-sans: 'Public Sans', sans-serif;
+    --font-sans: 'Outfit', sans-serif;
+}
+
+@layer base {
+    html {
+        font-size: 16px;
+    }
+
+    @media (max-width: 640px) {
+        html {
+            font-size: 15px;
+        }
+    }
 }

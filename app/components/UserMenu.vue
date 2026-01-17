@@ -17,7 +17,20 @@
     }"
     >
 
-      <UButton :label="user?.name" icon="i-lucide-menu" color="neutral" variant="outline" />
+      <UButton
+          class="hidden sm:inline-flex"
+          :label="user?.name"
+          icon="i-lucide-menu"
+          color="neutral"
+          variant="outline"
+      />
+      <UButton
+          class="sm:hidden"
+          icon="i-heroicons-user-circle"
+          color="neutral"
+          variant="outline"
+          aria-label="Account menu"
+      />
     </UDropdownMenu>
 
   </div>

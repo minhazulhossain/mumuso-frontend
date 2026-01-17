@@ -2,14 +2,14 @@
   <header
       class="relative z-50 bg-white dark:bg-gray-950/75 backdrop-blur-md border-b border-gray-200 dark:border-gray-800">
     <UContainer>
-      <div class="flex items-center justify-between h-13 md:h-16">
+      <div class="flex items-center justify-between h-14 md:h-16">
 
         <div class="md:hidden">
           <MobileGlobalCategoryMenu :items="categoryItems" />
         </div>
 
         <!-- Logo/Brand -->
-        <div class="flex items-center space-x-4">
+        <div class="flex items-center gap-2 sm:gap-4">
           <NuxtLink to="/" class="flex items-center space-x-3 hover:opacity-80 transition-opacity">
             <AppLogo />
           </NuxtLink>
@@ -93,7 +93,7 @@
         </div>
 
         <!-- Right side actions -->
-        <div class="flex items-center">
+        <div class="flex items-center gap-1 sm:gap-2">
           <!-- Search button (Mobile) -->
           <UButton
               icon="i-heroicons-magnifying-glass"
@@ -346,9 +346,34 @@ const formatPrice = (price) => {
   }).format(numPrice)
 }
 
-const [ categoryItems ] = await Promise.all([
+const normalizeCategoryLinks = (items) => {
+  if (!Array.isArray(items)) return []
+
+  return items.map((item) => {
+    const normalized = { ...item }
+
+    if (typeof normalized.to === 'string') {
+      const match = normalized.to.match(/category=([^&]+)/)
+      if (match && match[1]) {
+        normalized.to = `/categories/${match[1]}`
+      }
+    } else if (normalized.slug) {
+      normalized.to = `/categories/${normalized.slug}`
+    }
+
+    if (Array.isArray(normalized.children)) {
+      normalized.children = normalizeCategoryLinks(normalized.children)
+    }
+
+    return normalized
+  })
+}
+
+const [ rawCategoryItems ] = await Promise.all([
   fetchCategories(),
 ])
+
+const categoryItems = normalizeCategoryLinks(rawCategoryItems)
 
 // Click outside to close results
 onMounted(() => {

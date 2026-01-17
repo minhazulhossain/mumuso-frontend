@@ -10,7 +10,12 @@ const props = defineProps<{
 const { fetchSocialMedia } = useSettings()
 
 // Fetch social media links if not provided via props
-const { data: socialLinks, pending, error } = await fetchSocialMedia()
+const { data: socialLinks } = await fetchSocialMedia()
+
+const resolvedLinks = computed(() => {
+  const links = props.links && props.links.length > 0 ? props.links : (socialLinks.value || [])
+  return links.filter(link => typeof link.url === 'string' && link.url.trim().length > 0)
+})
 
 
 // Platform icons mapping (you can use actual SVG or icon library)
@@ -47,8 +52,8 @@ const getPlatformName = (link: SocialMediaLink) => {
 <template>
   <div class="flex items-center gap-4">
     <a
-        v-for="link in socialLinks"
-        :key="link.url"
+        v-for="link in resolvedLinks"
+        :key="link.url || link.platform"
         :href="link.url"
         target="_blank"
         rel="noopener noreferrer"

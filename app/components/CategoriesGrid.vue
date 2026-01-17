@@ -36,7 +36,7 @@
               />
             </div>
           </template>
-          <p class="mb-0 text-sm leading-none truncate">{{ item?.name }}</p>
+          <p class="mb-0 text-sm leading-4 truncate">{{ item?.name }}</p>
         </UCard>
       </NuxtLink>
     </UCarousel>
