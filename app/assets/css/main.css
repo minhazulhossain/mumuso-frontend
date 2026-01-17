@@ -1,8 +1,9 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
 
-@theme {
+@theme static{
     --font-sans: 'Outfit', sans-serif;
+
 }
 
 @layer base {
@@ -14,5 +15,65 @@
         html {
             font-size: 15px;
         }
+    }
+
+    *, *::before, *::after {
+        border-radius: 0 !important;
+    }
+
+    a[href],
+    button,
+    [role="button"] {
+        cursor: pointer;
+    }
+}
+
+@layer components {
+    .product-card-border {
+        position: relative;
+        isolation: isolate;
+    }
+
+    .product-card-border::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border: 1px solid var(--color-primary-500);
+        transform: scaleX(0) scaleY(0);
+        transform-origin: left top;
+        transition: transform 0.35s ease;
+        pointer-events: none;
+    }
+
+    .product-card-border:hover::after {
+        transform: scaleX(1) scaleY(1);
+    }
+
+    .swiper {
+        position: static !important;
+        /*padding-bottom: 30px !important;*/
+    }
+
+    .swiper .swiper-pagination {
+        /*position: static !important;*/
+        /*display: flex !important;*/
+        /*justify-content: center !important;*/
+        /*margin-top: 30px !important;*/
+        /*gap: 4px !important;*/
+        /*top: 30% !important;*/
+        bottom: -20px !important;
+    }
+
+    /*.swiper .swiper-pagination-bullet {*/
+    /*    width: 8px !important;*/
+    /*    height: 8px !important;*/
+    /*    background: rgb(var(--color-neutral-300)) !important;*/
+    /*    opacity: 1 !important;*/
+    /*    transition: width 0.2s ease, background-color 0.2s ease !important;*/
+    /*}*/
+
+    .swiper .swiper-pagination-bullet-active {
+        width: 20px !important;
+        background: var(--color-primary-500) !important;
     }
 }

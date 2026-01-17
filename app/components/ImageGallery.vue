@@ -1,16 +1,22 @@
 <template>
   <div class="flex-1 w-full">
-    <UCarousel
-        ref="carousel"
-        v-slot="{ item }"
-        :items="items"
-        :prev="{ onClick: onClickPrev }"
-        :next="{ onClick: onClickNext }"
-        class="w-full mx-auto"
-        @select="onSelect"
-    >
-      <img :src="item" width="100%" height="100%" class="rounded-lg">
-    </UCarousel>
+    <ClientOnly>
+      <Swiper
+          :modules="[Navigation]"
+          :slides-per-view="1"
+          :navigation="true"
+          class="w-full mx-auto"
+          @swiper="onSwiper"
+          @slideChange="onSelect"
+      >
+        <SwiperSlide v-for="(item, index) in items" :key="index">
+          <img :src="item" width="100%" height="100%" class="rounded-lg">
+        </SwiperSlide>
+      </Swiper>
+      <template #fallback>
+        <div class="w-full aspect-square bg-gray-100"></div>
+      </template>
+    </ClientOnly>
 
     <div class="flex gap-1 justify-between pt-4 max-w-xs mx-auto">
       <div
@@ -27,6 +33,9 @@
 </template>
 
 <script setup lang="ts">
+import { Swiper, SwiperSlide } from 'swiper/vue'
+import { Navigation } from 'swiper/modules'
+
 const items = [
   'https://picsum.photos/900/900?random=1',
   'https://picsum.photos/900/900?random=2',
@@ -37,23 +46,20 @@ const items = [
   'https://picsum.photos/900/900?random=7',
 ]
 
-const carousel = useTemplateRef('carousel')
+const swiperInstance = ref<any>(null)
 const activeIndex = ref(0)
 
-function onClickPrev() {
-  activeIndex.value--
+const onSwiper = (swiper: any) => {
+  swiperInstance.value = swiper
 }
-function onClickNext() {
-  activeIndex.value++
-}
-function onSelect(index: number) {
-  activeIndex.value = index
+
+const onSelect = (swiper: any) => {
+  activeIndex.value = swiper.activeIndex
 }
 
 function select(index: number) {
   activeIndex.value = index
-
-  carousel.value?.emblaApi?.scrollTo(index)
+  swiperInstance.value?.slideTo(index)
 }
 </script>
 

@@ -155,7 +155,14 @@ export function getItemOriginalPrice(item: CartItem): number {
  * Get safe product image from cart item
  */
 export function getItemImage(item: CartItem): string {
-    return item.product?.image || 'https://placehold.co/400x400?text=No+Image'
+    return (
+        item.variation?.images?.thumb ||
+        item.product?.featured_image_url ||
+        item.product?.image ||
+        item.product?.image_thumb ||
+        item.product?.images?.featured?.thumb ||
+        'https://placehold.co/400x400?text=No+Image'
+    )
 }
 
 /**

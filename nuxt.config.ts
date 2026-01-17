@@ -1,6 +1,11 @@
 export default defineNuxtConfig({
     modules: ['@nuxt/ui', '@nuxt/image', 'nuxt-auth-utils'],
-    css: ['~/assets/css/main.css'],
+    css: [
+        'swiper/css',
+        'swiper/css/pagination',
+        'swiper/css/navigation',
+        '~/assets/css/main.css'
+    ],
 
     ui: {
         theme: {
@@ -10,18 +15,19 @@ export default defineNuxtConfig({
             }
         },
         colors: {
-            primary: [
-                '#f8fafc',  // 50 - Almost white
-                '#f1f5f9',  // 100 - Very light
-                '#e2e8f0',  // 200 - Light
-                '#cbd5e1',  // 300 - Light-medium
-                '#94a3b8',  // 400 - Medium
-                '#64748b',  // 500 - Base primary
-                '#475569',  // 600 - Dark
-                '#334155',  // 700 - Darker
-                '#1e293b',  // 800 - Very dark
-                '#0f172a'   // 950 - Almost black
-            ]
+            primary: {
+                50:  '#ecfdf8',
+                100: '#d1faee',
+                200: '#a7f3df',
+                300: '#6ee7c9',
+                400: '#39d2ad',
+                500: '#33b68f', // your base
+                600: '#279b78',
+                700: '#1f7d63',
+                800: '#1c6452',
+                900: '#195346',
+                950: '#083126',
+            },
         }
     },
 

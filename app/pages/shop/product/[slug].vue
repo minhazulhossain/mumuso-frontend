@@ -20,7 +20,7 @@
       <!-- Product Content -->
       <div v-else-if="product" class="grid grid-cols-1 lg:grid-cols-2 gap-12">
         <!-- Product Image Gallery -->
-        <div class="space-y-4">
+        <div class="space-y-4 lg:sticky lg:top-24 self-start">
           <div class="aspect-square overflow-hidden rounded-lg bg-gray-100 relative group cursor-zoom-in">
             <img
                 :src="selectedImage"
@@ -75,7 +75,7 @@
         </div>
 
         <!-- Product Details -->
-        <div class="space-y-4">
+        <div class="space-y-4 lg:sticky lg:top-24 self-start">
           <!-- Category & Status -->
           <div class="flex items-center gap-2">
             <UBadge
@@ -479,14 +479,6 @@ const handleAddToCart = async () => {
   )
 
   if (success) {
-    toast.add({
-      title: 'Added to cart!',
-      description: selectedVariation.value
-          ? `${quantity.value}x ${selectedVariation.value.name}`
-          : `${quantity.value}x ${product.value.name}`,
-      color: 'success',
-      icon: 'i-heroicons-shopping-cart'
-    })
     quantity.value = 1
     setTimeout(() => {
       toggleCart()

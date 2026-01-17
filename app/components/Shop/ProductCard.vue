@@ -1,6 +1,6 @@
 <template>
   <NuxtLink :to="`/shop/product/${product.slug}`"
-      class="overflow-hidden bg-white dark:bg-gray-800 h-full flex flex-col group">
+      class="product-card-border overflow-hidden bg-white dark:bg-gray-800 h-full flex flex-col group">
     <!-- Image with fixed aspect ratio -->
     <div class="relative w-full aspect-square bg-gray-100 dark:bg-gray-900 overflow-hidden">
       <USkeleton

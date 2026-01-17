@@ -8,7 +8,6 @@
       </NuxtLink>
     </div>
 
-    <!-- Error State -->
     <div v-if="error" class="flex flex-col items-center justify-center py-16 px-4">
       <UIcon name="i-heroicons-exclamation-triangle" class="w-12 h-12 text-red-500 mb-4" />
       <p class="text-red-600 dark:text-red-400 text-center">
@@ -23,59 +22,65 @@
       </UButton>
     </div>
 
-    <!-- Carousel (same structure for loading and loaded) -->
-    <UCarousel
-        v-else
-        v-slot="{ item }"
-        align="start"
-        :items="loading ? skeletonItems : items"
-        :ui="{
-        viewport: '',
-        container: 'ms-0 items-stretch gap-2 sm:gap-3',
-        item: '!ps-0 basis-[40%] sm:basis-[calc((100%-2rem)/3)] lg:basis-[calc((100%-6rem)/5)] h-full',
-        dot: 'w-2 md:w-10 h-1.5 md:h-2 rounded-full transition-all cursor-pointer bg-gray-400 hover:bg-gray-500 data-[state=active]:bg-success-600 data-[state=active]:w-3 md:data-[state=active]:w-20',
-        dots: '-bottom-4 md:-bottom-7 flex gap-1 md:gap-2 justify-center'
-      }"
-        :dots="!loading"
-        :loop="!loading && items.length > 5"
-        :breakpoints="{
-        '(min-width: 640px)': { slidesToScroll: 2 },
-        '(min-width: 768px)': { slidesToScroll: 2 },
-        '(min-width: 1024px)': { slidesToScroll: 3 },
-        '(min-width: 1280px)': { slidesToScroll: 3 }
-      }"
-        :slidesToScroll="3"
-    >
-      <!-- Skeleton State -->
-      <div v-if="loading" class="p-2">
-        <div class="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-gray-800">
-          <!-- Image skeleton with fixed aspect ratio -->
-          <div class="relative w-full aspect-square bg-gray-100 dark:bg-gray-900">
-            <USkeleton class="w-full h-full absolute inset-0" />
+    <ClientOnly v-else>
+      <Swiper
+          :modules="[Pagination]"
+          :slides-per-view="2.5"
+          :slides-per-group="2"
+          :space-between="12"
+          :loop="!loading && items.length > 5"
+          :pagination="loading ? false : { clickable: true }"
+          :breakpoints="{
+            640: { slidesPerView: 3, slidesPerGroup: 3, spaceBetween: 15 },
+            1024: { slidesPerView: 5, slidesPerGroup: 5, spaceBetween: 15 }
+          }"
+          class="product-carousel"
+      >
+        <SwiperSlide v-for="(item, index) in (loading ? skeletonItems : items)" :key="item?.id || index">
+          <div v-if="loading" class="p-2 h-full">
+            <div class="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-gray-800 h-full">
+              <div class="relative w-full aspect-square bg-gray-100 dark:bg-gray-900">
+                <USkeleton class="w-full h-full absolute inset-0" />
+              </div>
+              <div class="p-4 space-y-3">
+                <USkeleton class="h-4 w-3/4" />
+                <USkeleton class="h-5 w-20" />
+                <USkeleton class="h-10 w-full" />
+              </div>
+            </div>
           </div>
 
-          <!-- Content skeleton -->
-          <div class="p-4 space-y-3">
-            <USkeleton class="h-4 w-3/4" />
-            <USkeleton class="h-5 w-20" />
-            <USkeleton class="h-10 w-full" />
+          <div v-else class="h-full">
+            <ShopProductCard
+                :product="item"
+                @add-to-cart="(qty) => $emit('add-to-cart', item.id, qty)"
+                @add-to-wishlist="() => $emit('add-to-wishlist', item.id)"
+            />
+          </div>
+        </SwiperSlide>
+      </Swiper>
+      <template #fallback>
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          <div v-for="i in 10" :key="i" class="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-gray-800">
+            <div class="relative w-full aspect-square bg-gray-100 dark:bg-gray-900">
+              <USkeleton class="w-full h-full absolute inset-0" />
+            </div>
+            <div class="p-4 space-y-3">
+              <USkeleton class="h-4 w-3/4" />
+              <USkeleton class="h-5 w-20" />
+              <USkeleton class="h-10 w-full" />
+            </div>
           </div>
         </div>
-      </div>
-
-      <!-- Actual Product -->
-      <div v-else class="h-full">
-        <ShopProductCard
-            :product="item"
-            @add-to-cart="(qty) => $emit('add-to-cart', item.id, qty)"
-            @add-to-wishlist="() => $emit('add-to-wishlist', item.id)"
-        />
-      </div>
-    </UCarousel>
+      </template>
+    </ClientOnly>
   </div>
 </template>
 
 <script setup lang="ts">
+import { Swiper, SwiperSlide } from 'swiper/vue'
+import { Pagination } from 'swiper/modules'
+
 interface Product {
   id: number,
   slug: string,

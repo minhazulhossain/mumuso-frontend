@@ -37,7 +37,7 @@
               {{ settings?.footer?.description }}
             </p>
             <div v-if="settings?.footer?.show_social" class="space-y-4">
-              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                 Follow Us
               </h3>
               <div class="flex justify-center sm:justify-start">
@@ -49,7 +49,7 @@
           <!-- Footer Navigation Sections -->
           <div v-for="section in footerSections" :key="section.title" class="space-y-4">
             <div class="hidden sm:block">
-              <h3 class="font-semibold text-gray-900 dark:text-white text-sm uppercase tracking-wider">
+              <h3 class="font-semibold text-gray-900 dark:text-white text-sm uppercase tracking-wider mb-2">
                 {{ section.title }}
               </h3>
               <ul class="space-y-3">
@@ -71,7 +71,7 @@
               </ul>
             </div>
             <details class="sm:hidden border-b border-gray-200 dark:border-gray-800 pb-3">
-              <summary class="font-semibold text-gray-900 dark:text-white text-sm uppercase tracking-wider cursor-pointer">
+              <summary class="font-semibold text-gray-900 dark:text-white text-sm uppercase tracking-wider cursor-pointer mb-2">
                 {{ section.title }}
               </summary>
               <ul class="space-y-3 mt-3">

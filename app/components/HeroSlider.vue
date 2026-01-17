@@ -1,66 +1,62 @@
 <template>
   <div class="relative w-full overflow-hidden" :class="wrapperClass" :style="wrapperStyle">
-    <!-- Loading State -->
     <div v-if="loading || !banners || banners.length === 0" class="w-full h-full">
       <USkeleton class="w-full h-full" />
     </div>
 
-    <!-- Carousel -->
-    <UCarousel
-        v-else
-        ref="carouselRef"
-        v-slot="{ item: banner }"
-        :items="banners"
-        :ui="{
-        item: 'w-full',
-        dots: 'absolute bottom-2 md:bottom-6 left-1/2 -translate-x-1/2 flex gap-1 md:gap-2 z-20',
-        dot: 'w-2 md:w-10 md:h-2 h-1.5 rounded-full transition-all cursor-pointer bg-white/50 hover:bg-white/75 data-[state=active]:w-3 md:data-[state=active]:w-16 md:data-[state=active]:w-20 data-[state=active]:bg-white',
-      }"
-        :arrows="false"
-        :dots="banners.length > 1"
-        :loop="true"
-        :autoplay="autoplay ? { delay: interval || 5000, stopOnInteraction: false } : false"
-        :duration="20"
-        class="w-full h-full"
-        @select="onSlideChange"
-    >
-      <!-- Banner Slide -->
-      <div class="relative w-full h-full">
-        <!-- Background Image -->
-        <div class="relative w-full h-full bg-gray-100">
-          <!-- Responsive Images -->
-          <picture>
-            <source
-                :srcset="banner.image.mobile || banner.image.desktop"
-                media="(max-width: 767px)"
-            />
-            <img
-                :src="banner.image.desktop"
-                :alt="banner.title"
-                class="w-full h-full object-cover"
-                loading="eager"
-                fetchpriority="high"
-                @load="handleImageLoad(banner.id)"
-                @error="handleImageError(banner.id)"
-            />
-          </picture>
-        </div>
+    <ClientOnly v-else>
+      <Swiper
+          :modules="[Pagination, Autoplay]"
+          :slides-per-view="1"
+          :loop="true"
+          :autoplay="autoplay ? { delay: interval || 5000, disableOnInteraction: false } : false"
+          :pagination="banners.length > 1 ? { clickable: true } : false"
+          class="w-full h-full"
+          @slideChange="onSlideChange($event.activeIndex)"
+      >
+        <SwiperSlide v-for="banner in banners" :key="banner.id">
+          <div class="relative w-full h-full">
+            <div class="relative w-full h-full bg-gray-100">
+              <picture>
+                <source
+                    :srcset="banner.image.mobile || banner.image.desktop"
+                    media="(max-width: 767px)"
+                />
+                <img
+                    :src="banner.image.desktop"
+                    :alt="banner.title"
+                    class="w-full h-full object-cover"
+                    loading="eager"
+                    fetchpriority="high"
+                    @load="handleImageLoad(banner.id)"
+                    @error="handleImageError(banner.id)"
+                />
+              </picture>
+            </div>
 
-        <!-- Overlay -->
-        <div
-            v-if="banner.overlay_color"
-            class="absolute inset-0 pointer-events-none"
-            :style="{
-            backgroundColor: banner.overlay_color,
-            opacity: (banner.overlay_opacity || 50) / 100
-          }"
-        />
-      </div>
-    </UCarousel>
+            <div
+                v-if="banner.overlay_color"
+                class="absolute inset-0 pointer-events-none"
+                :style="{
+                backgroundColor: banner.overlay_color,
+                opacity: (banner.overlay_opacity || 50) / 100
+              }"
+            />
+          </div>
+        </SwiperSlide>
+      </Swiper>
+      <template #fallback>
+        <div class="w-full h-full">
+          <USkeleton class="w-full h-full" />
+        </div>
+      </template>
+    </ClientOnly>
   </div>
 </template>
 
 <script setup lang="ts">
+import { Swiper, SwiperSlide } from 'swiper/vue'
+import { Pagination, Autoplay } from 'swiper/modules'
 // import type { HeroBanner } from '#shared/types/content'
 
 interface Props {
@@ -81,9 +77,6 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   'slide-change': [index: number]
 }>()
-
-// Carousel ref for accessing emblaApi
-const carouselRef = useTemplateRef('carouselRef')
 
 // Track loaded images to prevent layout shift
 const loadedImages = ref<Record<string | number, boolean>>({})

@@ -36,10 +36,10 @@
           >
             <div class="flex gap-4">
               <!-- Product Image -->
-              <NuxtLink :to="`/shop/product/${item.product.slug}`" class="flex-shrink-0">
+              <NuxtLink :to="`/shop/product/${getItemSlug(item)}`" class="flex-shrink-0">
                 <NuxtImg
-                    :src="item.variation?.images?.thumb || item.product.featured_image_url || 'https://placehold.co/120x120'"
-                    :alt="item.variation?.name || item.product.name"
+                    :src="getItemImage(item)"
+                    :alt="getItemName(item)"
                     class="w-24 h-24 object-cover rounded-lg hover:opacity-90 transition-opacity"
                     width="120"
                     height="120"
@@ -54,10 +54,10 @@
                 <div class="flex justify-between items-start mb-2">
                   <div class="flex-1 min-w-0 pr-4">
                     <NuxtLink
-                        :to="`/shop/product/${item.product.slug}`"
+                        :to="`/shop/product/${getItemSlug(item)}`"
                         class="font-semibold text-gray-900 dark:text-white hover:text-primary-500 block truncate"
                     >
-                      {{ item?.product?.name }}
+                      {{ getItemName(item) }}
                     </NuxtLink>
                     <!-- Variation Name -->
                     <p v-if="item.variation" class="text-sm font-medium text-primary-600 dark:text-primary-400 mt-1">
@@ -301,6 +301,8 @@
 
 <script setup lang="ts">
 
+import { getItemImage, getItemName, getItemSlug } from '#shared/types/cart'
+
 const toast = useToast()
 const router = useRouter()
 
@@ -378,12 +380,6 @@ const decrementQuantity = (item: any) => {
 const removeItemFromCart = (item: any) => {
   if (item) {
     removeFromCart(item.product?.slug || item.slug, item.variation_id)
-    toast.add({
-      title: 'Removed from cart',
-      description: `${item.product.name}${item.variation ? ' - ' + item.variation.name : ''} has been removed`,
-      color: 'success',
-      icon: 'i-heroicons-trash'
-    })
   }
 }
 

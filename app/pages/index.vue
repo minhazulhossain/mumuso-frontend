@@ -14,10 +14,9 @@
     <!-- Categories Section -->
     <section
         ref="categoriesSection"
-        class="py-4 sm:py-8 md:py-12 lg:py-16 bg-white dark:bg-gray-950 transition-all duration-1000"
-        :class="sectionStates.categories"
+        class="py-4 sm:py-8 md:py-12 lg:py-16 bg-white dark:bg-gray-950"
     >
-      <UContainer>
+      <UContainer class="transition-all duration-1000" :class="sectionStates.categories">
         <CategoriesGrid />
       </UContainer>
     </section>
@@ -25,10 +24,9 @@
     <!-- Promotions Section -->
     <section
         ref="promotionsSection"
-        class="py-6 sm:py-10 md:py-14 lg:py-16 bg-gray-50 dark:bg-gray-900 transition-all duration-1000"
-        :class="sectionStates.promotions"
+        class="py-6 sm:py-10 md:py-14 lg:py-16 bg-gray-50 dark:bg-gray-900"
     >
-      <UContainer>
+      <UContainer class="transition-all duration-1000" :class="sectionStates.promotions">
         <PromotionGrid />
       </UContainer>
     </section>
@@ -36,10 +34,9 @@
     <!-- Best Selling Section -->
     <section
         ref="bestSellingSection"
-        class="py-6 sm:py-10 md:py-14 lg:py-16 bg-white dark:bg-gray-950 transition-all duration-1000"
-        :class="sectionStates.bestSelling"
+        class="py-6 sm:py-10 md:py-14 lg:py-16 bg-white dark:bg-gray-950"
     >
-      <UContainer>
+      <UContainer class="transition-all duration-1000" :class="sectionStates.bestSelling">
         <ProductCarousel
             title="Best Selling"
             :items="products"
@@ -51,10 +48,9 @@
     <!-- New Arrivals Section -->
     <section
         ref="newArrivalsSection"
-        class="py-6 sm:py-10 md:py-14 lg:py-16 bg-success-500 dark:bg-success-600 transition-all duration-1000"
-        :class="sectionStates.newArrivals"
+        class="py-6 sm:py-10 md:py-14 lg:py-16 bg-[#33b68f] dark:bg-success-600"
     >
-      <UContainer>
+      <UContainer class="transition-all duration-1000" :class="sectionStates.newArrivals">
         <ProductCarousel
             title="New Arrivals"
             :items="products"
@@ -66,10 +62,9 @@
     <!-- Banners Section -->
     <section
         ref="bannersSection"
-        class="py-6 sm:py-10 md:py-14 lg:py-16 bg-white dark:bg-gray-950 transition-all duration-1000"
-        :class="sectionStates.banners"
+        class="py-6 sm:py-10 md:py-14 lg:py-16 bg-white dark:bg-gray-950"
     >
-      <UContainer>
+      <UContainer class="transition-all duration-1000" :class="sectionStates.banners">
         <BannersGrid />
       </UContainer>
     </section>
@@ -77,10 +72,9 @@
     <!-- Trending Section -->
     <section
         ref="trendingSection"
-        class="py-6 sm:py-10 md:py-14 lg:py-16 bg-gray-50 dark:bg-gray-900 transition-all duration-1000"
-        :class="sectionStates.trending"
+        class="py-6 sm:py-10 md:py-14 lg:py-16 bg-gray-50 dark:bg-gray-900"
     >
-      <UContainer>
+      <UContainer class="transition-all duration-1000" :class="sectionStates.trending">
         <ProductCarousel
             title="Trending"
             :items="products"

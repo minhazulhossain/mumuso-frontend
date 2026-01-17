@@ -50,7 +50,7 @@
                 @click="localCartOpen = false"
             >
               <NuxtImg
-                  :src="item.variation?.images?.thumb || item.product?.featured_image_url || 'https://placehold.co/60x60'"
+                  :src="getItemImage(item)"
                   :alt="item.variation?.name || item.product?.name || 'Product'"
                   class="w-20 h-20 object-cover"
                   width="80"
@@ -217,6 +217,7 @@
 </template>
 
 <script setup lang="ts">
+import { getItemImage } from '#shared/types/cart'
 
 const route = useRoute()
 
