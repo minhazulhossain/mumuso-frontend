@@ -28,10 +28,7 @@
                 <img
                     :src="banner.image.desktop"
                     :alt="banner.title"
-                    :class="[
-                    'w-full h-full object-cover transition-opacity duration-300',
-                    banner.video && activeIndex === index ? 'opacity-0' : 'opacity-100'
-                  ]"
+                    class="w-full h-full object-cover"
                     loading="eager"
                     fetchpriority="high"
                     @load="handleImageLoad(banner.id)"
@@ -41,11 +38,12 @@
               <video
                   v-if="banner.video"
                   class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
-                  :class="activeIndex === index ? 'opacity-100' : 'opacity-0'"
+                  :class="activeIndex === index && isVideoReady(banner.id) ? 'opacity-100' : 'opacity-0'"
                   muted
                   loop
                   playsinline
                   preload="none"
+                  @canplay="handleVideoReady(banner.id)"
               >
                 <source :src="banner.video" type="video/mp4" />
               </video>
@@ -98,6 +96,7 @@ const emit = defineEmits<{
 const autoplayProgress = ref(0)
 const activeIndex = ref(0)
 const swiperInstance = ref<any>(null)
+const readyVideos = ref<Record<string | number, boolean>>({})
 
 // Track loaded images to prevent layout shift
 const loadedImages = ref<Record<string | number, boolean>>({})
@@ -108,6 +107,14 @@ const handleImageLoad = (bannerId: string | number) => {
 
 const handleImageError = (bannerId: string | number) => {
   loadedImages.value[bannerId] = true
+}
+
+const handleVideoReady = (bannerId: string | number) => {
+  readyVideos.value[bannerId] = true
+}
+
+const isVideoReady = (bannerId: string | number) => {
+  return !!readyVideos.value[bannerId]
 }
 
 const onAutoplayTimeLeft = (_swiper: unknown, _time: number, progress: number) => {

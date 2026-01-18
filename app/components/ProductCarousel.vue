@@ -3,9 +3,34 @@
     <!-- Title Bar -->
     <div v-if="hasTitleBar" class="flex justify-between items-center mb-2 md:mb-4">
       <h2 class="text-2xl font-medium" :class="titleClass">{{ title }}</h2>
-      <NuxtLink :to="viewAllUrl" class="text-sm font-medium hover:underline" :class="linkClass">
-        View All
-      </NuxtLink>
+      <div class="flex items-center gap-2">
+        <button
+          v-if="showNavigation"
+          type="button"
+          aria-label="Previous slide"
+          :class="`carousel-nav-btn ${navId}-prev`"
+          class="flex items-center justify-center w-8 h-8 border border-gray-200 text-gray-900 hover:text-primary-500 transition-colors"
+        >
+          <UIcon name="i-heroicons-chevron-left" class="w-4 h-4" />
+        </button>
+        <button
+          v-if="showNavigation"
+          type="button"
+          aria-label="Next slide"
+          :class="`carousel-nav-btn ${navId}-next`"
+          class="flex items-center justify-center w-8 h-8 border border-gray-200 text-gray-900 hover:text-primary-500 transition-colors"
+        >
+          <UIcon name="i-heroicons-chevron-right" class="w-4 h-4" />
+        </button>
+        <NuxtLink
+          v-if="showViewMore"
+          :to="viewAllUrl"
+          class="text-sm font-medium hover:underline"
+          :class="linkClass"
+        >
+          View All
+        </NuxtLink>
+      </div>
     </div>
 
     <div v-if="error" class="flex flex-col items-center justify-center py-16 px-4">
@@ -24,12 +49,12 @@
 
     <ClientOnly v-else>
       <Swiper
-          :modules="[Pagination]"
+          :modules="[Navigation]"
           :slides-per-view="2.5"
           :slides-per-group="2"
           :space-between="12"
           :loop="!loading && items.length > 5"
-          :pagination="loading ? false : { clickable: true }"
+          :navigation="navigationOptions"
           :breakpoints="{
             640: { slidesPerView: 3, slidesPerGroup: 3, spaceBetween: 15 },
             1024: { slidesPerView: 5, slidesPerGroup: 5, spaceBetween: 15 }
@@ -79,7 +104,7 @@
 
 <script setup lang="ts">
 import { Swiper, SwiperSlide } from 'swiper/vue'
-import { Pagination } from 'swiper/modules'
+import { Navigation } from 'swiper/modules'
 
 interface Product {
   id: number,
@@ -110,6 +135,15 @@ const props = withDefaults(defineProps<Props>(), {
   loading: false,
   titleClass: '',
   linkClass: 'text-primary hover:text-primary'
+})
+
+const showNavigation = computed(() => !props.loading && (props.items?.length || 0) > 1)
+const showViewMore = computed(() => Boolean(props.viewAllUrl))
+const navId = useId()
+const navigationOptions = computed(() => {
+  return showNavigation.value
+    ? { prevEl: `.${navId}-prev`, nextEl: `.${navId}-next` }
+    : false
 })
 
 const emit = defineEmits<{

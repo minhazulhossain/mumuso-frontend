@@ -36,6 +36,7 @@
 @layer components {
 
 }
+.categories-carousel .swiper,
 .promotion-carousel.swiper,
 .product-carousel.swiper.swiper {
     position: static;
@@ -51,6 +52,19 @@
     opacity: 0;
     transform: translateY(4px);
 }
+
+.carousel-nav-btn {
+    width: 36px;
+    height: 36px;
+}
+
+@media (max-width: 640px) {
+    .carousel-nav-btn {
+        width: 28px;
+        height: 28px;
+    }
+}
+
 
 .product-card-border {
     position: relative;
@@ -111,6 +125,8 @@
 .hero-slider .swiper-pagination-bullet-active::after {
     transform: scaleX(var(--hero-slide-progress, 0));
 }
+
+.categories-carousel .swiper-pagination,
 .promotion-carousel .swiper-pagination,
 .product-carousel .swiper-pagination {
     display: flex;

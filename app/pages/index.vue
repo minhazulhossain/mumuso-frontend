@@ -14,7 +14,7 @@
     <!-- Categories Section -->
     <section
         ref="categoriesSection"
-        class="py-4 sm:py-8 md:py-12 lg:py-16 bg-white dark:bg-gray-950"
+        class="py-6 sm:py-8 md:py-12 lg:py-16 bg-white dark:bg-gray-950"
     >
       <UContainer class="transition-all duration-1000" :class="sectionStates.categories">
         <CategoriesGrid />

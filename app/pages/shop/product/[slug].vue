@@ -234,6 +234,7 @@
                 v-else
                 size="xl"
                 class="w-full sm:flex-1"
+                color="error"
                 disabled
             >
               Out of Stock
@@ -378,14 +379,14 @@ const currentStockStatus = computed(() => {
 
 const currentInStock = computed(() => {
   if (selectedVariation.value) {
-    return selectedVariation.value.stock_status === 'in_stock'
+    return selectedVariation.value.stock_status === 'in_stock' && selectedVariation.value.stock_quantity > 0
   }
 
   if (product.value?.stock_status) {
-    return product.value.stock_status === 'in_stock'
+    return product.value.stock_status === 'in_stock' && (product.value.stock_quantity || 0) > 0
   }
 
-  return Boolean(product.value?.in_stock)
+  return Boolean(product.value?.in_stock) && (product.value?.stock_quantity || 0) > 0
 })
 
 const currentSku = computed(() => {
@@ -466,6 +467,16 @@ const handleAddToCart = async () => {
         description: 'Choose a product variation before adding to cart',
         color: 'warning',
         icon: 'i-heroicons-exclamation-triangle'
+      })
+      return
+    }
+
+    if (currentStockQuantity.value <= 0) {
+      toast.add({
+        title: 'Out of stock',
+        description: 'This variation is currently out of stock',
+        color: 'error',
+        icon: 'i-heroicons-x-circle'
       })
       return
     }

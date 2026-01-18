@@ -10,7 +10,7 @@
             :key="variation.id"
             @click="selectVariation(variation)"
             :disabled="!variation.is_active || variation.stock_status !== 'in_stock'"
-            class="relative flex items-center justify-between p-4 border-2 rounded-lg transition-all text-left"
+            class="relative flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-4 border-2 rounded-lg transition-all text-left"
             :class="[
               selectedVariationId === variation.id
                 ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
@@ -20,9 +20,9 @@
                 : 'cursor-pointer'
             ]"
         >
-          <div class="flex items-center gap-4 flex-1">
+          <div class="flex items-start sm:items-center gap-3 sm:gap-4 flex-1 w-full">
             <!-- Variation Image -->
-            <div v-if="variation.images?.thumb" class="w-16 h-16 rounded-md overflow-hidden flex-shrink-0">
+            <div v-if="variation.images?.thumb" class="w-14 h-14 sm:w-16 sm:h-16 rounded-md overflow-hidden flex-shrink-0">
               <img
                   :src="variation.images.thumb"
                   :alt="variation.name"
@@ -64,7 +64,7 @@
             </div>
 
             <!-- Stock Status -->
-            <div class="flex flex-col items-end gap-1">
+            <div class="flex flex-row sm:flex-col items-center sm:items-end gap-2 sm:gap-1">
               <UBadge
                   :color="variation.stock_status === 'in_stock' ? 'success' : 'error'"
                   variant="soft"

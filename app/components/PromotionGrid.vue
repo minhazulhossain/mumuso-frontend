@@ -3,19 +3,35 @@
     <!-- Loading state for entire carousel -->
     <!-- Carousel with data -->
     <ClientOnly>
-      <Swiper
-          v-if="promoItems.length > 0"
-          :modules="[Pagination]"
-          :slides-per-view="1.4"
-          :space-between="12"
-          :loop="promoItems.length > 4"
-          :pagination="{ clickable: true }"
-          :breakpoints="{
-            640: { slidesPerView: 2, spaceBetween: 10 },
-            768: { slidesPerView: 3, spaceBetween: 10 },
-          }"
-          class="promotion-carousel px-2 sm:px-4 lg:px-6"
-      >
+      <div v-if="promoItems.length > 0" class="relative">
+        <button
+          type="button"
+          aria-label="Previous promotion"
+          :class="`carousel-nav-btn ${navId}-prev`"
+          class="absolute left-2 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-9 h-9 bg-white/90 border border-gray-200 text-gray-900 hover:text-primary-500 transition-colors"
+        >
+          <UIcon name="i-heroicons-chevron-left" class="w-4 h-4" />
+        </button>
+        <button
+          type="button"
+          aria-label="Next promotion"
+          :class="`carousel-nav-btn ${navId}-next`"
+          class="absolute right-2 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-9 h-9 bg-white/90 border border-gray-200 text-gray-900 hover:text-primary-500 transition-colors"
+        >
+          <UIcon name="i-heroicons-chevron-right" class="w-4 h-4" />
+        </button>
+        <Swiper
+            :modules="[Navigation]"
+            :slides-per-view="1.4"
+            :space-between="12"
+            :loop="promoItems.length > 4"
+            :navigation="navigationOptions"
+            :breakpoints="{
+              640: { slidesPerView: 2, spaceBetween: 10 },
+              768: { slidesPerView: 3, spaceBetween: 10 },
+            }"
+            class="promotion-carousel px-2 sm:px-4 lg:px-6"
+        >
         <SwiperSlide v-for="item in promoItems" :key="item.id">
           <NuxtLink to="/categories/kids" class="group">
             <UCard :ui="{ root: 'rounded-none mb-2', header: 'p-0 sm:px-0', body:'p-2 sm:p-3' }">
@@ -55,6 +71,7 @@
           </NuxtLink>
         </SwiperSlide>
       </Swiper>
+      </div>
       <template #fallback>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 px-2 sm:px-4 lg:px-6">
           <div v-for="i in 4" :key="i" class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
@@ -74,7 +91,7 @@
 
 <script setup lang="ts">
 import { Swiper, SwiperSlide } from 'swiper/vue'
-import { Pagination } from 'swiper/modules'
+import { Navigation } from 'swiper/modules'
 
 interface Product {
   id: number
@@ -141,6 +158,13 @@ const promoItems = computed(() => {
     video: item.video || '',
     description: item.description || ''
   }))
+})
+
+const navId = useId()
+const navigationOptions = computed(() => {
+  return promoItems.value.length > 1
+    ? { prevEl: `.${navId}-prev`, nextEl: `.${navId}-next` }
+    : false
 })
 
 const handlePromoHover = (event: MouseEvent, shouldPlay: boolean) => {
