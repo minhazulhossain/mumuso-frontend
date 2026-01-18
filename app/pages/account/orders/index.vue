@@ -127,7 +127,7 @@
                 <div>
                   <p class="text-xs text-gray-500 dark:text-gray-400">Amount</p>
                   <p class="text-sm font-semibold text-primary-600 dark:text-primary-400">
-                    ${{ order.total_amount.toFixed(2) }}
+                    {{ formatCurrency(order.total_amount) }}
                   </p>
                 </div>
                 <div>
@@ -244,6 +244,7 @@
 </template>
 
 <script setup lang="ts">
+import { useCurrency } from '#imports'
 definePageMeta({
   middleware: ['auth']
 })
@@ -252,6 +253,7 @@ const toast = useToast()
 const { user } = useUserSession()
 const { initiatePayment } = usePayment()
 const { fetchOrders, loading: ordersLoading } = useOrders()
+const { formatCurrency } = useCurrency()
 
 const orders = ref([])
 const loading = ref(false)

@@ -64,7 +64,7 @@
               {{ couponDisplayText }}
             </p>
             <p class="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
-              You're saving {{ formatPrice(discount) }}
+              You're saving {{ formatCurrency(discount) }}
             </p>
           </div>
         </div>
@@ -82,6 +82,7 @@
 </template>
 
 <script setup lang="ts">
+import { useCurrency } from '#imports'
 const props = withDefaults(defineProps<{
   amount?: number
 }>(), {
@@ -89,6 +90,7 @@ const props = withDefaults(defineProps<{
 })
 
 const { validateCoupon, removeCoupon, clearError: clearCouponError, isCouponApplied, couponDisplayText, couponState } = useCoupon()
+const { formatCurrency } = useCurrency()
 
 const inputCode = ref('')
 const emit = defineEmits<{

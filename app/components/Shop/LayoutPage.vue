@@ -110,7 +110,7 @@
                   @click="removeFilter('min_price')"
                   class="cursor-pointer"
               >
-                Min: ${{ activeFilters.min_price }}
+                Min: {{ formatCurrency(Number(activeFilters.min_price)) }}
                 <UIcon name="i-heroicons-x-mark" class="ml-1 w-3 h-3"/>
               </UBadge>
 
@@ -121,7 +121,7 @@
                   @click="removeFilter('max_price')"
                   class="cursor-pointer"
               >
-                Max: ${{ activeFilters.max_price }}
+                Max: {{ formatCurrency(Number(activeFilters.max_price)) }}
                 <UIcon name="i-heroicons-x-mark" class="ml-1 w-3 h-3"/>
               </UBadge>
 
@@ -285,6 +285,7 @@
 </template>
 
 <script setup lang="ts">
+import { useCurrency } from '#imports'
 const props = defineProps<{
   title?: string
   subTitle?: string
@@ -302,6 +303,7 @@ const {addToCart} = cart
 const toast = useToast()
 const route = useRoute()
 const router = useRouter()
+const { formatCurrency } = useCurrency()
 
 // State
 const searchQuery = ref('')

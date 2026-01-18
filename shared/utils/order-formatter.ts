@@ -73,6 +73,7 @@ export const formatOrderData = (data: OrderFormData): OrderFormData => {
       paymentMethod: data.paymentMethod,
       orderNotes: data.orderNotes,
       shippingCost: data.shippingCost,
+      ...(data.currency && { currency: data.currency }),
       ...(data.discount_amount !== undefined && { discount_amount: data.discount_amount }),
       ...(data.coupon_code && { coupon_code: data.coupon_code }),
       items: data.items

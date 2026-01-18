@@ -71,19 +71,19 @@
                     <div class="space-y-1">
                       <!-- Item Total -->
                       <p class="font-bold text-lg text-gray-900 dark:text-white">
-                        ${{ getItemTotal(item).toFixed(2) }}
+                        {{ formatCurrency(getItemTotal(item)) }}
                       </p>
                       <!-- Original Total (if discount) -->
                       <p v-if="hasDiscount(item)" class="text-sm text-gray-400 line-through">
-                        ${{ getItemOriginalTotal(item).toFixed(2) }}
+                        {{ formatCurrency(getItemOriginalTotal(item)) }}
                       </p>
                       <!-- Price per unit -->
                       <div class="flex items-center gap-2 justify-end">
                         <p class="text-sm font-medium text-gray-900 dark:text-white">
-                          ${{ getItemPrice(item).toFixed(2) }} each
+                          {{ formatCurrency(getItemPrice(item)) }} each
                         </p>
                         <p v-if="hasDiscount(item)" class="text-xs text-gray-400 line-through">
-                          ${{ getItemOriginalPrice(item).toFixed(2) }}
+                          {{ formatCurrency(getItemOriginalPrice(item)) }}
                         </p>
                       </div>
                       <!-- Discount Badge -->
@@ -187,7 +187,7 @@
                       <p class="text-xs text-gray-600 dark:text-gray-400">{{ discount.summary }}</p>
                     </div>
                     <UBadge color="success" variant="solid" size="xs">
-                      -${{ discount.discount_amount.toFixed(2) }}
+                      -{{ formatCurrency(discount.discount_amount) }}
                     </UBadge>
                   </div>
                   <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -202,13 +202,13 @@
               <!-- Original Subtotal (if discount) -->
               <div v-if="cartDiscount > 0" class="flex justify-between text-gray-500 dark:text-gray-400">
                 <span>Original Subtotal</span>
-                <span class="font-medium line-through">${{ cartOriginalTotal.toFixed(2) }}</span>
+                <span class="font-medium line-through">{{ formatCurrency(cartOriginalTotal) }}</span>
               </div>
 
               <!-- Subtotal (after discounts) -->
               <div class="flex justify-between text-gray-600 dark:text-gray-400">
                 <span>Subtotal</span>
-                <span class="font-medium">${{ subtotal.toFixed(2) }}</span>
+                <span class="font-medium">{{ formatCurrency(subtotal) }}</span>
               </div>
 
               <!-- Backend Discount -->
@@ -217,7 +217,7 @@
                   <UIcon name="i-heroicons-tag" class="text-sm" />
                   Discount Savings
                 </span>
-                <span class="font-medium">-${{ cartSavings.toFixed(2) }}</span>
+                <span class="font-medium">-{{ formatCurrency(cartSavings) }}</span>
               </div>
 
               <!-- Coupon Discount -->
@@ -226,21 +226,21 @@
                   <UIcon name="i-heroicons-tag" class="text-sm" />
                   Coupon ({{ appliedCoupon.code }})
                 </span>
-                <span class="font-medium">-${{ appliedCoupon.discount.toFixed(2) }}</span>
+                <span class="font-medium">-{{ formatCurrency(appliedCoupon.discount) }}</span>
               </div>
 
               <!-- Shipping -->
               <div class="flex justify-between text-gray-600 dark:text-gray-400">
                 <span>Shipping</span>
                 <span class="font-medium">
-                  {{ shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}` }}
+                  {{ shipping === 0 ? 'FREE' : formatCurrency(shipping) }}
                 </span>
               </div>
 
               <!-- Tax -->
               <div class="flex justify-between text-gray-600 dark:text-gray-400">
                 <span>Tax ({{ taxRate }}%)</span>
-                <span class="font-medium">${{ tax.toFixed(2) }}</span>
+                <span class="font-medium">{{ formatCurrency(tax) }}</span>
               </div>
             </div>
 
@@ -250,7 +250,7 @@
                 <div class="flex items-start gap-2 mb-2">
                   <UIcon name="i-heroicons-truck" class="text-blue-500 mt-0.5"/>
                   <p class="text-sm text-blue-700 dark:text-blue-300">
-                    Add ${{ (freeShippingThreshold - subtotal).toFixed(2) }} more for FREE shipping!
+                    Add {{ formatCurrency(freeShippingThreshold - subtotal) }} more for FREE shipping!
                   </p>
                 </div>
                 <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
@@ -266,7 +266,7 @@
             <div class="pt-4 border-t-2 border-gray-200 dark:border-gray-700 mb-6">
               <div class="flex justify-between items-baseline">
                 <span class="text-lg font-semibold text-gray-900 dark:text-white">Total</span>
-                <span class="text-2xl font-bold text-primary-500">${{ total.toFixed(2) }}</span>
+                <span class="text-2xl font-bold text-primary-500">{{ formatCurrency(total) }}</span>
               </div>
             </div>
 
@@ -300,13 +300,14 @@
 </template>
 
 <script setup lang="ts">
-
 import { getItemImage, getItemName, getItemSlug } from '#shared/types/cart'
+import { useCurrency } from '#imports'
 
 const toast = useToast()
 const router = useRouter()
 
 const cart = inject('cart')
+const { formatCurrency } = useCurrency()
 
 const {
   cartItems,

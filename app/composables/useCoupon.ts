@@ -1,8 +1,10 @@
 import type { Coupon, CouponValidationResult, CouponsListResponse, CartCouponState } from '#shared/types/coupon'
+import { useCurrency } from '#imports'
 
 export const useCoupon = () => {
     const toast = useToast()
     const config = useRuntimeConfig()
+    const { formatCurrency } = useCurrency()
 
     // State
     const couponState = useState<CartCouponState>('cartCoupon', () => ({
@@ -64,7 +66,7 @@ export const useCoupon = () => {
 
                 toast.add({
                     title: 'Coupon Applied',
-                    description: `You saved ${formatPrice(discount)}`,
+                    description: `You saved ${formatCurrency(discount)}`,
                     color: 'success',
                     icon: 'i-heroicons-check-circle'
                 })
@@ -172,7 +174,7 @@ export const useCoupon = () => {
 
         const discountText = coupon.discount_type === 'percentage'
             ? `${coupon.discount_value}% off`
-            : `${formatPrice(coupon.discount_value)} off`
+            : `${formatCurrency(coupon.discount_value)} off`
 
         return `${couponState.value.code} - ${discountText}`
     })

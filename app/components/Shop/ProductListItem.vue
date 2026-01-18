@@ -84,10 +84,10 @@
               <!-- Price -->
               <div class="flex items-baseline gap-2 mb-2">
                 <span class="text-2xl font-bold text-primary-600 dark:text-primary-400">
-                  ${{ parseFloat(product.price).toFixed(2) }}
+                  {{ formatCurrency(parseFloat(product.price)) }}
                 </span>
                 <span v-if="product.compare_price" class="text-sm text-gray-400 line-through">
-                  ${{ parseFloat(product.compare_price).toFixed(2) }}
+                  {{ formatCurrency(parseFloat(product.compare_price)) }}
                 </span>
               </div>
 
@@ -127,6 +127,7 @@
 </template>
 
 <script setup lang="ts">
+import { useCurrency } from '#imports'
 defineProps<{
   product: any
 }>()
@@ -135,6 +136,8 @@ defineEmits<{
   'add-to-cart': [productId: number, quantity: number]
   'add-to-wishlist': [productId: number]
 }>()
+
+const { formatCurrency } = useCurrency()
 
 const handleImageError = (event: Event) => {
   const target = event.target as HTMLImageElement

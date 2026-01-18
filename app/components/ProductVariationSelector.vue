@@ -52,13 +52,13 @@
 
               <div class="flex items-center gap-2">
                 <span class="text-lg font-bold text-primary-500">
-                  ${{ parseFloat(variation.price).toFixed(2) }}
+                  {{ formatCurrency(parseFloat(variation.price)) }}
                 </span>
                 <span
                     v-if="variation.compare_price"
                     class="text-sm text-gray-400 line-through"
                 >
-                  ${{ parseFloat(variation.compare_price).toFixed(2) }}
+                  {{ formatCurrency(parseFloat(variation.compare_price)) }}
                 </span>
               </div>
             </div>
@@ -122,7 +122,7 @@
           SKU: {{ selectedVariation.sku }}
         </p>
         <p class="text-gray-600 dark:text-gray-400">
-          Price: <span class="font-semibold text-primary-500">${{ parseFloat(selectedVariation.price).toFixed(2) }}</span>
+          Price: <span class="font-semibold text-primary-500">{{ formatCurrency(parseFloat(selectedVariation.price)) }}</span>
         </p>
       </div>
     </div>
@@ -131,6 +131,7 @@
 
 <script setup lang="ts">
 import type { ProductVariation } from '#shared/types/product'
+import { useCurrency } from '#imports'
 
 interface Props {
   variations: ProductVariation[]
@@ -144,6 +145,7 @@ interface Emits {
 
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
+const { formatCurrency } = useCurrency()
 
 // Computed properties
 const selectedVariationId = computed(() => props.modelValue)

@@ -197,7 +197,7 @@
                   </div>
                   <div class="text-right ml-4">
                     <p class="font-bold text-gray-900 dark:text-white">
-                      {{ method.is_free ? 'FREE' : `$${(method.cost || 0).toFixed(2)}` }}
+                      {{ method.is_free ? 'FREE' : formatCurrency(method.cost || 0) }}
                     </p>
                   </div>
                 </div>
@@ -221,6 +221,7 @@
 
 <script setup lang="ts">
 import type { Address } from '#shared/types/address'
+import { useCurrency } from '#imports'
 
 interface ShippingAddress {
   firstName: string
@@ -262,6 +263,7 @@ const emit = defineEmits<{
   'previous': []
   'address-selected': [address: Address]
 }>()
+const { formatCurrency } = useCurrency()
 
 // Saved addresses
 const savedAddresses = computed(() => props.savedAddresses || [])

@@ -104,6 +104,7 @@
 </template>
 
 <script setup lang="ts">
+import { useCurrency } from '#imports'
 
 const toast = useToast()
 const router = useRouter()
@@ -115,6 +116,7 @@ const { cartItems } = cart
 const { initiatePayment } = usePayment()
 const { createOrder } = useOrders()
 const { shippingMethods, fetchMethodsByLocation, loading: shippingLoading } = useShipping()
+const { currency } = useCurrency()
 
 // Fetch saved addresses on mount
 onMounted(async () => {
@@ -413,6 +415,7 @@ const handlePlaceOrder = async () => {
         email: shippingAddress.value.email || '',
         phone: shippingAddress.value.phone || ''
       },
+      currency: currency.value,
       paymentMethod: selectedPaymentMethod.value,
       orderNotes: orderNotes.value || '',
       shippingCost: shippingCost.value || 0,

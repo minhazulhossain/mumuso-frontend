@@ -99,8 +99,8 @@
 
         <!-- Price Display -->
         <div class="flex justify-between text-xs text-gray-500 mb-2">
-          <span>${{ displayMinPrice }}</span>
-          <span>${{ displayMaxPrice }}</span>
+          <span>{{ formatCurrency(displayMinPrice) }}</span>
+          <span>{{ formatCurrency(displayMaxPrice) }}</span>
         </div>
 
         <!-- Manual Price Inputs -->
@@ -234,7 +234,7 @@
             • {{ localFilters.in_stock ? 'In Stock' : 'Out of Stock' }}
           </div>
           <div v-if="localFilters.min_price || localFilters.max_price">
-            • Price: ${{ localFilters.min_price || 0 }} - ${{ localFilters.max_price || maxPriceLimit }}
+            • Price: {{ formatCurrency(localFilters.min_price || 0) }} - {{ formatCurrency(localFilters.max_price || maxPriceLimit) }}
           </div>
           <div v-if="localFilters.on_sale">
             • On Sale Only
@@ -246,6 +246,7 @@
 </template>
 
 <script setup lang="ts">
+import { useCurrency } from '#imports'
 interface Category {
   id: number
   name: string
@@ -273,6 +274,7 @@ const emit = defineEmits<{
   'update:filters': [filters: Filters]
   'close-mobile': []
 }>()
+const { formatCurrency } = useCurrency()
 
 const { getAllCategories, products } = useProducts()
 
@@ -301,12 +303,12 @@ const inStockCount = computed(() => {
 })
 
 // Quick price ranges
-const quickPriceRanges = [
-  { label: 'Under $50', min: 0, max: 50 },
-  { label: '$50-$100', min: 50, max: 100 },
-  { label: '$100-$500', min: 100, max: 500 },
-  { label: '$500+', min: 500, max: null },
-]
+const quickPriceRanges = computed(() => ([
+  { label: `Under ${formatCurrency(50)}`, min: 0, max: 50 },
+  { label: `${formatCurrency(50)}-${formatCurrency(100)}`, min: 50, max: 100 },
+  { label: `${formatCurrency(100)}-${formatCurrency(500)}`, min: 100, max: 500 },
+  { label: `${formatCurrency(500)}+`, min: 500, max: null },
+]))
 
 // Category options
 const categoryOptions = computed(() => {
@@ -371,7 +373,7 @@ const getCategoryLabel = (slug: string | undefined) => {
   return category?.label || slug
 }
 
-const isActivePriceRange = (range: typeof quickPriceRanges[0]) => {
+const isActivePriceRange = (range: (typeof quickPriceRanges.value)[number]) => {
   const min = Number(localFilters.value.min_price) || 0
   const max = Number(localFilters.value.max_price) || maxPriceLimit
 
@@ -382,7 +384,7 @@ const isActivePriceRange = (range: typeof quickPriceRanges[0]) => {
   return min === range.min && max === range.max
 }
 
-const setQuickPrice = (range: typeof quickPriceRanges[0]) => {
+const setQuickPrice = (range: (typeof quickPriceRanges.value)[number]) => {
   localFilters.value.min_price = range.min
   localFilters.value.max_price = range.max || maxPriceLimit
   tempMinPrice.value = range.min

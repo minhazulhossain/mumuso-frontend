@@ -52,10 +52,10 @@
       <div class="space-y-1 mt-auto">
         <div class="flex items-baseline gap-2">
           <p class="text-lg font-medium text-primary-600 dark:text-primary-400">
-            ${{ parseFloat(product.price).toFixed(2) }}
+            {{ formatCurrency(parseFloat(product.price)) }}
           </p>
           <p v-if="product.compare_price" class="text-sm text-gray-400 line-through">
-            ${{ parseFloat(product.compare_price).toFixed(2) }}
+            {{ formatCurrency(parseFloat(product.compare_price)) }}
           </p>
         </div>
       </div>
@@ -65,6 +65,7 @@
 
 <script setup lang="ts">
 import type { Product } from '#shared/types'
+import { useCurrency } from '#imports'
 
 interface Props {
   product: Product
@@ -79,4 +80,5 @@ defineEmits<{
 
 const imageLoaded = ref(false)
 const secondaryImage = computed(() => product.value.images?.all?.[1]?.url ?? null)
+const { formatCurrency } = useCurrency()
 </script>

@@ -231,6 +231,7 @@
 </template>
 
 <script setup lang="ts">
+import { useCurrency } from '#imports'
 
 
 const colorMode = useColorMode()
@@ -337,13 +338,12 @@ const handleProductSelect = (productSlug) => {
   }
 }
 
+const { formatCurrency } = useCurrency()
+
 const formatPrice = (price) => {
   if (!price) return ''
   const numPrice = typeof price === 'string' ? parseFloat(price) : price
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD'
-  }).format(numPrice)
+  return formatCurrency(numPrice)
 }
 
 const normalizeCategoryLinks = (items) => {

@@ -44,7 +44,7 @@
           </div>
           <div>
             <p class="text-xs text-gray-500 dark:text-gray-400 mb-0.5">Total Amount</p>
-            <p class="text-sm font-bold text-primary-500">${{ total.toFixed(2) }}</p>
+            <p class="text-sm font-bold text-primary-500">{{ formatCurrency(total) }}</p>
           </div>
         </div>
 
@@ -102,12 +102,12 @@
             <div class="flex-1 min-w-0">
               <p class="text-sm font-semibold text-gray-900 dark:text-white truncate">{{ item.name }}</p>
               <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                Qty: {{ item.quantity }} × ${{ item.price.toFixed(2) }}
+                Qty: {{ item.quantity }} × {{ formatCurrency(item.price) }}
               </p>
             </div>
             <div class="text-right flex-shrink-0">
               <p class="text-sm font-bold text-gray-900 dark:text-white">
-                ${{ (item.price * item.quantity).toFixed(2) }}
+                {{ formatCurrency(item.price * item.quantity) }}
               </p>
             </div>
           </div>
@@ -117,19 +117,19 @@
         <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700 space-y-1 text-sm">
           <div class="flex justify-between text-gray-600 dark:text-gray-400">
             <span>Subtotal</span>
-            <span>${{ subtotal.toFixed(2) }}</span>
+            <span>{{ formatCurrency(subtotal) }}</span>
           </div>
           <div class="flex justify-between text-gray-600 dark:text-gray-400">
             <span>Shipping</span>
-            <span>{{ shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}` }}</span>
+            <span>{{ shipping === 0 ? 'FREE' : formatCurrency(shipping) }}</span>
           </div>
           <div class="flex justify-between text-gray-600 dark:text-gray-400">
             <span>Tax</span>
-            <span>${{ tax.toFixed(2) }}</span>
+            <span>{{ formatCurrency(tax) }}</span>
           </div>
           <div class="flex justify-between font-bold text-gray-900 dark:text-white pt-2 border-t border-gray-200 dark:border-gray-700">
             <span>Total</span>
-            <span class="text-primary-500">${{ total.toFixed(2) }}</span>
+            <span class="text-primary-500">{{ formatCurrency(total) }}</span>
           </div>
         </div>
       </div>
@@ -266,11 +266,13 @@
 </template>
 
 <script setup lang="ts">
+import { useCurrency } from '#imports'
 const route = useRoute()
 const router = useRouter()
 const toast = useToast()
 const { fetchOrder, loading: composableLoading, error: composableError } = useOrders()
 const { initiatePayment } = usePayment()
+const { formatCurrency } = useCurrency()
 
 // Order data state
 const orderData = ref(null)

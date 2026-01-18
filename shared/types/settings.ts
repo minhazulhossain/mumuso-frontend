@@ -74,6 +74,17 @@ export interface FooterSettings {
     show_social: boolean
 }
 
+export interface CurrencyOption {
+    code: string
+    name?: string | null
+    symbol?: string | null
+}
+
+export interface CurrencySettings {
+    default: string
+    options: CurrencyOption[]
+}
+
 /**
  * Complete settings object structure
  */
@@ -84,4 +95,5 @@ export interface Settings {
     company: CompanySettings
     social_media: SocialMediaLink[]
     footer: FooterSettings
+    currency: CurrencySettings
 }

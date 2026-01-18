@@ -27,12 +27,12 @@
             {{ item.variation?.name ?? item.product?.name ?? 'Product' }}
           </p>
           <p class="text-sm text-gray-500 dark:text-gray-400">
-            ${{ (parseFloat(item.variation?.price ?? item.product?.price ?? 0)).toFixed(2) }} × {{ item.quantity }}
+            {{ formatCurrency(parseFloat(item.variation?.price ?? item.product?.price ?? 0)) }} × {{ item.quantity }}
           </p>
         </div>
         <div class="text-right">
           <p class="font-semibold text-gray-900 dark:text-white">
-            ${{ (parseFloat(item.variation?.price ?? item.product?.price ?? 0) * item.quantity).toFixed(2) }}
+            {{ formatCurrency(parseFloat(item.variation?.price ?? item.product?.price ?? 0) * item.quantity) }}
           </p>
         </div>
       </div>
@@ -50,25 +50,25 @@
     <div class="space-y-3 pb-4 border-b border-gray-200 dark:border-gray-700">
       <div class="flex justify-between text-gray-600 dark:text-gray-400">
         <span>Subtotal</span>
-        <span class="font-medium">${{ subtotal.toFixed(2) }}</span>
+        <span class="font-medium">{{ formatCurrency(subtotal) }}</span>
       </div>
 
       <!-- Coupon Discount -->
       <div v-if="appliedCoupon.discount > 0" class="flex justify-between text-green-600 dark:text-green-400">
         <span>Discount ({{ appliedCoupon.code }})</span>
-        <span class="font-medium">-${{ appliedCoupon.discount.toFixed(2) }}</span>
+        <span class="font-medium">-{{ formatCurrency(appliedCoupon.discount) }}</span>
       </div>
 
       <div class="flex justify-between text-gray-600 dark:text-gray-400">
         <span>Shipping</span>
         <span class="font-medium">
-          {{ (props.shippingCost || 0) === 0 ? 'FREE' : `$${(props.shippingCost || 0).toFixed(2)}` }}
+          {{ (props.shippingCost || 0) === 0 ? 'FREE' : formatCurrency(props.shippingCost || 0) }}
         </span>
       </div>
 
       <div class="flex justify-between text-gray-600 dark:text-gray-400">
         <span>Tax ({{ props.taxRate || 0 }}%)</span>
-        <span class="font-medium">${{ tax.toFixed(2) }}</span>
+        <span class="font-medium">{{ formatCurrency(tax) }}</span>
       </div>
     </div>
 
@@ -76,7 +76,7 @@
     <div class="pt-4 mb-6">
       <div class="flex justify-between items-baseline">
         <span class="text-lg font-semibold text-gray-900 dark:text-white">Total</span>
-        <span class="text-2xl font-bold text-primary-500">${{ finalTotal.toFixed(2) }}</span>
+        <span class="text-2xl font-bold text-primary-500">{{ formatCurrency(finalTotal) }}</span>
       </div>
     </div>
 
@@ -100,6 +100,7 @@
 </template>
 
 <script setup lang="ts">
+import { useCurrency } from '#imports'
 interface CartItem {
   slug?: string
   productId?: string
@@ -137,6 +138,7 @@ const props = withDefaults(defineProps<{
   shippingCost: 0,
   taxRate: 0
 })
+const { formatCurrency } = useCurrency()
 
 const appliedCoupon = ref<AppliedCoupon>({
   code: '',

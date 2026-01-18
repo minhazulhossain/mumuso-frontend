@@ -106,10 +106,10 @@
           <div class="space-y-2">
             <div class="flex items-baseline gap-4">
               <span class="text-3xl sm:text-4xl font-bold text-primary-500">
-                ${{ parseFloat(currentPrice).toFixed(2) }}
+                {{ formatCurrency(parseFloat(currentPrice)) }}
               </span>
               <span v-if="currentComparePrice" class="text-xl sm:text-2xl text-gray-400 line-through">
-                ${{ parseFloat(currentComparePrice).toFixed(2) }}
+                {{ formatCurrency(parseFloat(currentComparePrice)) }}
               </span>
             </div>
             <!-- Discount Badge (inline with price) -->
@@ -119,7 +119,7 @@
                 Save {{ product.discount_percentage }}%
               </UBadge>
               <span class="text-sm text-green-600 dark:text-green-400 font-medium">
-                You save ${{ (parseFloat(currentComparePrice || '0') - parseFloat(currentPrice)).toFixed(2) }}
+                You save {{ formatCurrency(parseFloat(currentComparePrice || '0') - parseFloat(currentPrice)) }}
               </span>
             </div>
           </div>
@@ -221,13 +221,11 @@
                 :ui="{ base: 'rounded-none' }"
             >
               <span v-if="product.has_discount" class="flex items-center gap-2">
-                Add to Cart - ${{ (parseFloat(currentPrice) * quantity).toFixed(2) }}
-                <span class="text-xs line-through opacity-75">${{
-                    (parseFloat(currentComparePrice || currentPrice) * quantity).toFixed(2)
-                  }}</span>
+                Add to Cart - {{ formatCurrency(parseFloat(currentPrice) * quantity) }}
+                <span class="text-xs line-through opacity-75">{{ formatCurrency(parseFloat(currentComparePrice || currentPrice) * quantity) }}</span>
               </span>
               <span v-else>
-                Add to Cart - ${{ (parseFloat(currentPrice) * quantity).toFixed(2) }}
+                Add to Cart - {{ formatCurrency(parseFloat(currentPrice) * quantity) }}
               </span>
             </UButton>
             <UButton
@@ -258,7 +256,7 @@
           <div class="border-t border-gray-200 dark:border-gray-700 pt-6 space-y-3">
             <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
               <UIcon name="i-heroicons-truck"/>
-              <span>Free shipping on orders over $50</span>
+              <span>Free shipping on orders over {{ formatCurrency(50) }}</span>
             </div>
             <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
               <UIcon name="i-heroicons-arrow-path"/>
@@ -289,6 +287,7 @@
 </template>
 
 <script setup lang="ts">
+import { useCurrency } from '#imports'
 // import type {Product, ProductVariation} from '#shared/types/product';
 
 const route = useRoute()
@@ -297,6 +296,7 @@ const {fetchProduct, error: fetchError} = useProducts()
 const cart = inject('cart')
 const {addToCart, toggleCart} = cart
 const {isInWishlist, toggleWishlist, initWishlist} = useWishlist()
+const { formatCurrency } = useCurrency()
 
 // State
 const product = ref<Product | null>(null)

@@ -80,10 +80,10 @@
               <div v-if="item.variation?.price || item.product?.price" class="mb-2">
                 <div class="flex items-center gap-2">
                   <span class="text-sm font-semibold text-gray-900 dark:text-white">
-                    ${{ getItemPrice(item).toFixed(2) }}
+                    {{ formatCurrency(getItemPrice(item)) }}
                   </span>
                   <span v-if="hasDiscount(item)" class="text-xs text-gray-400 line-through">
-                    ${{ getItemOriginalPrice(item).toFixed(2) }}
+                    {{ formatCurrency(getItemOriginalPrice(item)) }}
                   </span>
                 </div>
                 <!-- Discount Badge -->
@@ -138,10 +138,10 @@
             <div class="text-right">
               <div v-if="item.variation?.price || item.product?.price">
                 <p class="font-semibold text-gray-900 dark:text-white">
-                  ${{ getItemTotal(item).toFixed(2) }}
+                  {{ formatCurrency(getItemTotal(item)) }}
                 </p>
                 <p v-if="hasDiscount(item)" class="text-xs text-gray-400 line-through">
-                  ${{ getItemOriginalTotal(item).toFixed(2) }}
+                  {{ formatCurrency(getItemOriginalTotal(item)) }}
                 </p>
               </div>
               <p v-else class="text-sm text-gray-400">
@@ -161,7 +161,7 @@
                   <p class="text-xs font-medium text-green-600 dark:text-green-400">{{ discount.name }}</p>
                   <p class="text-xs text-gray-500 dark:text-gray-400">{{ discount.summary }} • {{ discount.items_affected }} {{ discount.items_affected === 1 ? 'item' : 'items' }}</p>
                 </div>
-                <span class="text-xs font-semibold text-green-600 dark:text-green-400">-${{ discount.discount_amount?.toFixed(2) }}</span>
+                <span class="text-xs font-semibold text-green-600 dark:text-green-400">-{{ formatCurrency(discount.discount_amount || 0) }}</span>
               </div>
             </div>
 
@@ -170,17 +170,17 @@
               <!-- Original Total (if discount) -->
               <div v-if="cartDiscount > 0" class="flex justify-between text-sm text-gray-500 dark:text-gray-400">
                 <span>Subtotal:</span>
-                <span class="line-through">${{ cartOriginalTotal?.toFixed(2) }}</span>
+                <span class="line-through">{{ formatCurrency(cartOriginalTotal || 0) }}</span>
               </div>
               <!-- Savings -->
               <div v-if="cartSavings > 0" class="flex justify-between text-sm text-green-600 dark:text-green-400">
                 <span>Savings:</span>
-                <span>-${{ cartSavings?.toFixed(2) }}</span>
+                <span>-{{ formatCurrency(cartSavings || 0) }}</span>
               </div>
               <!-- Final Total -->
               <div class="flex justify-between items-center text-lg font-semibold">
                 <span class="text-gray-900 dark:text-white">Total:</span>
-                <span class="text-primary-500">${{ cartTotal?.toFixed(2) }}</span>
+                <span class="text-primary-500">{{ formatCurrency(cartTotal || 0) }}</span>
               </div>
             </div>
 
@@ -219,6 +219,7 @@
 
 <script setup lang="ts">
 import { getItemImage } from '#shared/types/cart'
+import { useCurrency } from '#imports'
 
 const route = useRoute()
 
@@ -244,6 +245,7 @@ const emit = defineEmits<{ close: [boolean] }>()
 
 const { loggedIn } = useAuth()
 const checkoutLoading = ref(false)
+const { formatCurrency } = useCurrency()
 
 const localCartOpen = computed({
   get: () => {

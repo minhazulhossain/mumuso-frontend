@@ -63,7 +63,7 @@
 
                 <div class="flex items-center justify-between">
                   <span class="text-lg font-bold text-primary-600 dark:text-primary-400">
-                    ${{ parseFloat(item.price).toFixed(2) }}
+                    {{ formatCurrency(parseFloat(item.price)) }}
                   </span>
                   <UButton
                     size="sm"
@@ -100,11 +100,13 @@
 
 <script setup lang="ts">
 import type { WishlistItem } from '#shared/types'
+import { useCurrency } from '#imports'
 
 const toast = useToast()
 const { wishlistItems, wishlistCount, removeFromWishlist, clearWishlist, initWishlist } = useWishlist()
 const cart = inject('cart')
 const { addToCart } = cart
+const { formatCurrency } = useCurrency()
 
 // Initialize wishlist when page mounts
 onMounted(async () => {
