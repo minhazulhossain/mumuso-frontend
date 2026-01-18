@@ -10,6 +10,7 @@
       <UButton
           icon="i-heroicons-shopping-cart"
           variant="ghost"
+          class="text-gray-900 hover:text-primary-500"
       >
         <template #trailing>
           <UBadge v-if="cartItemsCount > 0" variant="solid">

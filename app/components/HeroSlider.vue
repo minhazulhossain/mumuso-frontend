@@ -11,10 +11,13 @@
           :loop="true"
           :autoplay="autoplay ? { delay: interval || 5000, disableOnInteraction: false } : false"
           :pagination="banners.length > 1 ? { clickable: true } : false"
-          class="w-full h-full"
-          @slideChange="onSlideChange($event.activeIndex)"
+          class="hero-slider w-full h-full"
+          :style="swiperStyle"
+          @autoplayTimeLeft="onAutoplayTimeLeft"
+          @swiper="onSwiper"
+          @slideChange="onSlideChange"
       >
-        <SwiperSlide v-for="banner in banners" :key="banner.id">
+        <SwiperSlide v-for="(banner, index) in banners" :key="banner.id">
           <div class="relative w-full h-full">
             <div class="relative w-full h-full bg-gray-100">
               <picture>
@@ -25,13 +28,27 @@
                 <img
                     :src="banner.image.desktop"
                     :alt="banner.title"
-                    class="w-full h-full object-cover"
+                    :class="[
+                    'w-full h-full object-cover transition-opacity duration-300',
+                    banner.video && activeIndex === index ? 'opacity-0' : 'opacity-100'
+                  ]"
                     loading="eager"
                     fetchpriority="high"
                     @load="handleImageLoad(banner.id)"
                     @error="handleImageError(banner.id)"
                 />
               </picture>
+              <video
+                  v-if="banner.video"
+                  class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
+                  :class="activeIndex === index ? 'opacity-100' : 'opacity-0'"
+                  muted
+                  loop
+                  playsinline
+                  preload="none"
+              >
+                <source :src="banner.video" type="video/mp4" />
+              </video>
             </div>
 
             <div
@@ -78,6 +95,10 @@ const emit = defineEmits<{
   'slide-change': [index: number]
 }>()
 
+const autoplayProgress = ref(0)
+const activeIndex = ref(0)
+const swiperInstance = ref<any>(null)
+
 // Track loaded images to prevent layout shift
 const loadedImages = ref<Record<string | number, boolean>>({})
 
@@ -89,10 +110,39 @@ const handleImageError = (bannerId: string | number) => {
   loadedImages.value[bannerId] = true
 }
 
-// Handle slide change
-const onSlideChange = (index: number) => {
-  emit('slide-change', index)
+const onAutoplayTimeLeft = (_swiper: unknown, _time: number, progress: number) => {
+  autoplayProgress.value = 1 - progress
 }
+
+const updateVideoPlayback = (swiper: any) => {
+  if (!swiper?.el) return
+  const videos = swiper.el.querySelectorAll('video')
+  videos.forEach((video: HTMLVideoElement) => {
+    video.pause()
+    video.currentTime = 0
+  })
+  const activeVideo = swiper.el.querySelector('.swiper-slide-active video') as HTMLVideoElement | null
+  if (activeVideo) {
+    activeVideo.play().catch(() => undefined)
+  }
+}
+
+const onSwiper = (swiper: any) => {
+  swiperInstance.value = swiper
+  activeIndex.value = swiper.realIndex || 0
+  updateVideoPlayback(swiper)
+}
+
+// Handle slide change
+const onSlideChange = (swiper: any) => {
+  activeIndex.value = swiper.realIndex || 0
+  emit('slide-change', activeIndex.value)
+  updateVideoPlayback(swiper)
+}
+
+const swiperStyle = computed(() => ({
+  '--hero-slide-progress': autoplayProgress.value
+}))
 
 const hasFixedHeight = computed(() => props.height !== 'auto')
 

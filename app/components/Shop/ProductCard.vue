@@ -1,6 +1,6 @@
 <template>
   <NuxtLink :to="`/shop/product/${product.slug}`"
-      class="product-card-border overflow-hidden bg-white dark:bg-gray-800 h-full flex flex-col group">
+      class="overflow-hidden bg-white dark:bg-gray-800 h-full flex flex-col group">
     <!-- Image with fixed aspect ratio -->
     <div class="relative w-full aspect-square bg-gray-100 dark:bg-gray-900 overflow-hidden">
       <USkeleton
@@ -11,13 +11,22 @@
           :src="product.image"
           :alt="product.name"
           :class="[
-          'w-full h-full object-cover transition-all duration-300 group-hover:scale-105',
-          imageLoaded ? 'opacity-100' : 'opacity-0'
+          'w-full h-full object-cover transition-opacity duration-300',
+          imageLoaded ? 'opacity-100 group-hover:opacity-0' : 'opacity-0'
         ]"
           sizes="xs:100vw sm:50vw md:33vw lg:25vw"
           loading="lazy"
           format="webp"
           @load="imageLoaded = true"
+      />
+      <NuxtImg
+          v-if="secondaryImage"
+          :src="secondaryImage"
+          :alt="product.name"
+          class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+          sizes="xs:100vw sm:50vw md:33vw lg:25vw"
+          loading="lazy"
+          format="webp"
       />
 
       <!-- Discount Badge -->
@@ -61,11 +70,13 @@ interface Props {
   product: Product
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
+const { product } = toRefs(props)
 defineEmits<{
   'add-to-cart': [quantity: number]
   'add-to-wishlist': []
 }>()
 
 const imageLoaded = ref(false)
+const secondaryImage = computed(() => product.value.images?.all?.[1]?.url ?? null)
 </script>

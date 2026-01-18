@@ -1,9 +1,6 @@
 export default defineNuxtConfig({
     modules: ['@nuxt/ui', '@nuxt/image', 'nuxt-auth-utils'],
     css: [
-        'swiper/css',
-        'swiper/css/pagination',
-        'swiper/css/navigation',
         '~/assets/css/main.css'
     ],
 

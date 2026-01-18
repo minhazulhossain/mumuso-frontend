@@ -1,6 +1,7 @@
 <template>
   <header
       class="relative z-50 bg-white dark:bg-gray-950/75 backdrop-blur-md border-b border-gray-200 dark:border-gray-800">
+    <TopBar />
     <UContainer>
       <div class="flex items-center justify-between h-14 md:h-16">
 
@@ -235,7 +236,6 @@
 const colorMode = useColorMode()
 const router = useRouter()
 const { fetchCategories } = useContent()
-
 // Desktop Search state
 const searchQuery = ref('')
 const showResults = ref(false)

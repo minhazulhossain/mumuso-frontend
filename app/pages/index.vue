@@ -31,10 +31,34 @@
       </UContainer>
     </section>
 
+    <!-- Featured Grid Section -->
+    <section
+        ref="featuredGridSection"
+        class="py-8 sm:py-10 md:py-14 lg:py-16 bg-primary-50"
+    >
+      <UContainer class="transition-all duration-1000" :class="sectionStates.featuredGrid">
+        <div class="flex items-center justify-between mb-4 sm:mb-6">
+          <h2 class="text-2xl font-medium text-gray-900">Featured Picks</h2>
+          <UButton to="/shop" variant="ghost" color="primary" size="sm">
+            View More
+          </UButton>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+          <div
+              v-for="(item, index) in featuredProducts"
+              :key="item.id"
+              :class="index >= 6 ? 'hidden lg:block' : ''"
+          >
+            <ShopProductCard :product="item" />
+          </div>
+        </div>
+      </UContainer>
+    </section>
+
     <!-- Best Selling Section -->
     <section
         ref="bestSellingSection"
-        class="py-6 sm:py-10 md:py-14 lg:py-16 bg-white dark:bg-gray-950"
+        class="py-8 sm:py-10 md:py-14 lg:py-16 bg-white dark:bg-gray-950"
     >
       <UContainer class="transition-all duration-1000" :class="sectionStates.bestSelling">
         <ProductCarousel
@@ -55,6 +79,8 @@
             title="New Arrivals"
             :items="products"
             :loading="loading || productsPending"
+            title-class="text-white"
+            link-class="text-white/90 hover:text-white"
         />
       </UContainer>
     </section>
@@ -102,11 +128,13 @@ const bestSellingSection = ref(null)
 const newArrivalsSection = ref(null)
 const bannersSection = ref(null)
 const trendingSection = ref(null)
+const featuredGridSection = ref(null)
 
 // Section animation states
 const sectionStates = ref({
   categories: '',
   promotions: '',
+  featuredGrid: '',
   bestSelling: '',
   newArrivals: '',
   banners: '',
@@ -138,9 +166,10 @@ const setupScrollAnimations = () => {
   }, observerOptions)
 
   // Observe all section elements
-  const sections = [
+const sections = [
     { ref: categoriesSection, key: 'categories' },
     { ref: promotionsSection, key: 'promotions' },
+    { ref: featuredGridSection, key: 'featuredGrid' },
     { ref: bestSellingSection, key: 'bestSelling' },
     { ref: newArrivalsSection, key: 'newArrivals' },
     { ref: bannersSection, key: 'banners' },
@@ -160,6 +189,7 @@ onMounted(() => {
   sectionStates.value = {
     categories: 'opacity-0 translate-y-8',
     promotions: 'opacity-0 translate-y-8',
+    featuredGrid: 'opacity-0 translate-y-8',
     bestSelling: 'opacity-0 translate-y-8',
     newArrivals: 'opacity-0 translate-y-8',
     banners: 'opacity-0 translate-y-8',
@@ -174,4 +204,6 @@ onUnmounted(() => {
     observer.disconnect()
   }
 })
+
+const featuredProducts = computed(() => products.value.slice(0, 10))
 </script>

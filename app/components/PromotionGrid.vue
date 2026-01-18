@@ -17,14 +17,19 @@
           class="promotion-carousel px-2 sm:px-4 lg:px-6"
       >
         <SwiperSlide v-for="item in promoItems" :key="item.id">
-          <NuxtLink to="/categories/kids">
+          <NuxtLink to="/categories/kids" class="group">
             <UCard :ui="{ root: 'rounded-none mb-2', header: 'p-0 sm:px-0', body:'p-2 sm:p-3' }">
               <template #header>
-                <div class="relative w-full aspect-[380/288] bg-gray-100">
+                <div
+                  class="relative w-full aspect-[380/288] bg-gray-100 overflow-hidden"
+                  @mouseenter="handlePromoHover($event, true)"
+                  @mouseleave="handlePromoHover($event, false)"
+                >
                   <NuxtImg
                       :src="item.img"
                       :class="[
-                    'w-full h-full object-cover transition-opacity duration-300',
+                    'w-full h-full object-cover transition-all duration-500',
+                    item.video ? 'group-hover:opacity-0' : 'group-hover:scale-105'
                   ]"
                       :alt="item.name"
                       width="380"
@@ -33,6 +38,16 @@
                       loading="lazy"
                       format="webp"
                   />
+                  <video
+                    v-if="item.video"
+                    class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                    muted
+                    loop
+                    playsinline
+                    preload="none"
+                  >
+                    <source :src="item.video" type="video/mp4" />
+                  </video>
                 </div>
               </template>
               <p class="text-sm">{{ item.description }}</p>
@@ -64,6 +79,7 @@ import { Pagination } from 'swiper/modules'
 interface Product {
   id: number
   img?: string
+  video?: string
   name: string
   description?: string
   short_description?: string
@@ -76,36 +92,42 @@ const fallbackProducts: Product[] = [
   {
     id: 1,
     img: '/promo/1.jpg',
+    video: '/promo/Agun.mp4',
     name: 'Mini Fan',
     description: 'Beat the heat in style with this adorably appealing Mini Fan from the house of MUMUSO.'
   },
   {
     id: 2,
     img: '/promo/2.jpg',
+    video: '/promo/Agun.mp4',
     name: 'Portable Fan',
     description: 'Beat the heat in style with this adorably appealing Mini Fan from the house of MUMUSO.'
   },
   {
     id: 3,
     img: '/promo/3.jpg',
+    video: '/promo/Agun.mp4',
     name: 'Desk Fan',
     description: 'Beat the heat in style with this adorably appealing Mini Fan from the house of MUMUSO.'
   },
   {
     id: 4,
     img: '/promo/1.jpg',
+    video: null,
     name: 'USB Fan',
     description: 'Beat the heat in style with this adorably appealing Mini Fan from the house of MUMUSO.'
   },
   {
     id: 5,
     img: '/promo/2.jpg',
+    video: '/promo/sample.mp4',
     name: 'Hand Fan',
     description: 'Beat the heat in style with this adorably appealing Mini Fan from the house of MUMUSO.'
   },
   {
     id: 6,
     img: '/promo/3.jpg',
+    video: '/promo/sample.mp4',
     name: 'Clip Fan',
     description: 'Beat the heat in style with this adorably appealing Mini Fan from the house of MUMUSO.'
   }
@@ -116,7 +138,22 @@ const promoItems = computed(() => {
     id: item.id,
     name: item.name,
     img: item.img || '/promo/1.jpg',
+    video: item.video || '',
     description: item.description || ''
   }))
 })
+
+const handlePromoHover = (event: MouseEvent, shouldPlay: boolean) => {
+  const target = event.currentTarget as HTMLElement | null
+  const video = target?.querySelector('video') as HTMLVideoElement | null
+  if (!video) return
+
+  if (shouldPlay) {
+    video.play().catch(() => undefined)
+    return
+  }
+
+  video.pause()
+  video.currentTime = 0
+}
 </script>

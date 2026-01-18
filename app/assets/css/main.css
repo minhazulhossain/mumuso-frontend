@@ -1,5 +1,9 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
+@import "swiper/css";
+@import "swiper/css/pagination";
+@import "swiper/css/navigation";
+@import "swiper/css/scrollbar";
 
 @theme static{
     --font-sans: 'Outfit', sans-serif;
@@ -26,54 +30,104 @@
     [role="button"] {
         cursor: pointer;
     }
+
 }
 
 @layer components {
-    .product-card-border {
-        position: relative;
-        isolation: isolate;
-    }
 
-    .product-card-border::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        border: 1px solid var(--color-primary-500);
-        transform: scaleX(0) scaleY(0);
-        transform-origin: left top;
-        transition: transform 0.35s ease;
-        pointer-events: none;
-    }
+}
+.promotion-carousel.swiper,
+.product-carousel.swiper.swiper {
+    position: static;
+}
 
-    .product-card-border:hover::after {
-        transform: scaleX(1) scaleY(1);
-    }
+.topbar-fade-enter-active,
+.topbar-fade-leave-active {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
 
-    .swiper {
-        position: static !important;
-        /*padding-bottom: 30px !important;*/
-    }
+.topbar-fade-enter-from,
+.topbar-fade-leave-to {
+    opacity: 0;
+    transform: translateY(4px);
+}
 
-    .swiper .swiper-pagination {
-        /*position: static !important;*/
-        /*display: flex !important;*/
-        /*justify-content: center !important;*/
-        /*margin-top: 30px !important;*/
-        /*gap: 4px !important;*/
-        /*top: 30% !important;*/
-        bottom: -20px !important;
-    }
+.product-card-border {
+    position: relative;
+    isolation: isolate;
+}
 
-    /*.swiper .swiper-pagination-bullet {*/
-    /*    width: 8px !important;*/
-    /*    height: 8px !important;*/
-    /*    background: rgb(var(--color-neutral-300)) !important;*/
-    /*    opacity: 1 !important;*/
-    /*    transition: width 0.2s ease, background-color 0.2s ease !important;*/
-    /*}*/
+.product-card-border::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border: 1px solid var(--color-primary-500);
+    transform: scaleX(0) scaleY(0);
+    transform-origin: left top;
+    transition: transform 0.35s ease;
+    pointer-events: none;
+}
 
-    .swiper .swiper-pagination-bullet-active {
-        width: 20px !important;
-        background: var(--color-primary-500) !important;
-    }
+.product-card-border:hover::after {
+    transform: scaleX(1) scaleY(1);
+}
+
+.swiper .swiper-pagination-bullet-active {
+    width: 20px;
+    background: var(--color-primary-500);
+}
+
+.hero-slider .swiper-pagination {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    left: 50%;
+    bottom: 18px;
+    transform: translateX(-50%);
+    z-index: 10;
+    width: auto;
+}
+
+.hero-slider .swiper-pagination-bullet {
+    width: 72px;
+    height: 6px;
+    border-radius: 0;
+    background: rgba(255, 255, 255, 0.45);
+    opacity: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-slider .swiper-pagination-bullet::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: #ffffff;
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 0.1s linear;
+}
+
+.hero-slider .swiper-pagination-bullet-active::after {
+    transform: scaleX(var(--hero-slide-progress, 0));
+}
+.promotion-carousel .swiper-pagination,
+.product-carousel .swiper-pagination {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    bottom: -15px;
+}
+
+.product-carousel .swiper-pagination-bullet {
+    width: 28px;
+    height: 5px;
+    border-radius: 0;
+    background: rgba(0, 0, 0, 0.2);
+    opacity: 1;
+}
+
+.product-carousel .swiper-pagination-bullet-active {
+    width: 44px;
+    background: var(--color-primary-500);
 }

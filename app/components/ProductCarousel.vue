@@ -2,8 +2,8 @@
   <div>
     <!-- Title Bar -->
     <div v-if="hasTitleBar" class="flex justify-between items-center mb-2 md:mb-4">
-      <h2 class="text-2xl font-medium">{{ title }}</h2>
-      <NuxtLink :to="viewAllUrl" class="text-sm font-medium text-primary hover:underline">
+      <h2 class="text-2xl font-medium" :class="titleClass">{{ title }}</h2>
+      <NuxtLink :to="viewAllUrl" class="text-sm font-medium hover:underline" :class="linkClass">
         View All
       </NuxtLink>
     </div>
@@ -97,6 +97,8 @@ interface Props {
   items?: Product[]
   error?: string | boolean
   loading?: boolean
+  titleClass?: string
+  linkClass?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -105,7 +107,9 @@ const props = withDefaults(defineProps<Props>(), {
   viewAllUrl: '/shop',
   items: () => [],
   error: false,
-  loading: false
+  loading: false,
+  titleClass: '',
+  linkClass: 'text-primary hover:text-primary'
 })
 
 const emit = defineEmits<{

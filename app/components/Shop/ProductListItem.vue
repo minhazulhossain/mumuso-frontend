@@ -3,7 +3,7 @@
       :to="`/shop/product/${product.slug}`"
       class="group block"
   >
-    <UCard class="product-card-border hover:shadow-lg transition-shadow duration-200">
+  <UCard class="hover:shadow-lg transition-shadow duration-200">
       <div class="flex gap-4">
         <!-- Product Image -->
         <div class="w-32 h-32 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 relative">

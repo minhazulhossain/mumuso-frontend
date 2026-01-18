@@ -4,7 +4,7 @@
     <UButton v-if="!user"
              to="/auth/login"
              size="sm"
-             class="hidden sm:inline-flex uppercase"
+             class="hidden sm:inline-flex uppercase text-gray-900 hover:text-primary-500"
              icon="i-heroicons-user"
              variant="ghost"
     >My Account</UButton>
