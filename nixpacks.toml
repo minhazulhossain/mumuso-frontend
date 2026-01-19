@@ -3,7 +3,7 @@ NPM_CONFIG_INCLUDE = "optional"
 NPM_CONFIG_OMIT = ""
 
 [phases.install]
-cmds = ["npm ci --include=optional"]
+cmds = ["npm ci --include=optional", "npm rebuild"]
 
 [phases.build]
 cmds = ["npm run build"]
