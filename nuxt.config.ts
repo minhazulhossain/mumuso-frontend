@@ -46,6 +46,12 @@ export default defineNuxtConfig({
         }
     },
 
+    vite: {
+        build: {
+            cssMinify: 'esbuild'
+        }
+    },
+
     compatibilityDate: '2024-11-16', // ✅ Fixed - current date
 
     nitro: {
