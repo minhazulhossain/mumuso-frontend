@@ -1,12 +1,8 @@
-[variables]
-NPM_CONFIG_INCLUDE = "optional"
-NPM_CONFIG_OMIT = ""
-
 [phases.install]
-cmds = ["npm ci --include=optional"]
+cmds = ["pnpm install --frozen-lockfile"]
 
 [phases.build]
-cmds = ["npm run build"]
+cmds = ["pnpm run build"]
 
 [start]
-cmd = "npm run start"
+cmd = "pnpm run start"

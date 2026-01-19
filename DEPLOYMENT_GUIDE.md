@@ -70,6 +70,25 @@ Your `vercel.json` is already configured:
 
 Nuxt 4 + Vercel preset (`nitro.preset: 'vercel'`) is properly configured in `nuxt.config.ts`.
 
+## Coolify Deployment (Nixpacks)
+
+Coolify Nuxt guidance for this repo using Nixpacks.
+
+### Server build (Nuxt, using `nuxt build`)
+- **Build Pack:** `nixpacks`
+- **Start Command:** `node .output/server/index.mjs`
+- **Alternative:** Set `start` script in `package.json` to `node .output/server/index.mjs` and Nixpacks will use it.
+
+### Static build (Nuxt, using `nuxt generate`)
+- **Build Pack:** `nixpacks`
+- **Is it a static site?:** enabled
+- **Output Directory:** `dist`
+
+### Nitro server build (Nitro, using `nitro build`)
+- **Build Pack:** `nixpacks`
+- **Start Command:** `node .output/server/index.mjs`
+- **Alternative:** Set `start` script in `package.json` to `node .output/server/index.mjs` and Nixpacks will use it.
+
 ## Build Output
 
 - **Size:** 56.6 MB (21.1 MB gzipped) ✅ Well under Vercel's 250 MB limit
