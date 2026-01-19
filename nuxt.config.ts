@@ -48,12 +48,12 @@ export default defineNuxtConfig({
     compatibilityDate: '2024-11-16', // ✅ Fixed - current date
 
     nitro: {
-        preset: 'vercel',
+        preset: 'node-server',
         compressPublicAssets: true,
         // ✅ Removed problematic proxy
     },
 
-    devtools: { enabled: true }, // ✅ Disable in production
+    devtools: { enabled: process.env.NODE_ENV !== 'production' }, // ✅ Disable in production
 
     runtimeConfig: {
         // Backend API URL - used by server-side code and client-side code
@@ -67,3 +67,4 @@ export default defineNuxtConfig({
         }
     }
 })
+
