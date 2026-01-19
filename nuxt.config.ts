@@ -1,5 +1,5 @@
 export default defineNuxtConfig({
-    modules: ['@nuxt/ui', '@nuxt/image', 'nuxt-auth-utils'],
+    modules: ['@nuxt/ui', '@nuxt/image', '@nuxt/fonts', 'nuxt-auth-utils'],
     css: [
         '~/assets/css/main.css'
     ],
@@ -27,6 +27,16 @@ export default defineNuxtConfig({
                 950: '#083126',
             },
         }
+    },
+
+    fonts: {
+        families: [
+            {
+                name: 'Outfit',
+                provider: 'google',
+                weights: [300, 400, 500, 600, 700],
+            },
+        ],
     },
 
     colorMode: {
