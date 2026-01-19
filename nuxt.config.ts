@@ -5,6 +5,7 @@ export default defineNuxtConfig({
     ],
 
     ui: {
+        fonts: false,
         theme: {
             defaultVariants: {
                 color: 'primary',
