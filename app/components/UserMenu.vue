@@ -1,38 +1,54 @@
 <template>
 
-  <div>
-    <UButton v-if="!user"
-             to="/auth/login"
-             size="sm"
-             class="hidden sm:inline-flex uppercase text-gray-900 hover:text-primary-500"
-             icon="i-heroicons-user"
-             variant="ghost"
+  <div class="flex items-center justify-end">
+    <UButton
+        v-if="!user"
+        to="/auth/login"
+        size="sm"
+        class="hidden sm:inline-flex uppercase text-gray-900 hover:text-primary-500"
+        icon="i-heroicons-user"
+        variant="ghost"
     >My Account</UButton>
+    <UButton
+        v-if="!user"
+        to="/auth/login"
+        size="sm"
+        class="sm:hidden"
+        icon="i-heroicons-user-circle"
+        variant="ghost"
+        aria-label="My Account"
+    />
 
-
-    <UDropdownMenu v-else
+    <UDropdownMenu
+        v-else
         :items="items"
-        :ui="{
-      content: 'w-48'
-    }"
+        :ui="{ content: 'w-48 right-0' }"
+        :popper="{ placement: 'bottom-end' }"
     >
-
       <UButton
-          class="hidden sm:inline-flex"
-          :label="user?.name"
-          icon="i-lucide-menu"
-          color="neutral"
-          variant="outline"
-      />
-      <UButton
-          class="sm:hidden"
-          icon="i-heroicons-user-circle"
+          class="sm:w-auto"
           color="neutral"
           variant="outline"
           aria-label="Account menu"
-      />
+      >
+        <UAvatar
+            v-if="avatarSrc"
+            :src="avatarSrc"
+            :alt="user?.name || 'User'"
+            size="xs"
+            class="sm:hidden"
+        />
+        <UIcon v-else name="i-heroicons-user-circle" class="sm:hidden text-lg" />
+        <UAvatar
+            v-if="avatarSrc"
+            :src="avatarSrc"
+            :alt="user?.name || 'User'"
+            size="xs"
+            class="hidden sm:inline-flex mr-2"
+        />
+        <span class="hidden sm:inline" :title="user?.name || ''">{{ displayName }}</span>
+      </UButton>
     </UDropdownMenu>
-
   </div>
 
 
@@ -45,12 +61,21 @@ import type { DropdownMenuItem } from '@nuxt/ui'
 
 const {user, clear: clearSession} = useUserSession()
 
+const avatarUrl = computed(() => user.value?.avatar || '')
+const defaultAvatar = 'https://github.com/benjamincanac.png'
+const avatarSrc = computed(() => avatarUrl.value || defaultAvatar)
+const displayName = computed(() => {
+  const name = user.value?.name || ''
+  if (name.length <= 10) return name
+  return `${name.slice(0, 10)}…`
+})
+
 const items = ref<DropdownMenuItem[][]>([
   [
     {
-      label: user.value?.name,
+      label: displayName.value || user.value?.name,
       avatar: {
-        src: 'https://github.com/benjamincanac.png'
+        src: avatarUrl.value || undefined
       },
       type: 'label'
     }
@@ -67,74 +92,18 @@ const items = ref<DropdownMenuItem[][]>([
       to: '/account/orders'
     },
     {
-      label: 'Billing',
-      icon: 'i-lucide-credit-card'
-    },
-    {
-      label: 'Settings',
-      icon: 'i-lucide-cog',
-      kbds: [',']
-    }
-  ],
-  [
-    {
-      label: 'Team',
-      icon: 'i-lucide-users'
-    },
-    {
-      label: 'Invite users',
-      icon: 'i-lucide-user-plus',
-      children: [
-        [
-          {
-            label: 'Email',
-            icon: 'i-lucide-mail'
-          },
-          {
-            label: 'Message',
-            icon: 'i-lucide-message-square'
-          }
-        ],
-        [
-          {
-            label: 'More',
-            icon: 'i-lucide-circle-plus'
-          }
-        ]
-      ]
-    },
-    {
-      label: 'New team',
-      icon: 'i-lucide-plus',
-      kbds: ['meta', 'n']
-    }
-  ],
-  [
-    {
-      label: 'GitHub',
-      icon: 'i-simple-icons-github',
-      to: 'https://github.com/nuxt/ui',
-      target: '_blank'
-    },
-    {
-      label: 'Support',
-      icon: 'i-lucide-life-buoy',
-      to: '/'
-    },
-    {
-      label: 'API',
-      icon: 'i-lucide-cloud',
-      disabled: true
+      label: 'Wishlist',
+      icon: 'i-lucide-heart',
+      to: '/wishlist'
     }
   ],
   [
     {
       label: 'Logout',
       icon: 'i-lucide-log-out',
-      onSelect(e) {
+      onSelect() {
           logout()
       },
-
     }
   ]
 ])

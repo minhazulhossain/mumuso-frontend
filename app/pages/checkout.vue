@@ -17,8 +17,51 @@
         />
       </div>
 
+      <!-- Loading State -->
+      <div v-if="!cartInitialized || cartLoading" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Forms Skeleton -->
+        <div class="lg:col-span-2 space-y-4">
+          <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
+            <USkeleton class="h-5 w-48 mb-4" />
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <USkeleton class="h-10 w-full" />
+              <USkeleton class="h-10 w-full" />
+              <USkeleton class="h-10 w-full" />
+              <USkeleton class="h-10 w-full" />
+            </div>
+            <USkeleton class="h-10 w-full mt-4" />
+          </div>
+          <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
+            <USkeleton class="h-5 w-40 mb-4" />
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <USkeleton class="h-10 w-full" />
+              <USkeleton class="h-10 w-full" />
+              <USkeleton class="h-10 w-full" />
+              <USkeleton class="h-10 w-full" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Summary Skeleton -->
+        <div class="lg:col-span-1 space-y-4">
+          <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
+            <USkeleton class="h-10 w-full" />
+          </div>
+          <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
+            <USkeleton class="h-5 w-40 mb-6" />
+            <USkeleton class="h-10 w-full mb-4" />
+            <div class="space-y-3">
+              <USkeleton class="h-4 w-full" />
+              <USkeleton class="h-4 w-5/6" />
+              <USkeleton class="h-4 w-4/6" />
+            </div>
+            <USkeleton class="h-10 w-full mt-6" />
+          </div>
+        </div>
+      </div>
+
       <!-- Main Checkout Content -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Left Side - Forms (2 columns) -->
         <div class="lg:col-span-2">
 
@@ -87,7 +130,6 @@
           <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
             <CouponInput
                 :amount="cartTotal"
-                @coupon="handleCouponApplied"
             />
           </div>
 
@@ -96,6 +138,7 @@
               :cart-items="cartItems || []"
               :shipping-cost="shippingCost"
               :tax-rate="0"
+              :applied-coupon="appliedCoupon"
           />
         </div>
       </div>
@@ -112,18 +155,26 @@ const { loggedIn } = useAuth()
 const { user } = useUserSession()
 const { addresses, fetchAddresses, createAddress } = useAddresses()
 const cart = inject('cart')
-const { cartItems } = cart
+const { cartItems, isLoading: cartLoading, cartInitialized, fetchCart } = cart
 const { initiatePayment } = usePayment()
 const { createOrder } = useOrders()
 const { shippingMethods, fetchMethodsByLocation, loading: shippingLoading } = useShipping()
 const { currency } = useCurrency()
+const { couponState } = useCoupon()
 
 // Fetch saved addresses on mount
 onMounted(async () => {
   if (loggedIn.value) {
     await fetchAddresses()
   }
-  if (!cartItems.value || cartItems.value.length === 0) {
+  if (!cartInitialized.value && !cartLoading.value) {
+    await fetchCart()
+  }
+})
+
+watch([cartInitialized, cartItems, cartLoading], ([initialized, items, loading]) => {
+  if (!initialized || loading) return
+  if (!items || items.length === 0) {
     toast.add({
       title: 'Cart is empty',
       description: 'Add some products before checkout',
@@ -131,7 +182,7 @@ onMounted(async () => {
     })
     router.push('/shop')
   }
-})
+}, { immediate: true })
 
 // Stepper steps configuration
 const steps = [
@@ -223,11 +274,11 @@ const orderNotes = ref('')
 const agreedToTerms = ref(false)
 const processingOrder = ref(false)
 
-// Coupon state
-const appliedCoupon = ref({
-  code: '',
-  discount: 0
-})
+// Coupon state (shared across cart/checkout)
+const appliedCoupon = computed(() => ({
+  code: couponState.value.code || '',
+  discount: couponState.value.discount || 0
+}))
 
 // Breadcrumb
 const breadcrumbLinks = [
@@ -362,23 +413,6 @@ const handlePrevious = () => {
     currentStep.value--
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
-}
-
-const handleCouponApplied = (couponData: { code: string; discount: number }) => {
-  console.log('[Checkout] handleCouponApplied received event:', {
-    couponData,
-    timestamp: new Date().toISOString()
-  })
-
-  appliedCoupon.value = {
-    code: couponData.code,
-    discount: couponData.discount
-  }
-
-  console.log('[Checkout] appliedCoupon updated:', {
-    appliedCoupon: appliedCoupon.value,
-    timestamp: new Date().toISOString()
-  })
 }
 
 const handlePlaceOrder = async () => {

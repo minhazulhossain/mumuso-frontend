@@ -9,9 +9,44 @@
         </p>
       </div>
 
+      <!-- Loading State -->
+      <div v-if="!cartInitialized || isLoading" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Cart Items Skeleton -->
+        <div class="lg:col-span-2 space-y-4">
+          <div v-for="i in 3" :key="`cart-skel-${i}`" class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
+            <div class="flex gap-4">
+              <USkeleton class="w-24 h-24 rounded-lg" />
+              <div class="flex-1 space-y-3">
+                <USkeleton class="h-4 w-2/3" />
+                <USkeleton class="h-3 w-1/3" />
+                <div class="flex justify-between items-center">
+                  <USkeleton class="h-4 w-24" />
+                  <USkeleton class="h-6 w-24" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order Summary Skeleton -->
+        <div class="lg:col-span-1">
+          <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
+            <USkeleton class="h-5 w-40 mb-6" />
+            <USkeleton class="h-10 w-full mb-4" />
+            <div class="space-y-3 mb-6">
+              <USkeleton class="h-4 w-full" />
+              <USkeleton class="h-4 w-5/6" />
+              <USkeleton class="h-4 w-4/6" />
+            </div>
+            <USkeleton class="h-10 w-full mb-4" />
+            <USkeleton class="h-4 w-2/3" />
+          </div>
+        </div>
+      </div>
+
       <!-- Empty Cart State -->
       <div
-          v-if="!cartItems || cartItems.length === 0"
+          v-else-if="!cartItems || cartItems.length === 0"
           class="flex flex-col items-center justify-center py-16 text-center"
       >
         <div class="bg-gray-100 dark:bg-gray-800 rounded-full p-8 mb-6">
@@ -116,7 +151,9 @@
                           size="xs"
                           color="secondary"
                           variant="ghost"
-                          :disabled="!canDecrementQuantity(item)"
+                          :loading="isItemUpdating(item)"
+                          loading-icon="i-heroicons-arrow-path-20-solid"
+                          :disabled="!canDecrementQuantity(item) || isItemUpdating(item)"
                       />
                       <span class="text-sm font-semibold w-10 text-center text-gray-900 dark:text-white">
                         {{ item.quantity }}
@@ -127,7 +164,9 @@
                           size="xs"
                           color="secondary"
                           variant="ghost"
-                          :disabled="!canIncrementQuantity(item)"
+                          :loading="isItemUpdating(item)"
+                          loading-icon="i-heroicons-arrow-path-20-solid"
+                          :disabled="!canIncrementQuantity(item) || isItemUpdating(item)"
                       />
                     </div>
                   </div>
@@ -169,7 +208,6 @@
             <div class="mb-6">
               <CouponInput
                 :amount="subtotal"
-                @coupon="watchCouponChanges"
               />
             </div>
 
@@ -318,6 +356,7 @@ const {
   appliedDiscounts,
   cartItemsCount,
   isLoading,
+  cartInitialized,
   updateCartItemQuantity,
   removeFromCart,
   clearCart,
@@ -329,20 +368,13 @@ const taxRate = 10 // 10% tax
 const freeShippingThreshold = 50
 const shippingRate = 5.99
 
-// Coupon state
-const appliedCoupon = ref({
-  code: '',
-  discount: 0
-})
+const { couponState } = useCoupon()
 
-// Watch for coupon changes from CouponInput component
-const watchCouponChanges = (couponData: { code: string; discount: number }) => {
-  appliedCoupon.value = {
-    code: couponData.code,
-    discount: couponData.discount
-  }
-  console.log('Coupon updated in cart:', couponData)
-}
+// Coupon state (shared across cart/checkout)
+const appliedCoupon = computed(() => ({
+  code: couponState.value.code || '',
+  discount: couponState.value.discount || 0
+}))
 
 // Computed values - use backend discount data
 const subtotal = computed(() => {
@@ -366,15 +398,42 @@ const total = computed(() => {
 })
 
 // Methods
-const incrementQuantity = (item: any, maxStock: number) => {
-  if (item && canIncrementQuantity(item)) {
-    updateCartItemQuantity(item.product?.slug || item.slug, item.quantity + 1, item.variation_id)
+const updatingItems = ref<Record<string, boolean>>({})
+
+const getItemKey = (item: any) => {
+  return `${item.product?.slug || item.slug}::${item.variation_id ?? 'default'}`
+}
+
+const setItemUpdating = (item: any, value: boolean) => {
+  updatingItems.value = {
+    ...updatingItems.value,
+    [getItemKey(item)]: value
   }
 }
 
-const decrementQuantity = (item: any) => {
+const isItemUpdating = (item: any) => {
+  return !!updatingItems.value[getItemKey(item)]
+}
+
+const incrementQuantity = async (item: any, maxStock: number) => {
+  if (item && canIncrementQuantity(item)) {
+    setItemUpdating(item, true)
+    try {
+      await updateCartItemQuantity(item.product?.slug || item.slug, item.quantity + 1, item.variation_id)
+    } finally {
+      setItemUpdating(item, false)
+    }
+  }
+}
+
+const decrementQuantity = async (item: any) => {
   if (item && canDecrementQuantity(item)) {
-    updateCartItemQuantity(item.product?.slug || item.slug, item.quantity - 1, item.variation_id)
+    setItemUpdating(item, true)
+    try {
+      await updateCartItemQuantity(item.product?.slug || item.slug, item.quantity - 1, item.variation_id)
+    } finally {
+      setItemUpdating(item, false)
+    }
   }
 }
 

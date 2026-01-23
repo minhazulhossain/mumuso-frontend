@@ -2,9 +2,9 @@
 
 ## Current Status
 
-✅ **Code fix deployed** - Proxy endpoint updated to use HTTPS
-✅ **Commit pushed** - Vercel will auto-redeploy
-⏳ **Waiting for your action** - Remove environment variable
+âœ… **Code fix deployed** - Proxy endpoint updated to use HTTPS
+âœ… **Commit pushed** - Vercel will auto-redeploy
+â³ **Waiting for your action** - Remove environment variable
 
 ## Why You're Getting CORS Errors
 
@@ -13,12 +13,12 @@ Your site is trying to call the backend **directly** instead of **through the pr
 **The issue:**
 - `NUXT_PUBLIC_API_BASE` is set in Vercel environment variables
 - This tells the frontend: "Call the backend directly at this URL"
-- Backend doesn't have CORS enabled → Browser blocks the request
+- Backend doesn't have CORS enabled â†’ Browser blocks the request
 
 **The fix:**
 - Delete `NUXT_PUBLIC_API_BASE` from Vercel
 - Frontend will use proxy as fallback
-- Proxy is same-origin (no CORS issues) ✓
+- Proxy is same-origin (no CORS issues) âœ“
 
 ## What You Need to Do (2 minutes)
 
@@ -45,24 +45,24 @@ https://vercel.com/dashboard
 2. Open browser DevTools (F12)
 3. Go to **Console** tab
 4. Check that you don't see CORS errors
-5. Homepage should show products ✓
+5. Homepage should show products âœ“
 
 ## Expected Results After Fix
 
 ### Before (Current - Error):
 ```
-Access to fetch at 'https://mumusoadmin.coderdrivelab.com/api/v1/content/navigation-items'
+Access to fetch at 'https://admin.mumuso.com.bd/api/v1/content/navigation-items'
 from origin 'https://mumuso-frontend-...-vercel.app' has been blocked
 by CORS policy: No 'Access-Control-Allow-Origin' header
 ```
 
 ### After (Fixed - Working):
 ```
-✓ Navigation items load
-✓ Products load
-✓ Categories load
-✓ Cart works
-✓ No CORS errors in console
+âœ“ Navigation items load
+âœ“ Products load
+âœ“ Categories load
+âœ“ Cart works
+âœ“ No CORS errors in console
 ```
 
 ## Technical Summary
@@ -71,7 +71,7 @@ by CORS policy: No 'Access-Control-Allow-Origin' header
 |------|-------|---------|-----|
 | **Frontend calls** | nuxt.config.ts | HTTPS backend directly | `/api/proxy/` (same-origin) |
 | **Proxy forwards to** | server/api/proxy/[...].get.ts | HTTP backend | HTTPS backend |
-| **CORS issues** | Browser | YES ❌ | NO ✓ |
+| **CORS issues** | Browser | YES âŒ | NO âœ“ |
 | **Environment variable** | Vercel Settings | `NUXT_PUBLIC_API_BASE` set | (deleted) |
 | **Code fallback** | nuxt.config.ts line 48 | Not used (env var overrides) | Used (env var deleted) |
 
@@ -79,7 +79,7 @@ by CORS policy: No 'Access-Control-Allow-Origin' header
 
 ```
 bfecd8e Update proxy endpoint to use HTTPS backend URL
-  - server/api/proxy/[...].get.ts: HTTP → HTTPS default URL
+  - server/api/proxy/[...].get.ts: HTTP â†’ HTTPS default URL
 ```
 
 ## Questions?

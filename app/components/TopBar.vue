@@ -1,7 +1,7 @@
 <template>
   <div class="bg-primary-500 text-white">
     <UContainer class="h-8 md:h-9">
-      <div class="flex items-center gap-2 h-full">
+      <div class="flex items-center gap-2 h-full min-w-0">
         <button
           v-if="messages.length > 1"
           class="flex items-center justify-center w-7 h-7 rounded-full hover:bg-white/15 transition-colors"
@@ -12,9 +12,9 @@
           <UIcon name="i-heroicons-chevron-left" class="w-4 h-4" />
         </button>
 
-        <div class="flex-1 text-center text-xs sm:text-sm font-medium tracking-wide uppercase">
+        <div class="flex-1 min-w-0 text-center text-xs sm:text-sm font-medium tracking-wide uppercase">
           <Transition name="topbar-fade" mode="out-in">
-            <span :key="currentIndex" class="block truncate" aria-live="polite">
+            <span :key="currentIndex" class="block truncate px-1" aria-live="polite">
               {{ messages[currentIndex] }}
             </span>
           </Transition>

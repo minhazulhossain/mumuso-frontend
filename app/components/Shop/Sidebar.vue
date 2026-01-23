@@ -27,8 +27,35 @@
         </div>
       </div>
 
+      <!-- Loading Skeleton -->
+      <div v-if="loading" class="space-y-6">
+        <div v-if="!hideCategoryFilter" class="space-y-2">
+          <USkeleton class="h-4 w-24" />
+          <USkeleton class="h-9 w-full" />
+        </div>
+        <div class="space-y-2">
+          <USkeleton class="h-4 w-28" />
+          <USkeleton class="h-4 w-40" />
+          <USkeleton class="h-4 w-32" />
+        </div>
+        <div class="space-y-3">
+          <USkeleton class="h-4 w-24" />
+          <USkeleton class="h-8 w-full" />
+          <USkeleton class="h-8 w-full" />
+        </div>
+        <div class="space-y-2">
+          <USkeleton class="h-4 w-24" />
+          <USkeleton class="h-4 w-36" />
+          <USkeleton class="h-4 w-28" />
+        </div>
+        <div class="space-y-2">
+          <USkeleton class="h-9 w-full" />
+          <USkeleton class="h-9 w-full" />
+        </div>
+      </div>
+
       <!-- Category Filter -->
-      <div v-if="!hideCategoryFilter" class="mb-6">
+      <div v-else-if="!hideCategoryFilter" class="mb-6">
         <label class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
           Category
         </label>
@@ -266,6 +293,7 @@ const props = defineProps<{
   filters?: Filters
   hideCategoryFilter?: boolean
   isMobile?: boolean
+  loading?: boolean
 }>()
 
 const emit = defineEmits<{

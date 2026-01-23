@@ -1,6 +1,6 @@
 export default defineEventHandler(async (event) => {
     const session = await getUserSession(event)
-    const backendUrl = process.env.BACKEND_API_BASE || 'https://mumusoadmin.coderdrivelab.com/api/v1/'
+    const backendUrl = process.env.BACKEND_API_BASE || 'https://admin.mumuso.com.bd/api/v1/'
 
     // Attempt to logout on backend if token exists
     if (session?.user?.token) {

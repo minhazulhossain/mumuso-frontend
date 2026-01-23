@@ -100,20 +100,24 @@
               <!-- Quantity Controls -->
               <div class="flex items-center gap-2">
                 <UButton
-                    @click="updateCartItemQuantity(item.product?.slug || item.slug, item.quantity - 1, item.variation_id)"
-                    icon="i-lucide-minus"
+                    @click="updateItemQuantity(item, item.quantity - 1)"
+                    icon="i-heroicons-minus"
                     size="xs"
                     color="secondary"
-                    :disabled="item.quantity <= 1 || isLoading"
+                    :loading="isItemUpdating(item)"
+                    loading-icon="i-heroicons-arrow-path-20-solid"
+                    :disabled="item.quantity <= 1 || isItemUpdating(item)"
                     :ui="{ base: 'rounded-none' }"
                 />
                 <span class="text-sm font-medium w-8 text-center">{{ item.quantity }}</span>
                 <UButton
-                    @click="updateCartItemQuantity(item.product?.slug || item.slug, item.quantity + 1, item.variation_id)"
-                    icon="i-lucide-plus"
+                    @click="updateItemQuantity(item, item.quantity + 1)"
+                    icon="i-heroicons-plus"
                     size="xs"
                     color="secondary"
-                    :disabled="isLoading || checkMaxStock(item)"
+                    :loading="isItemUpdating(item)"
+                    loading-icon="i-heroicons-arrow-path-20-solid"
+                    :disabled="isItemUpdating(item) || checkMaxStock(item)"
                     :ui="{ base: 'rounded-none' }"
                 />
                 <UButton
@@ -303,6 +307,32 @@ const getItemOriginalTotal = (item: any): number => {
 
 // Use shared helper for max stock check
 const checkMaxStock = isMaxStockReached
+
+const updatingItems = ref<Record<string, boolean>>({})
+
+const getItemKey = (item: any) => {
+  return `${item.product?.slug || item.slug}::${item.variation_id ?? 'default'}`
+}
+
+const setItemUpdating = (item: any, value: boolean) => {
+  updatingItems.value = {
+    ...updatingItems.value,
+    [getItemKey(item)]: value
+  }
+}
+
+const isItemUpdating = (item: any) => {
+  return !!updatingItems.value[getItemKey(item)]
+}
+
+const updateItemQuantity = async (item: any, quantity: number) => {
+  setItemUpdating(item, true)
+  try {
+    await updateCartItemQuantity(item.product?.slug || item.slug, quantity, item.variation_id)
+  } finally {
+    setItemUpdating(item, false)
+  }
+}
 
 const handleCheckout = async () => {
   // Check if user is logged in

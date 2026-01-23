@@ -22,6 +22,14 @@ const { fetchSettings } = useSettings()
 const cart = useCart()
 const route = useRoute()
 
+onMounted(() => {
+  cart.initCart()
+})
+
+onUnmounted(() => {
+  cart.destroyCart()
+})
+
 const { data: settings, pending, error } = await fetchSettings()
 
 // Provide settings and cart globally to all child components

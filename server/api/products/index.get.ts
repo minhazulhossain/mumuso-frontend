@@ -1,5 +1,5 @@
 export default defineEventHandler(async (event) => {
-  const backendUrl = process.env.BACKEND_API_BASE || 'https://mumusoadmin.coderdrivelab.com/api/v1/'
+  const backendUrl = process.env.BACKEND_API_BASE || 'https://admin.mumuso.com.bd/api/v1/'
   const query = getQuery(event)
 
   try {

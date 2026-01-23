@@ -1,12 +1,12 @@
 # Vercel Deployment Checklist
 
-## Pre-Deployment ✅
+## Pre-Deployment âœ…
 
 - [x] Build completes successfully
   ```bash
   npm run build
   ```
-  **Result:** 56.6 MB build (21.1 MB gzipped) ✅
+  **Result:** 56.6 MB build (21.1 MB gzipped) âœ…
 
 - [x] Environment file created (`.env.example`)
   **Purpose:** Documents required variables for team
@@ -22,11 +22,11 @@
   # 17b02e4 Fix critical Vercel deployment issues
   ```
 
-## Vercel Dashboard Setup (⚠️ DO THIS MANUALLY)
+## Vercel Dashboard Setup (âš ï¸ DO THIS MANUALLY)
 
 ### Step 1: Set Environment Variables
 
-Go to: **https://vercel.com/dashboard** → Select Project → **Settings** → **Environment Variables**
+Go to: **https://vercel.com/dashboard** â†’ Select Project â†’ **Settings** â†’ **Environment Variables**
 
 Add these exact variables:
 
@@ -38,7 +38,7 @@ Environments: Production, Preview, Development
 
 ```
 Name: NUXT_PUBLIC_API_BASE
-Value: https://mumusoadmin.coderdrivelab.com/api/v1/
+Value: https://admin.mumuso.com.bd/api/v1/
 Environments: Production, Preview, Development
 ```
 
@@ -55,7 +55,7 @@ Option B: Via Git
 - Push changes to main branch
 - Vercel automatically rebuilds
 
-## Post-Deployment Testing ✅
+## Post-Deployment Testing âœ…
 
 After deployment is successful:
 
@@ -74,12 +74,12 @@ After deployment is successful:
   - Login and verify cart syncs
 
 - [ ] Test API calls
-  - Open DevTools → Network tab
+  - Open DevTools â†’ Network tab
   - Load products page
   - Verify API requests to `https://mumusoadmin.coderdrivelab.com`
 
 - [ ] Monitor logs
-  - Vercel Dashboard → Deployments → Click deployment
+  - Vercel Dashboard â†’ Deployments â†’ Click deployment
   - View Function Logs
   - Check for NUXT_SESSION_PASSWORD or NUXT_PUBLIC_API_BASE errors
 
@@ -97,9 +97,9 @@ After deployment is successful:
 
 If deployment fails:
 
-1. Check Vercel dashboard → Deployments
+1. Check Vercel dashboard â†’ Deployments
 2. Click the previous successful deployment
-3. Click "..." → "Promote to Production"
+3. Click "..." â†’ "Promote to Production"
 
 Or redeploy locally:
 ```bash
@@ -112,7 +112,7 @@ npx vercel deploy --prebuilt
 ```
 Total Size: 56.6 MB (21.1 MB gzipped)
 Vercel Limit: 250 MB
-Usage: 22.6% ✅
+Usage: 22.6% âœ…
 
 Files:
 - 34 API routes

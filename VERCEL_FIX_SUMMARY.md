@@ -8,7 +8,7 @@ Root causes identified and fixed:
 
 ## Issues Found & Fixed
 
-### 1. ❌ Missing `@iconify/utils` Dependency
+### 1. âŒ Missing `@iconify/utils` Dependency
 
 **Error Message:**
 ```
@@ -21,7 +21,7 @@ imported from /var/task/index.mjs
 - Works locally because npm's dependency resolution happens to include it
 - Vercel's build environment didn't install transitive dependencies properly
 
-**Solution:** ✅ FIXED
+**Solution:** âœ… FIXED
 ```json
 // Added to package.json dependencies
 "@iconify/utils": "^2.1.20"
@@ -31,7 +31,7 @@ imported from /var/task/index.mjs
 
 ---
 
-### 2. ❌ Server Crash on Startup - Early Environment Validation
+### 2. âŒ Server Crash on Startup - Early Environment Validation
 
 **Error:**
 - Server crashed during initialization because `guestCart.ts` checked for `NUXT_SESSION_PASSWORD` at **module load time**
@@ -46,7 +46,7 @@ if (!SESSION_PASSWORD) {
 }
 ```
 
-**Solution:** ✅ FIXED - Lazy Validation
+**Solution:** âœ… FIXED - Lazy Validation
 
 Now checks for environment variables **only when cart features are actually used**:
 
@@ -72,32 +72,32 @@ session: {
     password: process.env.NUXT_SESSION_PASSWORD || 'dev-secret-key-...'
 },
 public: {
-    apiBase: process.env.NUXT_PUBLIC_API_BASE || 'https://mumusoadmin.coderdrivelab.com/api/v1/'
+    apiBase: process.env.NUXT_PUBLIC_API_BASE || 'https://admin.mumuso.com.bd/api/v1/'
 }
 ```
 
 **Benefits:**
-- ✅ Server starts successfully
-- ✅ Pages load and render
-- ✅ Only cart/auth operations fail gracefully if config is missing
-- ✅ Users see clear error messages on specific operations
+- âœ… Server starts successfully
+- âœ… Pages load and render
+- âœ… Only cart/auth operations fail gracefully if config is missing
+- âœ… Users see clear error messages on specific operations
 
 **Commit:** `5973397`
 
 ---
 
-### 3. ⚠️ Insecure API URL
+### 3. âš ï¸ Insecure API URL
 
 **Issue:**
 - `.env` file was using `http://` instead of `https://`
 
-**Fix:** ✅ Updated
+**Fix:** âœ… Updated
 ```
 # BEFORE
 NUXT_PUBLIC_API_BASE=http://mumusoadmin.coderdrivelab.com/api/v1/
 
 # AFTER
-NUXT_PUBLIC_API_BASE=https://mumusoadmin.coderdrivelab.com/api/v1/
+NUXT_PUBLIC_API_BASE=https://admin.mumuso.com.bd/api/v1/
 ```
 
 **Commit:** `17b02e4`
@@ -106,24 +106,24 @@ NUXT_PUBLIC_API_BASE=https://mumusoadmin.coderdrivelab.com/api/v1/
 
 ## Current Deployment Status
 
-### Build Status: ✅ SUCCESS
+### Build Status: âœ… SUCCESS
 
 ```
-✓ Build completes in ~30 seconds
-✓ Output: 56.6 MB (21.1 MB gzipped)
-✓ Within Vercel limits: 250 MB per function
-✓ No build errors or critical warnings
-✓ Server starts successfully
-✓ Pages render without errors
+âœ“ Build completes in ~30 seconds
+âœ“ Output: 56.6 MB (21.1 MB gzipped)
+âœ“ Within Vercel limits: 250 MB per function
+âœ“ No build errors or critical warnings
+âœ“ Server starts successfully
+âœ“ Pages render without errors
 ```
 
 ### What Works Out-of-Box
 
-- ✅ **Homepage loads** - No errors
-- ✅ **Product pages load** - Navigation works
-- ✅ **Public pages render** - Blog, contact, etc.
-- ✅ **Cart system initializes** - Uses fallback session password
-- ✅ **API calls attempt** - Go to fallback API endpoint
+- âœ… **Homepage loads** - No errors
+- âœ… **Product pages load** - Navigation works
+- âœ… **Public pages render** - Blog, contact, etc.
+- âœ… **Cart system initializes** - Uses fallback session password
+- âœ… **API calls attempt** - Go to fallback API endpoint
 
 ### What Needs Configuration (Recommended)
 
@@ -175,7 +175,7 @@ e5703fc Add missing @iconify/utils dependency
 ### Production Deploy (Recommended)
 
 1. Complete steps above
-2. Go to **Vercel Dashboard → Settings → Environment Variables**
+2. Go to **Vercel Dashboard â†’ Settings â†’ Environment Variables**
 3. Add two variables:
    - `NUXT_SESSION_PASSWORD=<your-secure-key>`
    - `NUXT_PUBLIC_API_BASE=<your-api-url>`
@@ -231,7 +231,7 @@ These are development defaults and are included in the public build:
 
 ---
 
-**Status:** ✅ Ready for Deployment
+**Status:** âœ… Ready for Deployment
 
 **Last Updated:** 2025-11-16
 

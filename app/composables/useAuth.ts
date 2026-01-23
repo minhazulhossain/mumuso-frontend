@@ -8,6 +8,7 @@ const handleAuthError = (error: any, defaultMessage: string): never => {
 
 export const useAuth = () => {
     const user = useUserSession()
+    const cart = useCart()
 
     // Login user
     const login = async (email: string, password: string) => {
@@ -18,6 +19,8 @@ export const useAuth = () => {
             })
 
             await user.fetch()
+            cart.clearLocalCache()
+            await cart.fetchCart()
             return data
         } catch (error: any) {
             handleAuthError(error, 'Login failed')
@@ -33,6 +36,8 @@ export const useAuth = () => {
             })
 
             await user.fetch()
+            cart.clearLocalCache()
+            await cart.fetchCart()
             return data
         } catch (error: any) {
             handleAuthError(error, 'Registration failed')
@@ -49,6 +54,7 @@ export const useAuth = () => {
             console.error('Logout error:', error)
         } finally {
             user.clear()
+            cart.resetCartState()
             await navigateTo('/auth/login')
         }
     }

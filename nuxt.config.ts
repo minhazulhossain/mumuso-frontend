@@ -75,7 +75,7 @@ export default defineNuxtConfig({
     runtimeConfig: {
         // Backend API URL - used by server-side code and client-side code
         public: {
-            apiBase: process.env.NUXT_PUBLIC_API_BASE || 'https://mumusoadmin.coderdrivelab.com/api/v1/'
+            apiBase: process.env.NUXT_PUBLIC_API_BASE || 'https://admin.mumuso.com.bd/api/v1/'
         },
         // ✅ Session config for nuxt-auth-utils
         // WARNING: Must be set via environment variable in production

@@ -19,10 +19,32 @@
       </div>
 
       <!-- Loading State -->
-      <div v-if="loading" class="flex justify-center py-16">
-        <div class="text-center">
-          <UIcon name="i-heroicons-arrow-path" class="w-12 h-12 animate-spin text-primary-500 mx-auto mb-4"/>
-          <p class="text-gray-600 dark:text-gray-400">Loading your orders...</p>
+      <div v-if="!ordersInitialized || loading" class="space-y-4">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+          <div class="flex flex-wrap gap-2">
+            <USkeleton class="h-8 w-24" />
+            <USkeleton class="h-8 w-28" />
+            <USkeleton class="h-8 w-28" />
+            <USkeleton class="h-8 w-28" />
+          </div>
+        </div>
+        <div class="space-y-3">
+          <UCard v-for="i in 5" :key="`order-skel-${i}`" class="p-4">
+            <div class="flex flex-col gap-3">
+              <div class="flex items-center justify-between">
+                <USkeleton class="h-4 w-24" />
+                <USkeleton class="h-4 w-20" />
+              </div>
+              <div class="grid grid-cols-2 gap-3 md:grid-cols-5">
+                <USkeleton class="h-4 w-full" />
+                <USkeleton class="h-4 w-full" />
+                <USkeleton class="h-4 w-full" />
+                <USkeleton class="h-4 w-full" />
+                <USkeleton class="h-8 w-full" />
+              </div>
+              <USkeleton class="h-3 w-3/4" />
+            </div>
+          </UCard>
         </div>
       </div>
 
@@ -113,7 +135,7 @@
           >
             <!-- Order Header (Compact) -->
             <div class="p-3 border-b border-gray-200 dark:border-gray-700">
-              <div class="grid grid-cols-1 md:grid-cols-5 gap-3 items-center">
+              <div class="flex flex-col gap-3 md:grid md:grid-cols-5 md:items-center">
                 <div>
                   <p class="text-xs text-gray-500 dark:text-gray-400">Order #</p>
                   <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ order.order_number }}</p>
@@ -133,26 +155,34 @@
                 <div>
                   <p class="text-xs text-gray-500 dark:text-gray-400">Status</p>
                   <div class="flex gap-1 flex-wrap">
-                    <UBadge :color="getStatusColor(order.status)" variant="subtle" size="xs">
+                    <UBadge
+                      variant="solid"
+                      size="xs"
+                      :class="getStatusBadgeClass(order.status)"
+                    >
                       {{ capitalizeFirstLetter(order.status) }}
                     </UBadge>
-                    <UBadge :color="getPaymentStatusColor(order.payment_status)" variant="subtle" size="xs">
+                    <UBadge
+                      variant="solid"
+                      size="xs"
+                      :class="getPaymentStatusBadgeClass(order.payment_status)"
+                    >
                       {{ capitalizeFirstLetter(order.payment_status) }}
                     </UBadge>
-                    <UBadge v-if="order.coupon_code" color="green" variant="subtle" size="xs">
+                    <UBadge v-if="order.coupon_code" variant="solid" size="xs" class="bg-emerald-600 text-white">
                       <UIcon name="i-heroicons-check-circle" class="w-3 h-3 mr-0.5"/>
                       {{ order.coupon_code }}
                     </UBadge>
                   </div>
                 </div>
-                <div class="flex gap-1 w-full md:w-auto justify-end">
+                <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto md:justify-end">
                   <UButton
                     :to="`/account/orders/${order.id}`"
                     variant="outline"
                     color="primary"
                     size="xs"
                     icon="i-heroicons-eye"
-                    class="flex-1 md:flex-none"
+                    class="w-full sm:w-auto"
                   >
                     Details
                   </UButton>
@@ -163,7 +193,7 @@
                     size="xs"
                     icon="i-heroicons-credit-card"
                     :loading="payingOrderId === order.id"
-                    class="flex-1 md:flex-none"
+                    class="w-full sm:w-auto"
                   >
                     Pay
                   </UButton>
@@ -258,6 +288,7 @@ const { formatCurrency } = useCurrency()
 const orders = ref([])
 const loading = ref(false)
 const error = ref<string | null>(null)
+const ordersInitialized = ref(false)
 const selectedStatus = ref<string | null>(null)
 const expandedOrder = ref<number | null>(null)
 const payingOrderId = ref<number | null>(null)
@@ -347,35 +378,35 @@ const capitalizeFirstLetter = (str: string) => {
   return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
-const getStatusColor = (status: string) => {
+const getStatusBadgeClass = (status: string) => {
   switch (status) {
     case 'pending':
-      return 'amber'
+      return 'bg-amber-100 text-amber-800'
     case 'processing':
-      return 'blue'
+      return 'bg-sky-100 text-sky-800'
     case 'shipped':
-      return 'cyan'
+      return 'bg-violet-100 text-violet-800'
     case 'delivered':
-      return 'green'
+      return 'bg-emerald-100 text-emerald-800'
     case 'cancelled':
-      return 'red'
+      return 'bg-rose-100 text-rose-800'
     default:
-      return 'gray'
+      return 'bg-gray-100 text-gray-800'
   }
 }
 
-const getPaymentStatusColor = (status: string) => {
+const getPaymentStatusBadgeClass = (status: string) => {
   switch (status) {
     case 'pending':
-      return 'amber'
+      return 'bg-amber-100 text-amber-800'
     case 'paid':
-      return 'green'
+      return 'bg-emerald-100 text-emerald-800'
     case 'failed':
-      return 'red'
+      return 'bg-rose-100 text-rose-800'
     case 'refunded':
-      return 'blue'
+      return 'bg-slate-100 text-slate-800'
     default:
-      return 'gray'
+      return 'bg-gray-100 text-gray-800'
   }
 }
 
@@ -401,6 +432,7 @@ const loadOrders = async () => {
     console.error('[Orders Page] Error loading orders:', err)
   } finally {
     loading.value = false
+    ordersInitialized.value = true
   }
 }
 

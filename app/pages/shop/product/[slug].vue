@@ -39,7 +39,7 @@
                  :class="{ 'hidden': isZoomed }">
               <div
                   class="bg-white dark:bg-gray-800 rounded-full p-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                <UIcon name="i-lucide-lightbulb" class="text-2xl text-gray-700 dark:text-gray-300"/>
+                <UIcon name="i-heroicons-magnifying-glass-plus-20-solid" class="text-2xl text-gray-700 dark:text-gray-300"/>
               </div>
             </div>
             <!-- Discount Badge -->

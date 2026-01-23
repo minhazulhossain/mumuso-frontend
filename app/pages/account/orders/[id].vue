@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
-    <UContainer class="max-w-4xl">
+    <UContainer>
       <!-- Breadcrumb Navigation -->
       <nav class="flex items-center gap-2 mb-4" aria-label="Breadcrumb">
         <ULink to="/" class="text-primary-600 dark:text-primary-400 hover:underline text-xs">Home</ULink>
@@ -13,9 +13,56 @@
       </nav>
 
       <!-- Loading State -->
-      <div v-if="loading" class="text-center py-12">
-        <UIcon name="i-heroicons-arrow-path" class="text-3xl text-primary-500 mb-2 animate-spin inline-block"/>
-        <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">Loading order details...</p>
+      <div v-if="!orderInitialized || loading" class="space-y-4">
+        <UCard class="p-4">
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div>
+              <USkeleton class="h-3 w-20 mb-2" />
+              <USkeleton class="h-4 w-24" />
+            </div>
+            <div>
+              <USkeleton class="h-3 w-20 mb-2" />
+              <USkeleton class="h-4 w-28" />
+            </div>
+            <div>
+              <USkeleton class="h-3 w-16 mb-2" />
+              <USkeleton class="h-5 w-20" />
+            </div>
+            <div>
+              <USkeleton class="h-3 w-24 mb-2" />
+              <USkeleton class="h-5 w-24" />
+            </div>
+          </div>
+        </UCard>
+
+        <UCard class="p-4">
+          <USkeleton class="h-4 w-28 mb-4" />
+          <div class="space-y-3">
+            <div v-for="i in 3" :key="`order-item-skel-${i}`" class="flex gap-3">
+              <USkeleton class="h-16 w-16 rounded-lg" />
+              <div class="flex-1 space-y-2">
+                <USkeleton class="h-4 w-40" />
+                <USkeleton class="h-3 w-24" />
+              </div>
+              <USkeleton class="h-4 w-20" />
+            </div>
+          </div>
+        </UCard>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <UCard class="p-4">
+            <USkeleton class="h-4 w-32 mb-3" />
+            <USkeleton class="h-3 w-40" />
+            <USkeleton class="h-3 w-52" />
+            <USkeleton class="h-3 w-36" />
+          </UCard>
+          <UCard class="p-4">
+            <USkeleton class="h-4 w-32 mb-3" />
+            <USkeleton class="h-3 w-40" />
+            <USkeleton class="h-3 w-52" />
+            <USkeleton class="h-3 w-36" />
+          </UCard>
+        </div>
       </div>
 
       <!-- Error State -->
@@ -29,7 +76,7 @@
       <div v-else-if="orderData" class="space-y-4">
         <!-- Order Status Header -->
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-3 pb-4 border-b border-gray-200 dark:border-gray-700">
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
             <div>
               <p class="text-xs text-gray-500 dark:text-gray-400 mb-0.5">Order Number</p>
               <p class="text-sm font-bold text-gray-900 dark:text-white">{{ orderNumber }}</p>
@@ -40,7 +87,11 @@
             </div>
             <div>
               <p class="text-xs text-gray-500 dark:text-gray-400 mb-0.5">Status</p>
-              <UBadge :color="getStatusColor(orderData.status)" variant="subtle" size="xs">
+              <UBadge
+                variant="solid"
+                size="xs"
+                :class="getStatusBadgeClass(orderData.status)"
+              >
                 {{ capitalizeFirstLetter(orderData.status) }}
               </UBadge>
             </div>
@@ -227,6 +278,7 @@ const orderData = ref(null)
 const loading = computed(() => composableLoading.value)
 const error = computed(() => composableError.value || error_local.value)
 const error_local = ref(null)
+const orderInitialized = ref(false)
 const retryPaymentLoading = ref(false)
 
 // Refs for order information
@@ -291,21 +343,21 @@ const capitalizeFirstLetter = (str: string | undefined) => {
   return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
-const getStatusColor = (status: string | undefined) => {
-  if (!status) return 'gray'
+const getStatusBadgeClass = (status: string | undefined) => {
+  if (!status) return 'bg-gray-100 text-gray-800'
   switch (status) {
     case 'pending':
-      return 'amber'
+      return 'bg-amber-100 text-amber-800'
     case 'processing':
-      return 'blue'
+      return 'bg-sky-100 text-sky-800'
     case 'shipped':
-      return 'cyan'
+      return 'bg-violet-100 text-violet-800'
     case 'delivered':
-      return 'green'
+      return 'bg-emerald-100 text-emerald-800'
     case 'cancelled':
-      return 'red'
+      return 'bg-rose-100 text-rose-800'
     default:
-      return 'gray'
+      return 'bg-gray-100 text-gray-800'
   }
 }
 
@@ -353,7 +405,7 @@ const loadOrder = async () => {
 
     if (order) {
       orderData.value = order
-      orderNumber.value = order.id || order.order_number || orderId
+      orderNumber.value = order.order_number || order.id || orderId
       orderDate.value = new Date(order.created_at).toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'short',
@@ -408,6 +460,8 @@ const loadOrder = async () => {
   } catch (err: any) {
     error_local.value = err.message || 'Failed to load order'
     console.error('Order loading error:', err)
+  } finally {
+    orderInitialized.value = true
   }
 }
 

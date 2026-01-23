@@ -38,7 +38,9 @@
           <UInput
               :model-value="modelValue.firstName"
               @update:model-value="updateField('firstName', $event)"
+              class="w-full"
               size="lg"
+              placeholder="John"
           />
         </UFormField>
 
@@ -46,7 +48,9 @@
           <UInput
               :model-value="modelValue.lastName"
               @update:model-value="updateField('lastName', $event)"
+              class="w-full"
               size="lg"
+              placeholder="Doe"
           />
         </UFormField>
       </div>
@@ -55,15 +59,19 @@
         <UInput
             :model-value="modelValue.address1"
             @update:model-value="updateField('address1', $event)"
+            class="w-full"
             size="lg"
+            placeholder="123 Main Street"
         />
       </UFormField>
 
-      <UFormField label="Address Line 2">
+      <UFormField label="Address Line 2" hint="Apartment, suite, etc. (optional)">
         <UInput
             :model-value="modelValue.address2"
             @update:model-value="updateField('address2', $event)"
+            class="w-full"
             size="lg"
+            placeholder="Apt 4B"
         />
       </UFormField>
 
@@ -72,26 +80,32 @@
           <UInput
               :model-value="modelValue.city"
               @update:model-value="updateField('city', $event)"
+              class="w-full"
               size="lg"
+              placeholder="New York"
           />
         </UFormField>
 
-        <UFormField label="State" required>
+        <UFormField label="State/Province" required>
           <USelectMenu
               :model-value="modelValue.state"
               @update:model-value="updateField('state', $event)"
-              :options="states"
+              :items="states"
+              class="w-full"
               size="lg"
+              placeholder="Select state"
               value-attribute="value"
               option-attribute="label"
           />
         </UFormField>
 
-        <UFormField label="ZIP Code" required>
+        <UFormField label="ZIP/Postal Code" required>
           <UInput
               :model-value="modelValue.zipCode"
               @update:model-value="updateField('zipCode', $event)"
+              class="w-full"
               size="lg"
+              placeholder="10001"
           />
         </UFormField>
       </div>
@@ -100,8 +114,10 @@
         <USelectMenu
             :model-value="modelValue.country"
             @update:model-value="updateField('country', $event)"
-            :options="countries"
+            :items="countries"
+            class="w-full"
             size="lg"
+            placeholder="Select country"
             value-attribute="value"
             option-attribute="label"
         />
@@ -111,6 +127,7 @@
         <UInput
             :model-value="modelValue.phone"
             @update:model-value="updateField('phone', $event)"
+            class="w-full"
             size="lg"
             placeholder="+1 (555) 123-4567"
         />

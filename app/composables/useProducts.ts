@@ -14,6 +14,99 @@ export const useProducts = () => {
     const error: Ref<string | null> = useState('products-error', () => null)
     const cachedFilters: Ref<ProductFilters> = useState('cached-filters', () => ({}))
 
+    const normalizeBoolean = (value: any): boolean | null => {
+        if (value === null || value === undefined) return null
+        if (typeof value === 'boolean') return value
+        if (typeof value === 'number') return value > 0
+        if (typeof value === 'string') {
+            const normalized = value.trim().toLowerCase()
+            if (['1', 'true', 'yes', 'in_stock', 'instock', 'available'].includes(normalized)) return true
+            if (['0', 'false', 'no', 'out_of_stock', 'outofstock', 'unavailable'].includes(normalized)) return false
+        }
+        return null
+    }
+
+    const normalizeStockQuantity = (value: any): number => {
+        if (value && typeof value === 'object') {
+            const nested =
+                value.available_stock ??
+                value.stock_quantity ??
+                value.quantity ??
+                value.qty
+            const nestedNum = Number(nested)
+            return Number.isFinite(nestedNum) ? nestedNum : 0
+        }
+        const num = Number(value)
+        return Number.isFinite(num) ? num : 0
+    }
+
+    const normalizeStockStatus = (value: any, quantity: number, inStock: boolean | null): string => {
+        if (typeof value === 'string') {
+            const normalized = value.trim().toLowerCase()
+            if (normalized.includes('in')) return 'in_stock'
+            if (normalized.includes('out')) return 'out_of_stock'
+        }
+        if (typeof value === 'boolean') return value ? 'in_stock' : 'out_of_stock'
+        if (typeof value === 'number') return value > 0 ? 'in_stock' : 'out_of_stock'
+        if (inStock !== null) return inStock ? 'in_stock' : 'out_of_stock'
+        return quantity > 0 ? 'in_stock' : 'out_of_stock'
+    }
+
+    const normalizeInStock = (value: any, quantity: number, stockStatus: any): boolean => {
+        const normalized = normalizeBoolean(value)
+        if (normalized !== null) return normalized
+        const status = normalizeStockStatus(stockStatus, quantity, null)
+        if (status === 'in_stock') return true
+        if (status === 'out_of_stock') return false
+        return quantity > 0
+    }
+
+    const normalizeVariation = (variation: any) => {
+        const stockQuantity = normalizeStockQuantity(
+            variation?.stock_quantity ?? variation?.available_stock ?? variation?.stock ?? variation?.quantity ?? variation?.qty ?? 0
+        )
+        const inStock = normalizeInStock(
+            variation?.in_stock ?? variation?.is_in_stock ?? variation?.inStock ?? variation?.available ?? variation?.is_available,
+            stockQuantity,
+            variation?.stock_status
+        )
+        const stockStatus = normalizeStockStatus(variation?.stock_status, stockQuantity, inStock)
+
+        return {
+            ...variation,
+            stock_quantity: stockQuantity,
+            in_stock: inStock,
+            stock_status: stockStatus
+        }
+    }
+
+    const normalizeProduct = (product: any) => {
+        const stockQuantity = normalizeStockQuantity(
+            product?.stock_quantity ?? product?.available_stock ?? product?.stock ?? product?.quantity ?? product?.qty ?? 0
+        )
+        const baseInStock = normalizeInStock(
+            product?.in_stock ?? product?.is_in_stock ?? product?.inStock ?? product?.available ?? product?.is_available,
+            stockQuantity,
+            product?.stock_status
+        )
+        const variations = Array.isArray(product?.variations)
+            ? product.variations.map(normalizeVariation)
+            : product?.variations
+        const variationsInStock = Array.isArray(variations)
+            ? variations.some(v => v?.stock_status === 'in_stock' && (v?.stock_quantity || 0) > 0)
+            : false
+        const inStock = variationsInStock || baseInStock
+        const stockStatus = normalizeStockStatus(product?.stock_status, stockQuantity, inStock)
+
+        return {
+            ...product,
+            variations,
+            stock_quantity: stockQuantity,
+            in_stock: inStock,
+            stock_status: stockStatus
+        }
+    }
+
     /**
      * Build query parameters from filters
      */
@@ -70,7 +163,7 @@ export const useProducts = () => {
                 query: queryParams
             })
 
-            products.value = response.data || []
+            products.value = (response.data || []).map(normalizeProduct)
 
             // Set pagination if exists
             if (response.meta) {
@@ -107,7 +200,7 @@ export const useProducts = () => {
                 `${apiUrl}products/${slug}`
             )
 
-            return response.data
+            return normalizeProduct(response.data)
         } catch (err: any) {
             error.value = err.message || 'Failed to fetch product'
             throw err

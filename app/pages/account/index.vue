@@ -9,8 +9,24 @@
       </div>
 
       <ClientOnly>
-        <div v-if="pending" class="flex justify-center py-12">
-          <UIcon name="i-heroicons-arrow-path" class="animate-spin text-4xl text-primary-500"/>
+        <div v-if="pending" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <UCard v-for="i in 4" :key="`address-skel-${i}`">
+            <div class="space-y-3">
+              <div class="flex items-start justify-between">
+                <div class="space-y-2">
+                  <USkeleton class="h-5 w-24" />
+                  <USkeleton class="h-3 w-32" />
+                </div>
+                <USkeleton class="h-8 w-8 rounded-full" />
+              </div>
+              <div class="space-y-2">
+                <USkeleton class="h-3 w-40" />
+                <USkeleton class="h-3 w-52" />
+                <USkeleton class="h-3 w-36" />
+                <USkeleton class="h-3 w-28" />
+              </div>
+            </div>
+          </UCard>
         </div>
 
         <div v-else-if="error" class="text-center py-12">
@@ -23,7 +39,7 @@
           <UButton @click="isAddModalOpen = true">Add Your First Address</UButton>
         </div>
 
-        <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <UCard
               v-for="address in addresses"
               :key="address.id"
@@ -33,7 +49,7 @@
               <div class="flex items-start justify-between">
                 <div>
                   <div class="flex items-center gap-2">
-                    <h3 class="font-semibold text-lg">{{ address.type }}</h3>
+                    <h3 class="font-semibold text-lg uppercase">{{ address.type }}</h3>
                     <UBadge v-if="address.is_default" color="primary" variant="subtle">
                       Default
                     </UBadge>
@@ -42,22 +58,37 @@
                 </div>
                 <UDropdownMenu :items="getDropdownItems(address)">
                   <UButton
-                      icon="i-heroicons-ellipsis-vertical"
+                      icon="i-heroicons-cog-6-tooth-20-solid"
                       variant="ghost"
-                      color="secondary"
+                      color="primary"
                   />
                 </UDropdownMenu>
               </div>
 
               <div class="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-                <p>{{ address.first_name }} {{ address.last_name }}</p>
-                <p>{{ address.address_line_1 }}</p>
-                <p v-if="address.address_line_2">{{ address.address_line_2 }}</p>
-                <p>{{ address.city }}, {{ address.state }} {{ address.postal_code }}</p>
-                <p>{{ address.country }}</p>
-                <p v-if="address.phone" class="flex items-center gap-1">
-                  <UIcon name="i-heroicons-phone" class="size-4"/>
-                  {{ address.phone }}
+                <p class="flex items-center gap-2">
+                  <UIcon name="i-heroicons-user" class="size-4 text-gray-400"/>
+                  <span class="font-medium text-gray-700 dark:text-gray-300">Name:</span> {{ address.first_name }} {{ address.last_name }}
+                </p>
+                <p class="flex items-center gap-2">
+                  <UIcon name="i-heroicons-home" class="size-4 text-gray-400"/>
+                  <span class="font-medium text-gray-700 dark:text-gray-300">Street:</span> {{ address.address_line_1 }}
+                </p>
+                <p v-if="address.address_line_2" class="flex items-center gap-2">
+                  <UIcon name="i-heroicons-building-office-2" class="size-4 text-gray-400"/>
+                  <span class="font-medium text-gray-700 dark:text-gray-300">Address 2:</span> {{ address.address_line_2 }}
+                </p>
+                <p class="flex items-center gap-2">
+                  <UIcon name="i-heroicons-map-pin" class="size-4 text-gray-400"/>
+                  <span class="font-medium text-gray-700 dark:text-gray-300">City/State/ZIP:</span> {{ address.city }}, {{ address.state }} {{ address.postal_code }}
+                </p>
+                <p class="flex items-center gap-2">
+                  <UIcon name="i-heroicons-globe-alt" class="size-4 text-gray-400"/>
+                  <span class="font-medium text-gray-700 dark:text-gray-300">Country:</span> {{ address.country }}
+                </p>
+                <p v-if="address.phone" class="flex items-center gap-2">
+                  <UIcon name="i-heroicons-phone" class="size-4 text-gray-400"/>
+                  <span class="font-medium text-gray-700 dark:text-gray-300">Phone:</span> {{ address.phone }}
                 </p>
               </div>
             </div>
@@ -65,8 +96,24 @@
         </div>
 
         <template #fallback>
-          <div class="flex justify-center py-12">
-            <UIcon name="i-heroicons-arrow-path" class="animate-spin text-4xl text-primary-500"/>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 py-4">
+            <UCard v-for="i in 4" :key="`address-fallback-skel-${i}`">
+              <div class="space-y-3">
+                <div class="flex items-start justify-between">
+                  <div class="space-y-2">
+                    <USkeleton class="h-5 w-24" />
+                    <USkeleton class="h-3 w-32" />
+                  </div>
+                  <USkeleton class="h-8 w-8 rounded-full" />
+                </div>
+                <div class="space-y-2">
+                  <USkeleton class="h-3 w-40" />
+                  <USkeleton class="h-3 w-52" />
+                  <USkeleton class="h-3 w-36" />
+                  <USkeleton class="h-3 w-28" />
+                </div>
+              </div>
+            </UCard>
           </div>
         </template>
       </ClientOnly>
@@ -75,7 +122,7 @@
     <!-- Add/Edit Address Modal -->
     <UModal v-model:open="isAddModalOpen" :dismissible="!loading" title="Add/Update Address" description="Address add/update">
       <template #content>
-        <UCard>
+        <UCard class="max-h-[80vh] overflow-y-auto">
           <template #header>
             <div class="flex items-center gap-3">
               <div class="p-2 bg-primary-50 dark:bg-primary-900/20 rounded-lg">
@@ -114,7 +161,7 @@
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <UFormField label="First Name" required name="first_name">
+              <UFormField label="First Name" required name="first_name" :error="fieldErrors.first_name || undefined">
                 <UInput
                     v-model="form.first_name"
                     placeholder="First Name"
@@ -123,7 +170,7 @@
                 />
               </UFormField>
 
-              <UFormField label="Last Name" required name="last_name">
+              <UFormField label="Last Name" required name="last_name" :error="fieldErrors.last_name || undefined">
                 <UInput
                     v-model="form.last_name"
                     placeholder="Last Name"
@@ -140,7 +187,7 @@
                 <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300">Location Details</h3>
               </div>
 
-              <UFormField label="Street Address" required name="street" >
+              <UFormField label="Street Address" required name="street" :error="fieldErrors.address_line_1 || undefined">
                 <UTextarea
                     v-model="form.address_line_1"
                     placeholder="Enter your street address, apartment, suite, etc."
@@ -154,7 +201,7 @@
 
             <!-- City & State -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <UFormField label="City" required name="city">
+              <UFormField label="City" required name="city" :error="fieldErrors.city || undefined">
                 <UInput
                     v-model="form.city"
                     placeholder="City"
@@ -163,7 +210,7 @@
                 />
               </UFormField>
 
-              <UFormField label="State / Province" required name="state">
+              <UFormField label="State / Province" required name="state" :error="fieldErrors.state || undefined">
                 <UInput
                     v-model="form.state"
                     placeholder="State or Province"
@@ -175,7 +222,7 @@
 
             <!-- ZIP & Country -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <UFormField label="ZIP / Postal Code" required name="zip">
+              <UFormField label="ZIP / Postal Code" required name="zip" :error="fieldErrors.postal_code || undefined">
                 <UInput
                     v-model="form.postal_code"
                     placeholder="e.g., 12345"
@@ -184,7 +231,7 @@
                 />
               </UFormField>
 
-              <UFormField label="Country" required name="country">
+              <UFormField label="Country" required name="country" :error="fieldErrors.country || undefined">
                 <USelectMenu
                     v-model="form.country"
                     :items="countries"
@@ -351,7 +398,7 @@ const {user} = useUserSession()
 const {fetchAddresses, createAddress, updateAddress, deleteAddress, setDefaultAddress} = useUser()
 const toast = useToast()
 
-const {data: addresses, pending, error, refresh} = await useAsyncData(
+const {data: addressesResponse, pending, error, refresh} = await useAsyncData(
     'addresses',
     () => fetchAddresses(),
     {
@@ -359,6 +406,45 @@ const {data: addresses, pending, error, refresh} = await useAsyncData(
       server: false
     }
 )
+
+const normalizeAddress = (address: any) => {
+  const first_name = address.first_name ?? address.firstName ?? ''
+  const last_name = address.last_name ?? address.lastName ?? ''
+  const address_line_1 = address.address_line_1 ?? address.address1 ?? address.address_line1 ?? address.address ?? ''
+  const address_line_2 = address.address_line_2 ?? address.address2 ?? address.address_line2 ?? ''
+  const city = address.city ?? ''
+  const state = address.state ?? address.province ?? ''
+  const postal_code = address.postal_code ?? address.zip_code ?? address.zipCode ?? ''
+  const country = address.country ?? address.country_code ?? ''
+  const phone = address.phone ?? address.phone_number ?? ''
+  const type = address.type ?? address.address_type ?? 'home'
+  const label = address.label ?? address.company ?? `${first_name} ${last_name}`.trim()
+  const is_default = address.is_default ?? address.default ?? false
+  const id = address.id ?? address.address_id ?? address.addressId
+
+  return {
+    ...address,
+    id,
+    type,
+    label,
+    first_name,
+    last_name,
+    address_line_1,
+    address_line_2,
+    city,
+    state,
+    postal_code,
+    country,
+    phone,
+    is_default
+  }
+}
+
+const addresses = computed(() => {
+  const raw = addressesResponse.value
+  const list = Array.isArray(raw) ? raw : (raw?.data || [])
+  return list.map(normalizeAddress)
+})
 
 const isAddModalOpen = ref(false)
 const isDeleteModalOpen = ref(false)
@@ -487,7 +573,75 @@ const handleSetDefault = async (address: any) => {
   }
 }
 
+const fieldErrors = reactive<Record<string, string | null>>({
+  first_name: null,
+  last_name: null,
+  address_line_1: null,
+  city: null,
+  state: null,
+  postal_code: null,
+  country: null
+})
+
+const clearFieldErrors = () => {
+  Object.keys(fieldErrors).forEach((key) => {
+    fieldErrors[key] = null
+  })
+}
+
+const clearFormState = () => {
+  clearFieldErrors()
+  editingAddress.value = null
+  Object.assign(form, {
+    type: 'home',
+    first_name: '',
+    last_name: '',
+    address_line_1: '',
+    address_line_2: '',
+    city: '',
+    state: '',
+    postal_code: '',
+    country: 'BD',
+    phone: '',
+    is_default: false,
+    notes: ''
+  })
+}
+
+const validateForm = () => {
+  clearFieldErrors()
+
+  if (!form.type) {
+    toast.add({
+      title: 'Missing required fields',
+      description: 'Address type is required',
+      color: 'warning'
+    })
+    return false
+  }
+
+  if (!form.first_name?.trim()) fieldErrors.first_name = 'First name is required'
+  if (!form.last_name?.trim()) fieldErrors.last_name = 'Last name is required'
+  if (!form.address_line_1?.trim()) fieldErrors.address_line_1 = 'Street address is required'
+  if (!form.city?.trim()) fieldErrors.city = 'City is required'
+  if (!form.state?.trim()) fieldErrors.state = 'State/Province is required'
+  if (!form.postal_code?.trim()) fieldErrors.postal_code = 'ZIP/Postal code is required'
+  if (!form.country?.trim()) fieldErrors.country = 'Country is required'
+
+  const hasErrors = Object.values(fieldErrors).some((value) => Boolean(value))
+  if (hasErrors) {
+    toast.add({
+      title: 'Missing required fields',
+      description: 'Please complete the highlighted fields',
+      color: 'warning'
+    })
+  }
+
+  return !hasErrors
+}
+
 const handleSubmit = async () => {
+  if (!validateForm()) return
   loading.value = true
   try {
     if (editingAddress.value) {
@@ -542,20 +696,18 @@ const confirmDelete = async () => {
 
 const closeModal = () => {
   isAddModalOpen.value = false
-  editingAddress.value = null
-  Object.assign(form, {
-    type: 'home',
-    first_name: '',
-    last_name: '',
-    address_line_1: '',
-    address_line_2: '',
-    city: '',
-    state: '',
-    postal_code: '',
-    country: 'BD',
-    phone: '',
-    is_default: false,
-    notes: ''
-  })
+  clearFormState()
 }
+
+watch(isAddModalOpen, (open) => {
+  if (open) {
+    if (!editingAddress.value) {
+      clearFormState()
+    } else {
+      clearFieldErrors()
+    }
+  } else {
+    clearFormState()
+  }
+})
 </script>

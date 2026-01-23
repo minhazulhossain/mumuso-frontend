@@ -14,6 +14,34 @@ export const useCoupon = () => {
         isApplying: false,
         error: null
     }))
+    const storageKey = 'mumuso_cart_coupon'
+
+    const loadStoredCoupon = () => {
+        if (!process.client) return
+        if (couponState.value.code || couponState.value.discount > 0) return
+
+        try {
+            const raw = localStorage.getItem(storageKey)
+            if (!raw) return
+            const stored = JSON.parse(raw)
+            if (!stored || typeof stored !== 'object') return
+
+            const code = typeof stored.code === 'string' ? stored.code : ''
+            const discount = Number(stored.discount) || 0
+            const coupon = stored.coupon || null
+
+            if (code && discount > 0) {
+                couponState.value = {
+                    ...couponState.value,
+                    code,
+                    discount,
+                    coupon
+                }
+            }
+        } catch (error) {
+            console.warn('Failed to load stored coupon:', error)
+        }
+    }
 
     const availableCoupons = useState<Coupon[]>('availableCoupons', () => [])
     const isLoadingCoupons = useState('isLoadingCoupons', () => false)
@@ -141,6 +169,13 @@ export const useCoupon = () => {
             isApplying: false,
             error: null
         }
+        if (process.client) {
+            try {
+                localStorage.removeItem(storageKey)
+            } catch (error) {
+                console.warn('Failed to clear stored coupon:', error)
+            }
+        }
 
         toast.add({
             title: 'Coupon Removed',
@@ -178,6 +213,26 @@ export const useCoupon = () => {
 
         return `${couponState.value.code} - ${discountText}`
     })
+
+    loadStoredCoupon()
+
+    watch(couponState, (nextState) => {
+        if (!process.client) return
+        try {
+            const payload = {
+                code: nextState.code,
+                discount: nextState.discount,
+                coupon: nextState.coupon
+            }
+            if (payload.code && payload.discount > 0) {
+                localStorage.setItem(storageKey, JSON.stringify(payload))
+            } else {
+                localStorage.removeItem(storageKey)
+            }
+        } catch (error) {
+            console.warn('Failed to persist coupon:', error)
+        }
+    }, { deep: true })
 
     return {
         // State

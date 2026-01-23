@@ -13,26 +13,28 @@
 
         <!-- Slide Over Content -->
         <template #content>
-          <ShopSidebar
-              v-model:filters="activeFilters"
-              @apply-filters="applyFilters"
-              @clear-filters="clearAllFilters"
-              @close-mobile="showMobileFilters = false"
-              :hide-category-filter="hideCategoryFilter"
-              :is-mobile="true"
-          />
+        <ShopSidebar
+            v-model:filters="activeFilters"
+            @apply-filters="applyFilters"
+            @clear-filters="clearAllFilters"
+            @close-mobile="showMobileFilters = false"
+            :hide-category-filter="hideCategoryFilter"
+            :is-mobile="true"
+            :loading="loadingContent || loading"
+        />
         </template>
       </USlideover>
 
       <div class="flex flex-col lg:flex-row gap-8">
         <!-- Filters Sidebar - Visible on desktop only -->
         <ShopSidebar
-            v-show="isLargeScreen"
+            class="hidden lg:block"
             v-model:filters="activeFilters"
             @apply-filters="applyFilters"
             @clear-filters="clearAllFilters"
             :hide-category-filter="hideCategoryFilter"
             :is-mobile="false"
+            :loading="loadingContent || loading"
         />
 
         <!-- Products Grid -->
@@ -50,7 +52,7 @@
               <div class="flex gap-2">
                 <!-- Filter Toggle Button (Mobile only) -->
                 <UButton
-                    v-if="!isLargeScreen"
+                    class="lg:hidden"
                     @click="showMobileFilters = !showMobileFilters"
                     :variant="showMobileFilters ? 'solid' : 'soft'"
                     color="primary"
@@ -310,7 +312,6 @@ const searchQuery = ref('')
 const sortBy = ref('featured')
 const viewMode = ref<'grid' | 'list'>('grid')
 const showMobileFilters = ref(false)
-const windowWidth = ref(0)
 const activeFilters = ref<any>({
   category: props.initialCategory || 'all',
   featured: undefined,
@@ -329,9 +330,6 @@ const sortOptions = [
   {value: 'name-asc', label: 'Name: A-Z'},
   {value: 'name-desc', label: 'Name: Z-A'},
 ]
-
-// Computed
-const isLargeScreen = computed(() => windowWidth.value >= 1024)
 
 const hasActiveFilters = computed(() => {
   return (
@@ -465,26 +463,6 @@ const debouncedSearch = () => {
   }, 500)
 }
 
-// Window resize handler for responsive sidebar
-const handleWindowResize = () => {
-  windowWidth.value = typeof window !== 'undefined' ? window.innerWidth : 0
-  // Auto-close mobile filters when resizing to large screen
-  if (isLargeScreen.value) {
-    showMobileFilters.value = false
-  }
-}
-
-onMounted(() => {
-  // Set initial window width
-  windowWidth.value = typeof window !== 'undefined' ? window.innerWidth : 0
-  // Add resize listener
-  window.addEventListener('resize', handleWindowResize)
-})
-
-onBeforeUnmount(() => {
-  // Clean up resize listener
-  window.removeEventListener('resize', handleWindowResize)
-})
 
 // Initialize from URL params
 const initializeFromUrl = () => {

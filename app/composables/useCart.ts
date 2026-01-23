@@ -22,13 +22,18 @@ const handleCartError = (
 export const useCart = () => {
     const toast = useToast()
     const config = useRuntimeConfig()
+    const session = useUserSession()
+    const loggedIn = session.loggedIn
 
     const cartItems = useState<CartItem[]>('cart', () => [])
     const cartTotals = useState<CartTotals | null>('cartTotals', () => null)
     const appliedDiscounts = useState<AppliedDiscount[]>('appliedDiscounts', () => [])
     const isCartOpen = useState('isCartOpen', () => false)
     const isLoading = useState('cartLoading', () => false)
+    const cartInitialized = useState('cartInitialized', () => false)
     const reservationTimer = useState<number | null>('reservationTimer', () => null)
+    const isRestoringFromCache = useState('cartRestoringFromCache', () => false)
+    const cartCacheKey = 'mumuso_cart_items'
 
     // Computed values
     const cartTotal = computed(() => {
@@ -60,8 +65,75 @@ export const useCart = () => {
     })
 
     const cartItemsCount = computed(() => {
-        return cartItems.value.reduce((total, item) => total + item.quantity, 0)
+        return cartItems.value.length
     })
+
+    const readCartCache = (): Array<{ slug: string; quantity: number; variation_id?: number }> => {
+        if (!process.client) return []
+        try {
+            const raw = localStorage.getItem(cartCacheKey)
+            if (!raw) return []
+            const parsed = JSON.parse(raw)
+            if (!Array.isArray(parsed)) return []
+            return parsed.filter(item => item?.slug && item?.quantity)
+        } catch (error) {
+            console.warn('Failed to read cart cache:', error)
+            return []
+        }
+    }
+
+    const writeCartCache = (items: CartItem[]) => {
+        if (!process.client) return
+        try {
+            const cached = items.map(item => ({
+                slug: item.slug || item.product?.slug,
+                quantity: item.quantity,
+                variation_id: item.variation_id
+            })).filter(item => item.slug && item.quantity)
+
+            if (cached.length > 0) {
+                localStorage.setItem(cartCacheKey, JSON.stringify(cached))
+            } else {
+                localStorage.removeItem(cartCacheKey)
+            }
+        } catch (error) {
+            console.warn('Failed to write cart cache:', error)
+        }
+    }
+
+    const clearCartCache = () => {
+        if (!process.client) return
+        try {
+            localStorage.removeItem(cartCacheKey)
+        } catch (error) {
+            console.warn('Failed to clear cart cache:', error)
+        }
+    }
+
+    const resetCartState = () => {
+        cartItems.value = []
+        cartTotals.value = null
+        appliedDiscounts.value = []
+        isCartOpen.value = false
+        cartInitialized.value = false
+        clearCartCache()
+    }
+
+    const restoreGuestCartFromCache = async (cachedItems: Array<{ slug: string; quantity: number; variation_id?: number }>) => {
+        if (!process.client || cachedItems.length === 0) return
+        const restorePromises = cachedItems.map(item => $fetch('/api/cart/add', {
+            method: 'POST',
+            body: {
+                slug: item.slug,
+                quantity: item.quantity,
+                variation_id: item.variation_id
+            }
+        }).catch(error => {
+            console.warn(`Failed to restore cart item ${item.slug}:`, error)
+        }))
+
+        await Promise.allSettled(restorePromises)
+    }
 
     // Fetch product details for a cart item
     const fetchProductDetails = async (slug: string) => {
@@ -99,6 +171,43 @@ export const useCart = () => {
             cartTotals.value = response?.totals || null
             appliedDiscounts.value = response?.applied_discounts || []
 
+            if (process.client && !loggedIn.value) {
+                const cachedItems = readCartCache()
+                const responseHasItems = (response.items?.length || 0) > 0
+
+                if (!responseHasItems && cachedItems.length > 0 && !isRestoringFromCache.value) {
+                    isRestoringFromCache.value = true
+                    try {
+                        await restoreGuestCartFromCache(cachedItems)
+                        const retry: CartResponse = await $fetch<CartResponse>('/api/cart')
+
+                        if (retry.items?.length) {
+                            cartItems.value = await Promise.all(
+                                retry.items.map(async (item: any) => {
+                                    if (!item.product && item.slug) {
+                                        const product = await fetchProductDetails(item.slug)
+                                        return product ? { ...item, product } : item
+                                    }
+                                    return item
+                                })
+                            )
+                        } else {
+                            cartItems.value = retry.items || []
+                        }
+
+                        cartTotals.value = retry?.totals || null
+                        appliedDiscounts.value = retry?.applied_discounts || []
+                        writeCartCache(cartItems.value)
+                    } finally {
+                        isRestoringFromCache.value = false
+                    }
+                } else {
+                    writeCartCache(cartItems.value)
+                }
+            } else if (process.client && loggedIn.value) {
+                clearCartCache()
+            }
+
             return response
         } catch (error) {
             console.error('Failed to fetch cart:', error)
@@ -106,6 +215,7 @@ export const useCart = () => {
             return null
         } finally {
             isLoading.value = false
+            cartInitialized.value = true
         }
     }
 
@@ -220,6 +330,7 @@ export const useCart = () => {
             })
 
             cartItems.value = []
+            clearCartCache()
 
             toast.add({
                 title: 'Cart Cleared',
@@ -246,6 +357,7 @@ export const useCart = () => {
 
             cartItems.value = []
             isCartOpen.value = false
+            clearCartCache()
 
             if (reservationTimer.value) {
                 clearInterval(reservationTimer.value)
@@ -328,16 +440,14 @@ export const useCart = () => {
         return getItemBySlug(slug, variationId)?.quantity || 0
     }
 
-    // Initialize cart on mount
-    onMounted(async () => {
+    const initCart = async () => {
         await fetchCart()
         startReservationTimer()
-    })
+    }
 
-    // Cleanup on unmount
-    onUnmounted(() => {
+    const destroyCart = () => {
         stopReservationTimer()
-    })
+    }
 
     return {
         // State
@@ -351,6 +461,7 @@ export const useCart = () => {
         cartItemsCount,
         isCartOpen,
         isLoading: readonly(isLoading),
+        cartInitialized: readonly(cartInitialized),
 
         // Actions
         addToCart,
@@ -361,6 +472,10 @@ export const useCart = () => {
         toggleCart,
         fetchCart,
         extendReservation,
+        clearLocalCache: clearCartCache,
+        resetCartState,
+        initCart,
+        destroyCart,
 
         // Helpers
         getItemBySlug,

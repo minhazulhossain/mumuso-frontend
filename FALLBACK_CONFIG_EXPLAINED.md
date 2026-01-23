@@ -10,7 +10,7 @@ session: {
     password: process.env.NUXT_SESSION_PASSWORD || 'dev-secret-key-change-in-production-min-32-xxx'
 },
 public: {
-    apiBase: process.env.NUXT_PUBLIC_API_BASE || 'https://mumusoadmin.coderdrivelab.com/api/v1/'
+    apiBase: process.env.NUXT_PUBLIC_API_BASE || 'https://admin.mumuso.com.bd/api/v1/'
 }
 ```
 
@@ -26,9 +26,9 @@ public: {
 - Used for client cookies
 
 **Why It's Safe for Testing:**
-- ✓ Works fine for development
-- ✓ Good enough for staging/testing
-- ⚠️ NOT secure for production (exposed in source code)
+- âœ“ Works fine for development
+- âœ“ Good enough for staging/testing
+- âš ï¸ NOT secure for production (exposed in source code)
 
 **When to Override:**
 - Production deployments
@@ -54,7 +54,7 @@ public: {
 
 ### API Base URL Fallback
 
-**Default Value:** `https://mumusoadmin.coderdrivelab.com/api/v1/`
+**Default Value:** `https://admin.mumuso.com.bd/api/v1/`
 
 **What It Does:**
 - Routes all API calls to this endpoint
@@ -66,10 +66,10 @@ public: {
 - No broken state - app still functions
 
 **Problems with Fallback:**
-- ❌ Points to someone else's API (coderdrivelab.com)
-- ❌ Not your database/data
-- ❌ Not secure for production
-- ❌ Could break if that domain changes
+- âŒ Points to someone else's API (coderdrivelab.com)
+- âŒ Not your database/data
+- âŒ Not secure for production
+- âŒ Could break if that domain changes
 
 **When to Override:**
 - Always for production
@@ -94,31 +94,31 @@ public: {
 
 ```
 Environment Variables: (none set)
-↓
+â†“
 Uses Fallback Values
-↓
-✓ Homepage loads
-✓ Products show (from coderdrivelab.com)
-✓ Cart works (with dev password)
-✓ Everything functions
-✗ But uses demo data, not your data
+â†“
+âœ“ Homepage loads
+âœ“ Products show (from coderdrivelab.com)
+âœ“ Cart works (with dev password)
+âœ“ Everything functions
+âœ— But uses demo data, not your data
 ```
 
 ### Scenario 2: Production Deploy (With Config)
 
 ```
 Environment Variables:
-• NUXT_SESSION_PASSWORD = <your-secure-key>
-• NUXT_PUBLIC_API_BASE = https://your-api.com/api/v1/
+â€¢ NUXT_SESSION_PASSWORD = <your-secure-key>
+â€¢ NUXT_PUBLIC_API_BASE = https://your-api.com/api/v1/
 
-↓
+â†“
 Overrides Fallback Values
-↓
-✓ Homepage loads
-✓ Products show (from your API)
-✓ Cart works (with your session key)
-✓ Uses YOUR data
-✓ Secure & production-ready
+â†“
+âœ“ Homepage loads
+âœ“ Products show (from your API)
+âœ“ Cart works (with your session key)
+âœ“ Uses YOUR data
+âœ“ Secure & production-ready
 ```
 
 ---
@@ -127,7 +127,7 @@ Overrides Fallback Values
 
 ### Using Fallback Values
 
-**Risk Level:** 🟡 Medium (for testing/staging)
+**Risk Level:** ðŸŸ¡ Medium (for testing/staging)
 
 **Risks:**
 - Session password is in source code
@@ -148,7 +148,7 @@ Overrides Fallback Values
 
 ### Using Environment Variables
 
-**Risk Level:** 🟢 Low (secure)
+**Risk Level:** ðŸŸ¢ Low (secure)
 
 **Benefits:**
 - Unique password per deployment
@@ -173,12 +173,12 @@ Overrides Fallback Values
 // Check which API endpoint is being used
 window.__NUXT__?.config?.public?.apiBase
 // or
-// Check network requests - look at the URL in DevTools → Network tab
+// Check network requests - look at the URL in DevTools â†’ Network tab
 ```
 
 ### In Vercel Logs
 
-1. Go to Vercel Dashboard → Deployments → Click deployment
+1. Go to Vercel Dashboard â†’ Deployments â†’ Click deployment
 2. View Function Logs
 3. Look for API endpoint in requests (should show your URL if env vars set)
 
@@ -192,7 +192,7 @@ env | grep NUXT
 # If variables show:
 # NUXT_SESSION_PASSWORD=<value>
 # NUXT_PUBLIC_API_BASE=<value>
-# Then production config is active ✓
+# Then production config is active âœ“
 
 # If variables are empty:
 # Then fallback values are being used (check if intended)
@@ -207,7 +207,7 @@ env | grep NUXT
 **Cause:** `NUXT_PUBLIC_API_BASE` environment variable not set
 
 **Solution:**
-1. Go to Vercel Dashboard → Settings → Environment Variables
+1. Go to Vercel Dashboard â†’ Settings â†’ Environment Variables
 2. Add `NUXT_PUBLIC_API_BASE` with your API URL
 3. Trigger redeploy
 4. Verify in browser Network tab that API calls go to your domain
@@ -276,11 +276,11 @@ env | grep NUXT
 
 ### Warning Signs
 
-- ❌ API calls to wrong domain
-- ❌ Cart data not persisting
-- ❌ Login failures
-- ❌ "Cannot find package" errors
-- ❌ Function invocation failed
+- âŒ API calls to wrong domain
+- âŒ Cart data not persisting
+- âŒ Login failures
+- âŒ "Cannot find package" errors
+- âŒ Function invocation failed
 
 ---
 
@@ -291,7 +291,7 @@ env | grep NUXT
 | Session Password | Development key | Your secure key |
 | API Endpoint | coderdrivelab.com | Your API |
 | Data | Demo data | Your data |
-| Security | ⚠️ Not secure | ✓ Secure |
+| Security | âš ï¸ Not secure | âœ“ Secure |
 | Suitable For | Testing | Production |
 | When to Use | Now (test) | After setup |
 

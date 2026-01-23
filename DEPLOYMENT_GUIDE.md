@@ -1,19 +1,19 @@
 # Vercel Deployment Guide
 
 ## Status
-✅ **Build:** Succeeds without errors
-✅ **Server:** Starts successfully with fallback values
-⚠️  **Configuration:** Environment variables recommended for production security
+âœ… **Build:** Succeeds without errors
+âœ… **Server:** Starts successfully with fallback values
+âš ï¸  **Configuration:** Environment variables recommended for production security
 
 ## Critical Steps to Deploy
 
 ### 1. Set Vercel Environment Variables (STRONGLY RECOMMENDED)
 
-Go to **Vercel Dashboard → Your Project → Settings → Environment Variables** and add:
+Go to **Vercel Dashboard â†’ Your Project â†’ Settings â†’ Environment Variables** and add:
 
 ```
 NUXT_SESSION_PASSWORD=42fb3ccd4d6f4df49f4429771b02141f
-NUXT_PUBLIC_API_BASE=https://mumusoadmin.coderdrivelab.com/api/v1/
+NUXT_PUBLIC_API_BASE=https://admin.mumuso.com.bd/api/v1/
 ```
 
 **Why:**
@@ -26,20 +26,20 @@ NUXT_PUBLIC_API_BASE=https://mumusoadmin.coderdrivelab.com/api/v1/
 - API calls will go to the fallback domain instead of your configured API
 - This is fine for testing but **not recommended for production**
 
-### 2. Update Local .env to HTTPS (Already Done ✅)
+### 2. Update Local .env to HTTPS (Already Done âœ…)
 
 Changed from `http://` to `https://` in `.env` file.
 
 **Reason:** Prevents browser mixed content warnings and security issues.
 
-### 3. Remove Hardcoded Password Fallbacks (Already Done ✅)
+### 3. Remove Hardcoded Password Fallbacks (Already Done âœ…)
 
 - Updated `server/utils/guestCart.ts` to fail fast if `NUXT_SESSION_PASSWORD` is missing
 - Updated `nuxt.config.ts` to require env variables in production
 
 **Reason:** Prevents silent failures and inconsistent behavior across deployments.
 
-### 4. Create .env.example (Already Done ✅)
+### 4. Create .env.example (Already Done âœ…)
 
 Created `.env.example` documenting all required environment variables.
 
@@ -91,7 +91,7 @@ Coolify Nuxt guidance for this repo using Nixpacks.
 
 ## Build Output
 
-- **Size:** 56.6 MB (21.1 MB gzipped) ✅ Well under Vercel's 250 MB limit
+- **Size:** 56.6 MB (21.1 MB gzipped) âœ… Well under Vercel's 250 MB limit
 - **Output:** `.vercel/output/` directory ready for deployment
 - **Function:** Single serverless function `__fallback.func` handles all routes
 
@@ -106,7 +106,7 @@ Coolify Nuxt guidance for this repo using Nixpacks.
 
 ### "Function Invocation Failed" Error
 - **Cause:** Missing `@iconify/utils` dependency (now fixed)
-- **Status:** ✅ Resolved - added to package.json
+- **Status:** âœ… Resolved - added to package.json
 
 ### API calls go to wrong domain
 - **Cause:** `NUXT_PUBLIC_API_BASE` not set or using fallback
@@ -130,7 +130,7 @@ Coolify Nuxt guidance for this repo using Nixpacks.
 
 1. Go to Vercel Dashboard
 2. Select your project
-3. Navigate to Settings → Environment Variables
+3. Navigate to Settings â†’ Environment Variables
 4. Add the two required variables from Step 1
 5. Redeploy (or push to trigger new build)
 6. Test login, cart, and API calls

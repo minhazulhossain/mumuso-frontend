@@ -1,7 +1,13 @@
 export const useUser = () => {
     const fetchAddresses = async () => {
         // Call your Nuxt server API endpoint (not Laravel directly)
-        return await $fetch('/api/user/addresses')
+        const response = await $fetch('/api/user/addresses')
+
+        if (response?.success) {
+            return response.data || []
+        }
+
+        return response?.data || response || []
     }
 
     const createAddress = async (addressData: any) => {

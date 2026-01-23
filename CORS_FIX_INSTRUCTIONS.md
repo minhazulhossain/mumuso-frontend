@@ -2,11 +2,11 @@
 
 ## Problem Identified
 
-Your backend at `https://mumusoadmin.coderdrivelab.com/api/v1/` doesn't have CORS headers enabled. When the frontend running on `https://mumuso-frontend.vercel.app/` tries to call the backend directly, the browser blocks the request.
+Your backend at `https://admin.mumuso.com.bd/api/v1/` doesn't have CORS headers enabled. When the frontend running on `https://mumuso-frontend.vercel.app/` tries to call the backend directly, the browser blocks the request.
 
 **Error you're seeing:**
 ```
-Access to fetch at 'https://mumusoadmin.coderdrivelab.com/api/v1/...'
+Access to fetch at 'https://admin.mumuso.com.bd/api/v1/...'
 from origin 'https://mumuso-frontend-...-vercel.app' has been blocked
 by CORS policy: No 'Access-Control-Allow-Origin' header
 ```
@@ -23,7 +23,7 @@ We've implemented a **server-side proxy endpoint** at `/api/proxy/` that:
 
 1. **Updated proxy endpoint** - Changed to use HTTPS backend URL
    - File: `server/api/proxy/[...].get.ts`
-   - Changed from: `http://mumusoadmin...` → `https://mumusoadmin...`
+   - Changed from: `http://mumusoadmin...` â†’ `https://mumusoadmin...`
 
 2. **Code is already configured to use proxy as fallback**
    - File: `nuxt.config.ts` (line 48)
@@ -38,8 +38,8 @@ We've implemented a **server-side proxy endpoint** at `/api/proxy/` that:
 
 ### Steps to Remove NUXT_PUBLIC_API_BASE:
 
-1. Go to **Vercel Dashboard** → **Your Project**
-2. Click **Settings** → **Environment Variables**
+1. Go to **Vercel Dashboard** â†’ **Your Project**
+2. Click **Settings** â†’ **Environment Variables**
 3. Find `NUXT_PUBLIC_API_BASE`
 4. Click the **trash icon** to delete it
 5. Click **Save** or **Deploy**
@@ -55,14 +55,14 @@ We've implemented a **server-side proxy endpoint** at `/api/proxy/` that:
 
 ```
 Browser (Frontend)
-    ↓ (same-origin, no CORS)
+    â†“ (same-origin, no CORS)
 Vercel Server (/api/proxy/...)
-    ↓ (server-to-server, no CORS restrictions)
+    â†“ (server-to-server, no CORS restrictions)
 Backend (HTTPS)
-    ↓ (response)
+    â†“ (response)
 Vercel Server
-    ↓ (same-origin response)
-Browser (Frontend) ✅
+    â†“ (same-origin response)
+Browser (Frontend) âœ…
 ```
 
 ## Deployment Steps
@@ -77,20 +77,20 @@ Browser (Frontend) ✅
 After deployment:
 
 1. Open your site: https://mumuso-frontend-...vercel.app
-2. Open **Browser DevTools** → **Console** tab
+2. Open **Browser DevTools** â†’ **Console** tab
 3. You should **NOT** see CORS errors
 4. Homepage should load with:
-   - Navigation items ✓
-   - Product listing ✓
-   - Categories ✓
+   - Navigation items âœ“
+   - Product listing âœ“
+   - Categories âœ“
 
 ## If It Still Doesn't Work
 
 Check Vercel function logs:
 
-1. Go to **Vercel Dashboard** → **Your Project**
-2. Click **Deployments** → Latest deployment
-3. Click **Deployment** → **Function Logs** (top tabs)
+1. Go to **Vercel Dashboard** â†’ **Your Project**
+2. Click **Deployments** â†’ Latest deployment
+3. Click **Deployment** â†’ **Function Logs** (top tabs)
 4. Look for errors related to proxy
 5. Share the error message
 
@@ -111,8 +111,8 @@ bfecd8e Update proxy endpoint to use HTTPS backend URL
 
 # What changed:
 - server/api/proxy/[...].get.ts
-  - HTTP fallback → HTTPS fallback
-  - Now: https://mumusoadmin.coderdrivelab.com/api/v1/
+  - HTTP fallback â†’ HTTPS fallback
+  - Now: https://admin.mumuso.com.bd/api/v1/
 ```
 
 ---

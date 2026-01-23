@@ -38,14 +38,6 @@
       </div>
     </div>
 
-    <!-- Coupon Input -->
-    <div class="mb-6">
-      <CouponInput
-        :amount="subtotal"
-        @coupon="handleCouponChange"
-      />
-    </div>
-
     <!-- Price Breakdown -->
     <div class="space-y-3 pb-4 border-b border-gray-200 dark:border-gray-700">
       <div class="flex justify-between text-gray-600 dark:text-gray-400">
@@ -54,9 +46,9 @@
       </div>
 
       <!-- Coupon Discount -->
-      <div v-if="appliedCoupon.discount > 0" class="flex justify-between text-green-600 dark:text-green-400">
-        <span>Discount ({{ appliedCoupon.code }})</span>
-        <span class="font-medium">-{{ formatCurrency(appliedCoupon.discount) }}</span>
+      <div v-if="props.appliedCoupon.discount > 0" class="flex justify-between text-green-600 dark:text-green-400">
+        <span>Discount ({{ props.appliedCoupon.code }})</span>
+        <span class="font-medium">-{{ formatCurrency(props.appliedCoupon.discount) }}</span>
       </div>
 
       <div class="flex justify-between text-gray-600 dark:text-gray-400">
@@ -124,37 +116,23 @@ interface CartItem {
   }
 }
 
-interface AppliedCoupon {
-  code: string
-  discount: number
-}
-
 const props = withDefaults(defineProps<{
   cartItems?: CartItem[]
   shippingCost?: number
   taxRate?: number
+  appliedCoupon?: {
+    code: string
+    discount: number
+  }
 }>(), {
   cartItems: () => [],
   shippingCost: 0,
-  taxRate: 0
+  taxRate: 0,
+  appliedCoupon: () => ({ code: '', discount: 0 })
 })
 const { formatCurrency } = useCurrency()
 
-const appliedCoupon = ref<AppliedCoupon>({
-  code: '',
-  discount: 0
-})
-
 const taxRate = props.taxRate || 0
-
-// Handle coupon changes from CouponInput component
-const handleCouponChange = (couponData: AppliedCoupon) => {
-  appliedCoupon.value = {
-    code: couponData.code,
-    discount: couponData.discount
-  }
-  console.log('Coupon updated in order summary:', couponData)
-}
 
 // Computed values
 const subtotal = computed(() => {
@@ -166,7 +144,7 @@ const subtotal = computed(() => {
 })
 
 const tax = computed(() => {
-  return ((subtotal.value - appliedCoupon.value.discount) * taxRate) / 100
+  return ((subtotal.value - props.appliedCoupon.discount) * taxRate) / 100
 })
 
 const total = computed(() => {
@@ -174,6 +152,6 @@ const total = computed(() => {
 })
 
 const finalTotal = computed(() => {
-  return total.value - appliedCoupon.value.discount
+  return total.value - props.appliedCoupon.discount
 })
 </script>
