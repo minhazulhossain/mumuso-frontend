@@ -66,7 +66,7 @@
                 :class="selectedImage === image.url ? 'border-primary-500' : 'border-transparent hover:border-gray-300'"
             >
               <img
-                  :src="image.thumb"
+                  :src="image.thumb || image.url || image.original || image.medium || image.large || selectedImage"
                   :alt="image.alt"
                   class="w-full h-full object-cover"
               />

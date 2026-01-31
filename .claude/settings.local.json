@@ -35,7 +35,9 @@
       "Bash(ngrok update:*)",
       "Bash(kill:*)",
       "Bash(netstat:*)",
-      "Bash(xargs basename:*)"
+      "Bash(xargs basename:*)",
+      "Bash(git checkout:*)",
+      "Bash(npm ci:*)"
     ],
     "deny": [],
     "ask": []

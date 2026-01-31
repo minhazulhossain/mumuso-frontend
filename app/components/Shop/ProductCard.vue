@@ -8,11 +8,12 @@
           class="w-full h-full absolute inset-0"
       />
       <NuxtImg
-          :src="product.image"
+          :src="primaryImage"
           :alt="product.name"
           :class="[
           'w-full h-full object-cover transition-opacity duration-300',
-          imageLoaded ? 'opacity-100 group-hover:opacity-0' : 'opacity-0'
+          imageLoaded ? 'opacity-100' : 'opacity-0',
+          secondaryImage ? 'group-hover:opacity-0' : ''
         ]"
           sizes="xs:100vw sm:50vw md:33vw lg:25vw"
           loading="lazy"
@@ -79,6 +80,73 @@ defineEmits<{
 }>()
 
 const imageLoaded = ref(false)
-const secondaryImage = computed(() => product.value.images?.all?.[1]?.url ?? null)
+const normalizeImageKey = (url: string) => {
+  try {
+    const { pathname } = new URL(url)
+    const filename = pathname.split('/').pop() || ''
+    const withoutExt = filename.replace(/\.[^/.]+$/, '')
+    return withoutExt
+      .replace(/-(thumb|small|medium|large)$/, '')
+      .replace(/-jpg$/, '')
+  } catch {
+    return url
+      .replace(/\.[^/.]+$/, '')
+      .replace(/-(thumb|small|medium|large)$/, '')
+      .replace(/-jpg$/, '')
+  }
+}
+
+const primaryImage = computed(() => {
+  const featured = product.value.images?.featured
+  return (
+    product.value.image ||
+    product.value.image_webp ||
+    product.value.image_thumb ||
+    featured?.medium ||
+    featured?.original ||
+    featured?.large ||
+    featured?.thumb ||
+    ''
+  )
+})
+
+const secondaryImage = computed(() => {
+  const primaryUrl = primaryImage.value
+  const primaryKey = primaryUrl ? normalizeImageKey(primaryUrl) : ''
+  const candidates: string[] = []
+
+  const pushIfValid = (url?: string) => {
+    if (url) candidates.push(url)
+  }
+
+  const images = product.value.images?.all ?? []
+  images.forEach((image) => {
+    pushIfValid(image.url)
+    pushIfValid(image.thumb)
+    // Fallbacks for APIs that use different keys
+    pushIfValid((image as any).original)
+    pushIfValid((image as any).medium)
+    pushIfValid((image as any).large)
+  })
+
+  const variations = product.value.variations ?? []
+  variations.forEach((variation) => {
+    const variationImages = variation?.images
+    pushIfValid(variationImages?.medium)
+    pushIfValid(variationImages?.original)
+    pushIfValid(variationImages?.large)
+    pushIfValid(variationImages?.thumb)
+  })
+
+  const seenKeys = new Set<string>()
+  for (const url of candidates) {
+    const key = normalizeImageKey(url)
+    if (key === primaryKey || seenKeys.has(key)) continue
+    seenKeys.add(key)
+    return url
+  }
+
+  return null
+})
 const { formatCurrency } = useCurrency()
 </script>

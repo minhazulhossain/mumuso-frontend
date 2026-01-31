@@ -20,7 +20,7 @@
             @close-mobile="showMobileFilters = false"
             :hide-category-filter="hideCategoryFilter"
             :is-mobile="true"
-            :loading="loadingContent || loading"
+            :loading="isLoading"
         />
         </template>
       </USlideover>
@@ -34,13 +34,29 @@
             @clear-filters="clearAllFilters"
             :hide-category-filter="hideCategoryFilter"
             :is-mobile="false"
-            :loading="loadingContent || loading"
+            :loading="isLoading"
         />
 
         <!-- Products Grid -->
         <div class="flex-1">
           <!-- Search and Sort -->
           <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm mb-6">
+            <div v-if="isLoading" class="space-y-4">
+              <div class="flex flex-col sm:flex-row gap-4">
+                <USkeleton class="h-10 flex-1" />
+                <div class="flex gap-2">
+                  <USkeleton class="h-9 w-20 lg:hidden" />
+                  <USkeleton class="h-9 w-40" />
+                </div>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <USkeleton class="h-6 w-20" />
+                <USkeleton class="h-6 w-24" />
+                <USkeleton class="h-6 w-16" />
+                <USkeleton class="h-6 w-24" />
+              </div>
+            </div>
+            <template v-else>
             <div class="flex flex-col sm:flex-row gap-4">
               <UInput
                   v-model="searchQuery"
@@ -136,9 +152,10 @@
                 Clear All
               </UButton>
             </div>
+            </template>
           </div>
           <!-- Loading State -->
-          <div v-if="loadingContent">
+          <div v-if="isLoading">
             <!-- Grid Skeleton -->
             <template v-if="viewMode === 'grid'">
               <div class="grid grid-cols-2 md:grid-cols-2 xl:grid-cols-3 gap-3">
@@ -235,7 +252,7 @@
                 <div class="flex gap-2">
                   <UButton
                       @click="changePage(1)"
-                      :disabled="pagination.currentPage === 1 || loading"
+                      :disabled="pagination.currentPage === 1 || isLoading"
                       icon="i-heroicons-chevron-double-left"
                       color="primary"
                       variant="soft"
@@ -244,7 +261,7 @@
 
                   <UButton
                       @click="changePage(pagination.currentPage - 1)"
-                      :disabled="pagination.currentPage === 1 || loading"
+                      :disabled="pagination.currentPage === 1 || isLoading"
                       icon="i-heroicons-chevron-left"
                       color="primary"
                       variant="soft"
@@ -258,7 +275,7 @@
 
                   <UButton
                       @click="changePage(pagination.currentPage + 1)"
-                      :disabled="pagination.currentPage === pagination.lastPage || loading"
+                      :disabled="pagination.currentPage === pagination.lastPage || isLoading"
                       icon="i-heroicons-chevron-right"
                       trailing
                       color="primary"
@@ -269,7 +286,7 @@
 
                   <UButton
                       @click="changePage(pagination.lastPage)"
-                      :disabled="pagination.currentPage === pagination.lastPage || loading"
+                      :disabled="pagination.currentPage === pagination.lastPage || isLoading"
                       icon="i-heroicons-chevron-double-right"
                       trailing
                       color="primary"
@@ -288,17 +305,24 @@
 
 <script setup lang="ts">
 import { useCurrency } from '#imports'
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   title?: string
   subTitle?: string
   loadingContent?: boolean
   hideCategoryFilter?: boolean
   initialCategory?: string
-}>()
+}>(), {
+  loadingContent: false
+})
 
 const {
-  products, pagination, error, fetchProducts,
-  changePage: apiChangePage, getAllCategories
+  products,
+  pagination,
+  error,
+  fetchProducts,
+  loading: productsLoading,
+  changePage: apiChangePage,
+  getAllCategories
 } = useProducts()
 const cart = inject('cart')
 const {addToCart} = cart
@@ -306,6 +330,7 @@ const toast = useToast()
 const route = useRoute()
 const router = useRouter()
 const { formatCurrency } = useCurrency()
+const isLoading = computed(() => Boolean(props.loadingContent || pageLoading.value || productsLoading.value))
 
 // State
 const searchQuery = ref('')
@@ -435,9 +460,23 @@ const changePage = async (page: number) => {
   window.scrollTo({top: 0, behavior: 'smooth'})
 }
 
-const handleAddToCart = async (productId: number, quantity: number) => {
+const handleAddToCart = async (productId: number | string, quantity: number = 1) => {
+  const product =
+    typeof productId === 'number'
+      ? products.value.find((item) => item.id === productId)
+      : products.value.find((item) => item.slug === productId)
+  const slug = product?.slug ?? (typeof productId === 'string' ? productId : '')
+  if (!slug) {
+    toast.add({
+      title: 'Error',
+      description: 'Unable to add product to cart',
+      color: 'error',
+      icon: 'i-heroicons-exclamation-circle'
+    })
+    return
+  }
   try {
-    await addToCart(productId, quantity)
+    await addToCart(slug, quantity)
     toast.add({
       title: 'Success',
       description: 'Product added to cart',
@@ -479,7 +518,7 @@ const initializeFromUrl = () => {
 
 // Fetch products on server and client
 // Using pending from useAsyncData as the single source of truth for loading state
-const { pending: loading } = await useAsyncData(async () => {
+const { pending: pageLoading } = await useAsyncData(async () => {
   initializeFromUrl()
   await loadProducts()
   return products.value

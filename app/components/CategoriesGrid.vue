@@ -6,28 +6,12 @@
 
     <ClientOnly v-else-if="categories && categories.length > 0">
       <div class="relative">
-        <button
-          type="button"
-          aria-label="Previous category"
-          :class="`carousel-nav-btn ${navId}-prev`"
-          class="absolute left-2 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-9 h-9 bg-white/90 border border-gray-200 text-gray-900 hover:text-primary-500 transition-colors"
-        >
-          <UIcon name="i-heroicons-chevron-left" class="w-4 h-4" />
-        </button>
-        <button
-          type="button"
-          aria-label="Next category"
-          :class="`carousel-nav-btn ${navId}-next`"
-          class="absolute right-2 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-9 h-9 bg-white/90 border border-gray-200 text-gray-900 hover:text-primary-500 transition-colors"
-        >
-          <UIcon name="i-heroicons-chevron-right" class="w-4 h-4" />
-        </button>
         <Swiper
-            :modules="[Navigation]"
+            :modules="[Pagination]"
             :slides-per-view="4"
             :space-between="12"
             :loop="categories.length > 8"
-            :navigation="navigationOptions"
+            :pagination="paginationOptions"
             :breakpoints="{
               768: { slidesPerView: 6, spaceBetween: 16 },
               1024: { slidesPerView: 8, spaceBetween: 20 }
@@ -38,11 +22,11 @@
           <NuxtLink :to="`/categories/${item.slug}`" class="group">
             <UCard variant="soft" :ui="{ root: 'bg-transparent ring-0', header: 'p-0 sm:px-0 border-0', body:'p-0 sm:p-0 text-center' }" >
               <template #header>
-                <div class="relative w-full aspect-[50/50] rounded-full transition-transform duration-300 group-hover:scale-105">
+                <div class="relative w-16 h-16 md:w-20 md:h-20 rounded-full bg-gray-100 overflow-hidden transition-transform duration-300 group-hover:scale-105 mb-2 flex items-center justify-center mx-auto">
                   <NuxtImg
                       :src="item?.image ? item.image?.original : ''"
                       :class="[
-                    'transition-all w-12 md:w-16 duration-300 absolute top-[50%] left-[50%] translate-[-50%] group-hover:drop-shadow',
+                    'transition-all w-12 md:w-16 duration-300 group-hover:drop-shadow',
                   ]"
                       @load="handleImageLoad(item?.image ? item.image?.original : '')"
                       :alt="item?.name"
@@ -58,6 +42,7 @@
           </NuxtLink>
         </SwiperSlide>
       </Swiper>
+      <div :class="`categories-pagination ${navId}-pagination`"></div>
       </div>
       <template #fallback>
         <div class="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 px-2 sm:px-4">
@@ -75,7 +60,7 @@
 
 <script setup lang="ts">
 import { Swiper, SwiperSlide } from 'swiper/vue'
-import { Navigation } from 'swiper/modules'
+import { Pagination } from 'swiper/modules'
 
 const { fetchFeaturedCategories } = useContent()
 const { data: categories, pending: loading } = await fetchFeaturedCategories()
@@ -87,10 +72,33 @@ const handleImageLoad = (src: string) => {
 }
 
 const navId = useId()
-const navigationOptions = computed(() => {
+const paginationOptions = computed(() => {
   return categories.value && categories.value.length > 1
-    ? { prevEl: `.${navId}-prev`, nextEl: `.${navId}-next` }
+    ? { el: `.${navId}-pagination`, clickable: true }
     : false
 })
 
 </script>
+
+<style scoped>
+.categories-pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding-top: 14px;
+}
+
+.categories-pagination :deep(.swiper-pagination-bullet) {
+  width: 8px;
+  height: 8px;
+  background: #d1d5db;
+  opacity: 1;
+  border-radius: 999px;
+  transition: all 0.2s ease;
+}
+
+.categories-pagination :deep(.swiper-pagination-bullet-active) {
+  background: #ef4444;
+  width: 22px;
+}
+</style>

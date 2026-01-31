@@ -15,13 +15,27 @@
           </div>
 
           <div class="categories-content">
-            <div v-for="category in categories" :key="category.id" class="category-group">
-              <div class="category-main" @click="toggleCategory(category.id)">
-                <span class="category-icon">{{ category.icon }}</span>
-                <span class="category-name">{{ category.name }}</span>
+            <div v-for="(category, index) in categories" :key="getCategoryKey(category, index)" class="category-group">
+              <div class="category-main" @click="toggleCategory(getCategoryKey(category, index), category)">
+                <span class="category-thumb">
+                  <NuxtImg
+                      v-if="category.image?.original || category.image?.thumb"
+                      :src="category.image?.thumb || category.image?.original"
+                      :alt="category.label || category.name"
+                      width="36"
+                      height="36"
+                      loading="lazy"
+                      format="webp"
+                  />
+                  <span v-else class="category-fallback">
+                    {{ getInitial(category.label || category.name) }}
+                  </span>
+                </span>
+                <span class="category-name">{{ category.label || category.name }}</span>
                 <svg
+                    v-if="(category.children || category.subcategories || []).length > 0"
                     class="chevron"
-                    :class="{ 'rotated': expandedCategory === category.id }"
+                    :class="{ 'rotated': expandedCategory === getCategoryKey(category, index) }"
                     width="20"
                     height="20"
                     viewBox="0 0 24 24"
@@ -34,15 +48,29 @@
               </div>
 
               <transition name="expand">
-                <div v-if="expandedCategory === category.id" class="subcategories">
+                <div v-if="expandedCategory === getCategoryKey(category, index)" class="subcategories">
                   <NuxtLink
-                      v-for="sub in category.subcategories"
+                      v-for="sub in (category.children || category.subcategories || [])"
                       :key="sub.id"
-                      :to="sub.link"
+                      :to="sub.to || `/categories/${sub.slug}`"
                       class="subcategory-item"
                       @click="showCategories = false"
                   >
-                    {{ sub.name }}
+                    <span class="subcategory-thumb">
+                      <NuxtImg
+                          v-if="sub.image?.original || sub.image?.thumb"
+                          :src="sub.image?.thumb || sub.image?.original"
+                          :alt="sub.label || sub.name"
+                          width="24"
+                          height="24"
+                          loading="lazy"
+                          format="webp"
+                      />
+                      <span v-else class="subcategory-fallback">
+                        {{ getInitial(sub.label || sub.name) }}
+                      </span>
+                    </span>
+                    {{ sub.label || sub.name }}
                   </NuxtLink>
                 </div>
               </transition>
@@ -104,7 +132,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, inject, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
@@ -115,67 +143,56 @@ const cartItemsCount = computed(() => cart?.cartItemsCount?.value || 0)
 
 const currentRoute = computed(() => route.path)
 
-// Sample categories data - replace with your actual categories
-const categories = ref([
-  {
-    id: 1,
-    name: 'Electronics',
-    icon: '📱',
-    subcategories: [
-      { id: 11, name: 'Smartphones', link: '/shop/electronics/smartphones' },
-      { id: 12, name: 'Laptops', link: '/shop/electronics/laptops' },
-      { id: 13, name: 'Tablets', link: '/shop/electronics/tablets' },
-      { id: 14, name: 'Accessories', link: '/shop/electronics/accessories' }
-    ]
-  },
-  {
-    id: 2,
-    name: 'Fashion',
-    icon: '👕',
-    subcategories: [
-      { id: 21, name: 'Men\'s Clothing', link: '/shop/fashion/men' },
-      { id: 22, name: 'Women\'s Clothing', link: '/shop/fashion/women' },
-      { id: 23, name: 'Kids\' Clothing', link: '/shop/fashion/kids' },
-      { id: 24, name: 'Shoes', link: '/shop/fashion/shoes' }
-    ]
-  },
-  {
-    id: 3,
-    name: 'Home & Living',
-    icon: '🏠',
-    subcategories: [
-      { id: 31, name: 'Furniture', link: '/shop/home/furniture' },
-      { id: 32, name: 'Decor', link: '/shop/home/decor' },
-      { id: 33, name: 'Kitchen', link: '/shop/home/kitchen' },
-      { id: 34, name: 'Bedding', link: '/shop/home/bedding' }
-    ]
-  },
-  {
-    id: 4,
-    name: 'Sports & Outdoors',
-    icon: '⚽',
-    subcategories: [
-      { id: 41, name: 'Fitness Equipment', link: '/shop/sports/fitness' },
-      { id: 42, name: 'Outdoor Gear', link: '/shop/sports/outdoor' },
-      { id: 43, name: 'Team Sports', link: '/shop/sports/team' },
-      { id: 44, name: 'Activewear', link: '/shop/sports/activewear' }
-    ]
-  },
-  {
-    id: 5,
-    name: 'Beauty & Health',
-    icon: '💄',
-    subcategories: [
-      { id: 51, name: 'Skincare', link: '/shop/beauty/skincare' },
-      { id: 52, name: 'Makeup', link: '/shop/beauty/makeup' },
-      { id: 53, name: 'Haircare', link: '/shop/beauty/haircare' },
-      { id: 54, name: 'Wellness', link: '/shop/beauty/wellness' }
-    ]
-  }
-])
+const { fetchCategories } = useContent()
 
-const toggleCategory = (categoryId) => {
-  expandedCategory.value = expandedCategory.value === categoryId ? null : categoryId
+const normalizeCategoryLinks = (items) => {
+  if (!Array.isArray(items)) return []
+
+  return items.map((item) => {
+    const normalized = { ...item }
+
+    if (typeof normalized.to === 'string') {
+      const match = normalized.to.match(/category=([^&]+)/)
+      if (match && match[1]) {
+        normalized.to = `/categories/${match[1]}`
+      }
+    } else if (normalized.slug) {
+      normalized.to = `/categories/${normalized.slug}`
+    }
+
+    if (Array.isArray(normalized.children)) {
+      normalized.children = normalizeCategoryLinks(normalized.children)
+    }
+
+    return normalized
+  })
+}
+
+const categories = ref([])
+
+onMounted(async () => {
+  try {
+    const rawCategories = await fetchCategories()
+    categories.value = normalizeCategoryLinks(rawCategories)
+  } catch (error) {
+    console.error('Failed to load categories:', error)
+    categories.value = []
+  }
+})
+
+const getCategoryKey = (category, index) => {
+  return category?.id ?? category?.slug ?? `${index}`
+}
+
+const toggleCategory = (categoryKey, category) => {
+  const hasChildren = (category?.children || category?.subcategories || []).length > 0
+  if (!hasChildren) return
+  expandedCategory.value = expandedCategory.value === categoryKey ? null : categoryKey
+}
+
+const getInitial = (name) => {
+  if (!name || typeof name !== 'string') return '?'
+  return name.trim().charAt(0).toUpperCase()
 }
 </script>
 
@@ -323,6 +340,55 @@ const toggleCategory = (categoryId) => {
   transition: all 0.2s;
 }
 
+.category-thumb {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  background: #eef2f7;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.category-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.category-fallback {
+  font-size: 14px;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.subcategory-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: #eef2f7;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+  margin-right: 10px;
+}
+
+.subcategory-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.subcategory-fallback {
+  font-size: 11px;
+  font-weight: 600;
+  color: #4b5563;
+}
+
 .category-main:active {
   background: #f3f4f6;
   transform: scale(0.98);
@@ -354,7 +420,8 @@ const toggleCategory = (categoryId) => {
 }
 
 .subcategory-item {
-  display: block;
+  display: flex;
+  align-items: center;
   padding: 12px 16px;
   color: #4b5563;
   text-decoration: none;
@@ -415,3 +482,4 @@ const toggleCategory = (categoryId) => {
   }
 }
 </style>
+
