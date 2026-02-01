@@ -71,6 +71,7 @@ export default defineEventHandler(async (event) => {
       ...(body.paymentMethod && { payment_method: body.paymentMethod }),
       ...(body.orderNotes && { notes: body.orderNotes }),
       ...(body.shippingCost !== undefined && { shipping_amount: body.shippingCost }),
+      ...(body.vat_amount !== undefined && { vat_amount: parseFloat(String(body.vat_amount)) }),
 
       // Coupon/Discount fields
       ...(body.discount_amount !== undefined && body.discount_amount > 0 && { discount_amount: body.discount_amount }),
@@ -82,6 +83,7 @@ export default defineEventHandler(async (event) => {
       coupon_code: transformedOrder.coupon_code,
       discount_amount: transformedOrder.discount_amount,
       items_count: transformedOrder.items?.length,
+      vat_amount: transformedOrder.vat_amount,
       timestamp: new Date().toISOString()
     })
 
@@ -93,6 +95,7 @@ export default defineEventHandler(async (event) => {
       has_token: !!session?.user?.token,
       coupon_code_sending: transformedOrder.coupon_code,
       discount_amount_sending: transformedOrder.discount_amount,
+      vat_amount_sending: transformedOrder.vat_amount,
       timestamp: new Date().toISOString()
     })
 

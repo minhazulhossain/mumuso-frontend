@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-primary-500 text-white">
+  <div v-if="isVisible" class="bg-primary-500 text-white">
     <UContainer class="h-8 md:h-9">
       <div class="flex items-center gap-2 h-full min-w-0">
         <button
@@ -35,21 +35,50 @@
 </template>
 
 <script setup lang="ts">
+import type { Ref } from 'vue'
+import type { Settings, TopbarItem } from '#shared/types/settings'
+
 interface Props {
   messages?: string[]
   intervalMs?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  messages: () => [
-    'WINTER WISHLIST: FLAT 20% OFF ON ORDERS ABOVE BDT 499/-',
-    'FREE SHIPPING ON ORDERS ABOVE BDT 999/-',
-    'NEW ARRIVALS DROPPED THIS WEEK'
-  ],
+  messages: () => [],
   intervalMs: 3500
 })
 
-const messages = computed(() => props.messages.filter(Boolean))
+const settings = inject<Ref<Settings | null> | null>('settings', null)
+
+const normalizeTopbarMessages = (items: Array<TopbarItem | string>) => {
+  return items
+    .map((item, index) => {
+      if (typeof item === 'string') {
+        return { text: item, order: index, is_active: true }
+      }
+
+      return {
+        text: item.text ?? item.label ?? item.message ?? item.title ?? '',
+        order: item.order ?? index,
+        is_active: item.is_active ?? true
+      }
+    })
+    .filter((item) => item.is_active && item.text?.trim())
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+    .map((item) => item.text!.trim())
+}
+
+const messages = computed(() => {
+  const dynamicItems = settings?.value?.topbar?.items ?? []
+  const source = dynamicItems.length ? dynamicItems : props.messages
+  return normalizeTopbarMessages(source)
+})
+
+const isVisible = computed(() => {
+  const isEnabled = settings?.value?.topbar?.enabled ?? true
+  return isEnabled && messages.value.length > 0
+})
+
 const currentIndex = ref(0)
 let timer: ReturnType<typeof setInterval> | null = null
 
@@ -64,15 +93,33 @@ const prevMessage = () => {
     (currentIndex.value - 1 + messages.value.length) % messages.value.length
 }
 
-onMounted(() => {
+const stopRotation = () => {
+  if (timer) {
+    clearInterval(timer)
+    timer = null
+  }
+}
+
+const startRotation = () => {
+  stopRotation()
+  if (!import.meta.client) return
   if (messages.value.length > 1) {
     timer = setInterval(nextMessage, props.intervalMs)
   }
+}
+
+onMounted(() => {
+  watch([messages, () => props.intervalMs, isVisible], () => {
+    currentIndex.value = 0
+    if (isVisible.value) {
+      startRotation()
+    } else {
+      stopRotation()
+    }
+  }, { immediate: true })
 })
 
 onUnmounted(() => {
-  if (timer) {
-    clearInterval(timer)
-  }
+  stopRotation()
 })
 </script>

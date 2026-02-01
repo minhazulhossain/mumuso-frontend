@@ -256,7 +256,7 @@
           <div class="border-t border-gray-200 dark:border-gray-700 pt-6 space-y-3">
             <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
               <UIcon name="i-heroicons-truck"/>
-              <span>Free shipping on orders over {{ formatCurrency(50) }}</span>
+              <span>Shipping calculated at checkout</span>
             </div>
             <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
               <UIcon name="i-heroicons-arrow-path"/>

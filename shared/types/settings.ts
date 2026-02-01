@@ -85,6 +85,20 @@ export interface CurrencySettings {
     options: CurrencyOption[]
 }
 
+export interface TopbarItem {
+    text?: string | null
+    label?: string | null
+    message?: string | null
+    title?: string | null
+    is_active?: boolean
+    order?: number
+}
+
+export interface TopbarSettings {
+    enabled: boolean
+    items: TopbarItem[]
+}
+
 /**
  * Complete settings object structure
  */
@@ -96,4 +110,5 @@ export interface Settings {
     social_media: SocialMediaLink[]
     footer: FooterSettings
     currency: CurrencySettings
+    topbar: TopbarSettings
 }

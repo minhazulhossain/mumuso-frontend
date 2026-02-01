@@ -50,45 +50,41 @@
           </UFormField>
         </div>
 
-        <UFormField v-if="props.showEmail !== false" label="Email" required>
-          <UInput
-              :model-value="modelValue.email"
-              @update:model-value="updateField('email', $event)"
-              type="email"
-              size="lg"
-              class="w-full"
-              placeholder="john.doe@example.com"
-          />
-        </UFormField>
-
-        <UFormField label="Address Line 1" required>
-          <UInput
-              class="w-full"
-              :model-value="modelValue.address1"
-              @update:model-value="updateField('address1', $event)"
-              size="lg"
-              placeholder="123 Main Street"
-          />
-        </UFormField>
-
-        <UFormField label="Address Line 2" hint="Apartment, suite, etc. (optional)">
-          <UInput
-              :model-value="modelValue.address2"
-              class="w-full"
-              @update:model-value="updateField('address2', $event)"
-              size="lg"
-              placeholder="Apt 4B"
-          />
-        </UFormField>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <UFormField label="City" required>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <UFormField label="Phone Number" required>
             <UInput
-                :model-value="modelValue.city"
-                @update:model-value="updateField('city', $event)"
+                :model-value="modelValue.phone"
+                @update:model-value="updateField('phone', $event)"
                 size="lg"
                 class="w-full"
-                placeholder="New York"
+                placeholder="+88 017XXXXXXXX"
+            />
+          </UFormField>
+
+          <UFormField v-if="props.showEmail !== false" label="Email" required>
+            <UInput
+                :model-value="modelValue.email"
+                @update:model-value="updateField('email', $event)"
+                type="email"
+                size="lg"
+                class="w-full"
+                placeholder="john.doe@example.com"
+            />
+          </UFormField>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <UFormField label="Country" required>
+            <USelectMenu
+                :model-value="modelValue.country"
+                @update:model-value="updateField('country', $event)"
+                :items="countries"
+                size="lg"
+                placeholder="Select country"
+                value-attribute="value"
+                option-attribute="label"
+                class="w-full"
+                :disabled="isCountryLocked"
             />
           </UFormField>
 
@@ -96,12 +92,30 @@
             <USelectMenu
                 :model-value="modelValue.state"
                 @update:model-value="updateField('state', $event)"
-                :items="states"
+                :items="stateOptions"
                 size="lg"
                 placeholder="Select state"
                 value-attribute="value"
                 option-attribute="label"
                 class="w-full"
+                :disabled="isStateLocked"
+            />
+          </UFormField>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <UFormField label="City / District" required>
+            <USelectMenu
+                :model-value="modelValue.city"
+                @update:model-value="updateField('city', $event)"
+                :items="districtOptions"
+                size="lg"
+                placeholder="Select district"
+                value-attribute="value"
+                option-attribute="label"
+                class="w-full"
+                :disabled="isDistrictLocked"
+                searchable
             />
           </UFormField>
 
@@ -112,33 +126,11 @@
                 size="lg"
                 class="w-full"
                 placeholder="10001"
+                :disabled="isPostalLocked"
             />
           </UFormField>
         </div>
 
-        <UFormField label="Country" required>
-          <USelectMenu
-              :model-value="modelValue.country"
-              @update:model-value="updateField('country', $event)"
-              :items="countries"
-              size="lg"
-
-              placeholder="Select country"
-              value-attribute="value"
-              option-attribute="label"
-              class="w-full"
-          />
-        </UFormField>
-
-        <UFormField label="Phone Number" hint="For delivery notifications">
-          <UInput
-              :model-value="modelValue.phone"
-              @update:model-value="updateField('phone', $event)"
-              size="lg"
-              class="w-full"
-              placeholder="+1 (555) 123-4567"
-          />
-        </UFormField>
 
         <!-- Shipping Method -->
         <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
@@ -197,7 +189,7 @@
                   </div>
                   <div class="text-right ml-4">
                     <p class="font-bold text-gray-900 dark:text-white">
-                      {{ method.is_free ? 'FREE' : formatCurrency(method.cost || 0) }}
+                      {{ formatCurrency(method.cost || 0) }}
                     </p>
                   </div>
                 </div>
@@ -205,12 +197,32 @@
             </div>
           </div>
         </div>
+
+        <UFormField label="Address Line 1" required>
+          <UInput
+              class="w-full"
+              :model-value="modelValue.address1"
+              @update:model-value="updateField('address1', $event)"
+              size="lg"
+              placeholder="123 Main Street"
+          />
+        </UFormField>
+
+        <UFormField label="Address Line 2" hint="Apartment, suite, etc. (optional)">
+          <UInput
+              :model-value="modelValue.address2"
+              class="w-full"
+              @update:model-value="updateField('address2', $event)"
+              size="lg"
+              placeholder="Apt 4B"
+          />
+        </UFormField>
       </div>
     </div>
 
     <div class="mt-6 flex justify-between">
       <UButton @click="$emit('previous')" variant="soft" size="lg" icon="i-heroicons-arrow-left">
-        Back
+        {{ props.previousLabel }}
       </UButton>
       <UButton @click="$emit('next')" size="lg" icon="i-heroicons-arrow-right" trailing>
         Continue to Payment
@@ -221,7 +233,11 @@
 
 <script setup lang="ts">
 import type { Address } from '#shared/types/address'
+import { nextTick, watch } from 'vue'
 import { useCurrency } from '#imports'
+import bangladeshDivisions from '#shared/data/bangladesh-divisions.json'
+import bangladeshDistricts from '#shared/data/bangladesh-districts.json'
+import { normalizeDivisionValue, normalizeDistrictValue } from '#shared/utils/address-display'
 
 interface ShippingAddress {
   firstName: string
@@ -246,7 +262,7 @@ interface ShippingMethod {
   taxable: boolean
 }
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   modelValue: ShippingAddress
   selectedShippingMethod: number | null
   shippingMethods: ShippingMethod[]
@@ -254,7 +270,10 @@ const props = defineProps<{
   showSavedAddresses?: boolean
   loading?: boolean
   showEmail?: boolean
-}>()
+  previousLabel?: string
+}>(), {
+  previousLabel: 'Back'
+})
 
 const emit = defineEmits<{
   'update:modelValue': [value: ShippingAddress]
@@ -270,6 +289,8 @@ const savedAddresses = computed(() => props.savedAddresses || [])
 const selectedSavedAddressId = ref<number | null>(null)
 const showSavedAddresses = computed(() => props.showSavedAddresses && savedAddresses.value.length > 0)
 
+const shouldClearPostalOnCityChange = ref(true)
+
 const selectSavedAddress = (addressId: number) => {
   const address = savedAddresses.value.find(a => a.id === addressId)
   if (address) {
@@ -281,39 +302,44 @@ const selectSavedAddress = (addressId: number) => {
       email: address.email || '',
       address1: address.address_line_1,
       address2: address.address_line_2 || '',
-      city: address.city,
-      state: address.state,
+      city: normalizeDistrictValue(address.city),
+      state: normalizeDivisionValue(address.state),
       zipCode: address.postal_code,
       country: address.country,
       phone: address.phone
     }
+    shouldClearPostalOnCityChange.value = false
     emit('update:modelValue', formAddress)
+    nextTick(() => {
+      shouldClearPostalOnCityChange.value = true
+    })
     emit('address-selected', address)
   }
 }
 
 // Countries and States
 const countries = [
-  { label: 'United States', value: 'US' },
-  { label: 'Canada', value: 'CA' },
-  { label: 'United Kingdom', value: 'UK' },
-  { label: 'Australia', value: 'AU' },
-  { label: 'Germany', value: 'DE' },
-  { label: 'France', value: 'FR' },
+  { label: 'Bangladesh', value: 'BD' }
 ]
 
-const states = [
-  { label: 'California', value: 'CA' },
-  { label: 'New York', value: 'NY' },
-  { label: 'Texas', value: 'TX' },
-  { label: 'Florida', value: 'FL' },
-  { label: 'Illinois', value: 'IL' },
-  { label: 'Pennsylvania', value: 'PA' },
-  { label: 'Ohio', value: 'OH' },
-  { label: 'Georgia', value: 'GA' },
-  { label: 'North Carolina', value: 'NC' },
-  { label: 'Michigan', value: 'MI' }
-]
+const stateOptions = computed(() => {
+  if (props.modelValue.country === 'BD') {
+    return bangladeshDivisions
+  }
+  return []
+})
+
+const districtOptions = computed(() => {
+  if (props.modelValue.country !== 'BD') return []
+  if (!props.modelValue.state) return []
+  const normalizedState = normalizeDivisionValue(props.modelValue.state)
+  return bangladeshDistricts[normalizedState] || []
+})
+
+const isCountryLocked = computed(() => countries.length === 1)
+const isStateLocked = computed(() => stateOptions.value.length <= 1)
+const isDistrictLocked = computed(() => districtOptions.value.length <= 1)
+const isPostalLocked = computed(() => !Boolean(props.modelValue.city))
 
 const updateField = (field: keyof ShippingAddress, value: any) => {
   // Handle select menu objects - extract the value property
@@ -322,9 +348,54 @@ const updateField = (field: keyof ShippingAddress, value: any) => {
     fieldValue = value.value
   }
 
-  emit('update:modelValue', {
+  const nextValue = {
     ...props.modelValue,
     [field]: fieldValue
-  })
+  }
+
+  if (field === 'country') {
+    const validStates = fieldValue === 'BD' ? bangladeshDivisions.map((state) => state.value) : []
+    if (nextValue.state && !validStates.includes(nextValue.state)) {
+      nextValue.state = ''
+    }
+    nextValue.city = ''
+  }
+
+  if (field === 'state') {
+    const normalizedState = normalizeDivisionValue(fieldValue)
+    const validDistricts = bangladeshDistricts[normalizedState] || []
+    const validValues = validDistricts.map((district) => district.value)
+    if (nextValue.city && !validValues.includes(nextValue.city)) {
+      nextValue.city = ''
+    }
+  }
+
+  if (field === 'city') {
+    if (shouldClearPostalOnCityChange.value) {
+      nextValue.zipCode = ''
+    }
+  }
+
+  emit('update:modelValue', nextValue)
 }
+
+watch(
+  () => stateOptions.value,
+  (options) => {
+    if (options.length === 1 && !props.modelValue.state) {
+      updateField('state', options[0].value)
+    }
+  },
+  { immediate: true }
+)
+
+watch(
+  () => districtOptions.value,
+  (options) => {
+    if (options.length === 1 && !props.modelValue.city) {
+      updateField('city', options[0].value)
+    }
+  },
+  { immediate: true }
+)
 </script>

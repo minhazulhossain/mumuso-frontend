@@ -54,12 +54,12 @@
       <div class="flex justify-between text-gray-600 dark:text-gray-400">
         <span>Shipping</span>
         <span class="font-medium">
-          {{ (props.shippingCost || 0) === 0 ? 'FREE' : formatCurrency(props.shippingCost || 0) }}
+          {{ formatCurrency(props.shippingCost || 0) }}
         </span>
       </div>
 
       <div class="flex justify-between text-gray-600 dark:text-gray-400">
-        <span>Tax ({{ props.taxRate || 0 }}%)</span>
+        <span>VAT ({{ props.taxRate || 0 }}%)</span>
         <span class="font-medium">{{ formatCurrency(tax) }}</span>
       </div>
     </div>
@@ -127,7 +127,7 @@ const props = withDefaults(defineProps<{
 }>(), {
   cartItems: () => [],
   shippingCost: 0,
-  taxRate: 0,
+  taxRate: 7.5,
   appliedCoupon: () => ({ code: '', discount: 0 })
 })
 const { formatCurrency } = useCurrency()

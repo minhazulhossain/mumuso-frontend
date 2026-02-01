@@ -59,9 +59,9 @@
               <span v-if="address.address_line_2" class="block">{{ address.address_line_2 }}</span>
             </p>
             <p>
-              {{ address.city }}, {{ address.state }} {{ address.postal_code }}
+              {{ getDistrictLabel(address.city) }}, {{ getDivisionLabel(address.state) }} {{ address.postal_code }}
             </p>
-            <p>{{ address.country }}</p>
+            <p>{{ getCountryLabel(address.country) }}</p>
             <p v-if="address.phone">{{ address.phone }}</p>
             <p v-if="address.notes" class="italic text-gray-500 dark:text-gray-500">
               {{ address.notes }}
@@ -96,6 +96,7 @@
 
 <script setup lang="ts">
 import type { Address } from '#shared/types/address'
+import { getCountryLabel, getDivisionLabel, getDistrictLabel } from '#shared/utils/address-display'
 
 interface Props {
     addresses: Address[]

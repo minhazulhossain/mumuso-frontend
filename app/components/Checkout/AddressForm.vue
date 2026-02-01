@@ -64,22 +64,14 @@
         />
       </UFormField>
 
-      <!-- City, State, ZIP -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <UFormField label="City" required>
-          <UInput
-              v-model="form.city"
-              size="lg"
-              placeholder="New York"
-          />
-        </UFormField>
-
-        <UFormField label="State/Province" required>
+      <!-- City, ZIP -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <UFormField label="City / District" required>
           <USelectMenu
-              v-model="form.state"
-              :items="states"
+              v-model="form.city"
+              :items="districtOptions"
               size="lg"
-              placeholder="Select state"
+              placeholder="Select district"
               value-attribute="value"
               option-attribute="label"
               searchable
@@ -95,18 +87,32 @@
         </UFormField>
       </div>
 
-      <!-- Country -->
-      <UFormField label="Country" required>
-        <USelectMenu
-            v-model="form.country"
-            :items="countries"
-            size="lg"
-            placeholder="Select country"
-            value-attribute="value"
-            option-attribute="label"
-            searchable
-        />
-      </UFormField>
+      <!-- Country, State -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <UFormField label="Country" required>
+          <USelectMenu
+              v-model="form.country"
+              :items="countries"
+              size="lg"
+              placeholder="Select country"
+              value-attribute="value"
+              option-attribute="label"
+              searchable
+          />
+        </UFormField>
+
+        <UFormField label="State/Province" required>
+          <USelectMenu
+              v-model="form.state"
+              :items="stateOptions"
+              size="lg"
+              placeholder="Select state"
+              value-attribute="value"
+              option-attribute="label"
+              searchable
+          />
+        </UFormField>
+      </div>
 
       <!-- Phone -->
       <UFormField label="Phone Number" required>
@@ -155,6 +161,9 @@
 
 <script setup lang="ts">
 import type { AddressFormData } from '#shared/types/address'
+import bangladeshDivisions from '#shared/data/bangladesh-divisions.json'
+import bangladeshDistricts from '#shared/data/bangladesh-districts.json'
+import { normalizeDivisionValue, normalizeDistrictValue } from '#shared/utils/address-display'
 
 interface Props {
     modelValue?: Partial<AddressFormData> | null
@@ -184,7 +193,7 @@ const form = ref<AddressFormData>({
     city: '',
     state: '',
     postal_code: '',
-    country: 'US',
+    country: 'BD',
     phone: '',
     is_default: false,
     notes: ''
@@ -193,9 +202,13 @@ const form = ref<AddressFormData>({
 // Initialize form from props
 watchEffect(() => {
     if (props.modelValue) {
+        const normalizedState = normalizeDivisionValue(props.modelValue.state || '')
+        const normalizedCity = normalizeDistrictValue(props.modelValue.city || '')
         form.value = {
             ...form.value,
-            ...props.modelValue
+            ...props.modelValue,
+            ...(props.modelValue.state && { state: normalizedState }),
+            ...(props.modelValue.city && { city: normalizedCity })
         }
     }
 })
@@ -208,26 +221,39 @@ const addressTypes = [
 ]
 
 const countries = [
-    { label: 'United States', value: 'US' },
-    { label: 'Canada', value: 'CA' },
-    { label: 'United Kingdom', value: 'UK' },
-    { label: 'Australia', value: 'AU' },
-    { label: 'Germany', value: 'DE' },
-    { label: 'France', value: 'FR' }
+    { label: 'Bangladesh', value: 'BD' }
 ]
 
-const states = [
-    { label: 'California', value: 'CA' },
-    { label: 'New York', value: 'NY' },
-    { label: 'Texas', value: 'TX' },
-    { label: 'Florida', value: 'FL' },
-    { label: 'Illinois', value: 'IL' },
-    { label: 'Pennsylvania', value: 'PA' },
-    { label: 'Ohio', value: 'OH' },
-    { label: 'Georgia', value: 'GA' },
-    { label: 'North Carolina', value: 'NC' },
-    { label: 'Michigan', value: 'MI' }
-]
+const stateOptions = computed(() => {
+    if (form.value.country === 'BD') {
+        return bangladeshDivisions
+    }
+    return []
+})
+
+const districtOptions = computed(() => {
+    if (form.value.country !== 'BD') return []
+    if (!form.value.state) return []
+    const normalizedState = normalizeDivisionValue(form.value.state)
+    return bangladeshDistricts[normalizedState] || []
+})
+
+watch(() => form.value.country, (nextCountry) => {
+    const validStates = nextCountry === 'BD' ? bangladeshDivisions.map((state) => state.value) : []
+    if (form.value.state && !validStates.includes(form.value.state)) {
+        form.value.state = ''
+    }
+    form.value.city = ''
+})
+
+watch(() => form.value.state, (nextState) => {
+    const normalizedState = normalizeDivisionValue(nextState)
+    const validDistricts = bangladeshDistricts[normalizedState] || []
+    const validValues = validDistricts.map((district) => district.value)
+    if (form.value.city && !validValues.includes(form.value.city)) {
+        form.value.city = ''
+    }
+})
 
 const submitForm = () => {
     // Validate required fields

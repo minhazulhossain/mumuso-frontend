@@ -77,6 +77,7 @@
               :loading="shippingLoading"
               @next="handleNext"
               @previous="handlePrevious"
+              previous-label="Back to cart"
           />
 
           <!-- Step 3: Payment Information -->
@@ -93,6 +94,10 @@
             <CheckoutPaymentMethodForm
                 v-model="paymentInfo"
                 v-model:selected-payment-method="selectedPaymentMethod"
+                :methods="paymentMethods"
+                :loading="paymentMethodsLoading"
+                :error="Boolean(paymentMethodsError)"
+                :refresh-methods="refreshPaymentMethods"
             />
 
             <!-- Order Notes -->
@@ -137,7 +142,7 @@
           <CheckoutOrderSummary
               :cart-items="cartItems || []"
               :shipping-cost="shippingCost"
-              :tax-rate="0"
+              :tax-rate="VAT_RATE"
               :applied-coupon="appliedCoupon"
           />
         </div>
@@ -148,6 +153,8 @@
 
 <script setup lang="ts">
 import { useCurrency } from '#imports'
+import { usePaymentMethods } from '~/composables/usePaymentMethods'
+import { calculateTax } from '#shared/utils/cart-helpers'
 
 const toast = useToast()
 const router = useRouter()
@@ -219,7 +226,7 @@ const shippingAddress = ref({
   city: '',
   state: '',
   zipCode: '',
-  country: 'US',
+  country: 'BD',
   phone: ''
 })
 
@@ -232,7 +239,7 @@ const billingAddress = ref({
   city: '',
   state: '',
   zipCode: '',
-  country: 'US',
+  country: 'BD',
   phone: ''
 })
 
@@ -242,15 +249,24 @@ const sameAsShipping = ref(true)
 const selectedShippingMethod = ref<number | null>(null)
 
 // Fetch shipping methods when shipping address country/state changes
-watch([() => shippingAddress.value.country, () => shippingAddress.value.state], async () => {
-  if (shippingAddress.value.country) {
+watch(
+  () => [
+    shippingAddress.value.country,
+    shippingAddress.value.state,
+    shippingAddress.value.city,
+    shippingAddress.value.zipCode
+  ],
+  async ([country, state, district, postalCode]) => {
+    if (!country) return
+
     await fetchMethodsByLocation({
-      country: shippingAddress.value.country,
-      state: shippingAddress.value.state,
-      postal_code: shippingAddress.value.zipCode
+      country,
+      state,
+      district,
+      postal_code: postalCode
     })
   }
-})
+)
 
 // Set first shipping method as default once loaded
 watch(shippingMethods, (methods) => {
@@ -274,6 +290,31 @@ const orderNotes = ref('')
 const agreedToTerms = ref(false)
 const processingOrder = ref(false)
 
+const {
+  methods: paymentMethods,
+  loading: paymentMethodsLoading,
+  error: paymentMethodsError,
+  refresh: refreshPaymentMethods,
+  hasActive: hasActivePaymentMethod
+} = usePaymentMethods()
+
+const selectedPaymentMethodDetails = computed(() => {
+  return paymentMethods.value.find((method) => method.id === selectedPaymentMethod.value)
+})
+
+watch(paymentMethods, (methods) => {
+  if (!methods.length) {
+    selectedPaymentMethod.value = ''
+    return
+  }
+
+  const currentlySelected = methods.find((method) => method.id === selectedPaymentMethod.value)
+  if (currentlySelected && currentlySelected.active) return
+
+  const firstActive = methods.find((method) => method.active) ?? methods[0]
+  selectedPaymentMethod.value = firstActive?.id ?? ''
+}, { immediate: true })
+
 // Coupon state (shared across cart/checkout)
 const appliedCoupon = computed(() => ({
   code: couponState.value.code || '',
@@ -294,6 +335,19 @@ const cartTotal = computed(() => {
     const price = item.pricing?.final_price || item.variation?.price || item.product?.price || item.price || 0
     return total + (price * (item.quantity || 0))
   }, 0)
+})
+
+const VAT_RATE = 7.5
+
+const taxableSubtotal = computed(() => {
+  const discount = appliedCoupon.value.discount || 0
+  const subtotal = cartTotal.value || 0
+  return Math.max(0, subtotal - discount)
+})
+
+const vatAmount = computed(() => {
+  const amount = calculateTax(taxableSubtotal.value, VAT_RATE)
+  return parseFloat(amount.toFixed(2))
 })
 
 const shippingCost = computed(() => {
@@ -409,6 +463,11 @@ const handleNext = () => {
 }
 
 const handlePrevious = () => {
+  if (currentStep.value === 1) {
+    router.push('/cart')
+    return
+  }
+
   if (currentStep.value > 1) {
     currentStep.value--
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -420,14 +479,29 @@ const handlePlaceOrder = async () => {
     return
   }
 
+  if (!paymentMethods.value.length || !hasActivePaymentMethod.value) {
+    toast.add({
+      title: 'Payment unavailable',
+      description: 'No active payment methods are configured right now. Please try again later.',
+      color: 'error'
+    })
+    return
+  }
+
+  const activeMethod = selectedPaymentMethodDetails.value
+  if (!activeMethod || !activeMethod.active) {
+    toast.add({
+      title: 'Select a valid payment method',
+      description: 'Please choose an enabled payment method before placing your order.',
+      color: 'error'
+    })
+    return
+  }
+
   processingOrder.value = true
 
   try {
     const billingAddr = sameAsShipping.value ? shippingAddress.value : billingAddress.value
-
-    console.log('User session:', user.value)
-    console.log('Is logged in:', loggedIn.value)
-    console.log('User ID:', user.value?.id)
 
     // Step 1: Create order object matching server expectations
     const order = {
@@ -453,6 +527,7 @@ const handlePlaceOrder = async () => {
       paymentMethod: selectedPaymentMethod.value,
       orderNotes: orderNotes.value || '',
       shippingCost: shippingCost.value || 0,
+      vat_amount: vatAmount.value,
       discount_amount: appliedCoupon.value.discount || 0,
       coupon_code: appliedCoupon.value.code || null,
       items: cartItems.value && cartItems.value.length > 0 ? cartItems.value.map((item: any) => {
@@ -481,6 +556,7 @@ const handlePlaceOrder = async () => {
       discount_amount: order.discount_amount,
       items_count: order.items?.length,
       shipping_cost: order.shippingCost,
+      vat_amount: order.vat_amount,
       timestamp: new Date().toISOString()
     })
 
@@ -503,6 +579,15 @@ const handlePlaceOrder = async () => {
 
     // Step 2: Handle payment based on selected method
     if (selectedPaymentMethod.value === 'sslcommerz') {
+      if (!activeMethod?.configured) {
+        toast.add({
+          title: 'SSL not ready',
+          description: 'SSLCommerz is currently disabled. Please pick another payment method.',
+          color: 'error'
+        })
+        return
+      }
+
       // Initiate SSLCommerz payment gateway
       const paymentResponse = await initiatePayment(orderId)
 

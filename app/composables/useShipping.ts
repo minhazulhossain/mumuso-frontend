@@ -13,6 +13,7 @@ interface ShippingMethod {
 interface ShippingLocation {
   country: string
   state?: string
+  district?: string
   postal_code?: string
 }
 

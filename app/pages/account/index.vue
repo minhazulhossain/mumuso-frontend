@@ -80,11 +80,11 @@
                 </p>
                 <p class="flex items-center gap-2">
                   <UIcon name="i-heroicons-map-pin" class="size-4 text-gray-400"/>
-                  <span class="font-medium text-gray-700 dark:text-gray-300">City/State/ZIP:</span> {{ address.city }}, {{ address.state }} {{ address.postal_code }}
+                  <span class="font-medium text-gray-700 dark:text-gray-300">City/State/ZIP:</span> {{ getDistrictLabel(address.city) }}, {{ getDivisionLabel(address.state) }} {{ address.postal_code }}
                 </p>
                 <p class="flex items-center gap-2">
                   <UIcon name="i-heroicons-globe-alt" class="size-4 text-gray-400"/>
-                  <span class="font-medium text-gray-700 dark:text-gray-300">Country:</span> {{ address.country }}
+                  <span class="font-medium text-gray-700 dark:text-gray-300">Country:</span> {{ getCountryLabel(address.country) }}
                 </p>
                 <p v-if="address.phone" class="flex items-center gap-2">
                   <UIcon name="i-heroicons-phone" class="size-4 text-gray-400"/>
@@ -199,35 +199,19 @@
               </UFormField>
             </div>
 
-            <!-- City & State -->
+            <!-- City & Country -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <UFormField label="City" required name="city" :error="fieldErrors.city || undefined">
-                <UInput
+              <UFormField label="City / District" required name="city" :error="fieldErrors.city || undefined">
+                <USelectMenu
                     v-model="form.city"
-                    placeholder="City"
+                    :items="districtOptions"
+                    value-attribute="value"
+                    option-attribute="label"
+                    placeholder="Select district"
                     icon="i-heroicons-building-office-2"
                     size="lg"
-                />
-              </UFormField>
-
-              <UFormField label="State / Province" required name="state" :error="fieldErrors.state || undefined">
-                <UInput
-                    v-model="form.state"
-                    placeholder="State or Province"
-                    icon="i-heroicons-map"
-                    size="lg"
-                />
-              </UFormField>
-            </div>
-
-            <!-- ZIP & Country -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <UFormField label="ZIP / Postal Code" required name="zip" :error="fieldErrors.postal_code || undefined">
-                <UInput
-                    v-model="form.postal_code"
-                    placeholder="e.g., 12345"
-                    icon="i-heroicons-hashtag"
-                    size="lg"
+                    class="w-full"
+                    searchable
                 />
               </UFormField>
 
@@ -241,6 +225,31 @@
                     icon="i-heroicons-globe-alt"
                     size="lg"
                     class="w-full"
+                />
+              </UFormField>
+            </div>
+
+            <!-- State & ZIP -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <UFormField label="State / Province" required name="state" :error="fieldErrors.state || undefined">
+                <USelectMenu
+                    v-model="form.state"
+                    :items="stateOptions"
+                    value-attribute="value"
+                    option-attribute="label"
+                    placeholder="State or Province"
+                    icon="i-heroicons-map"
+                    size="lg"
+                    class="w-full"
+                />
+              </UFormField>
+
+              <UFormField label="ZIP / Postal Code" required name="zip" :error="fieldErrors.postal_code || undefined">
+                <UInput
+                    v-model="form.postal_code"
+                    placeholder="e.g., 12345"
+                    icon="i-heroicons-hashtag"
+                    size="lg"
                 />
               </UFormField>
             </div>
@@ -352,7 +361,7 @@
               <div class="text-sm text-gray-600 dark:text-gray-400 space-y-1">
                 <p class="font-medium">{{ deletingAddress.first_name }} {{ deletingAddress.last_name }}</p>
                 <p>{{ deletingAddress.address_line_1 }}</p>
-                <p>{{ deletingAddress.city }}, {{ deletingAddress.state }} {{ deletingAddress.postal_code }}</p>
+                <p>{{ getDistrictLabel(deletingAddress.city) }}, {{ getDivisionLabel(deletingAddress.state) }} {{ deletingAddress.postal_code }}</p>
               </div>
             </div>
           </div>
@@ -390,6 +399,16 @@
 </template>
 
 <script setup lang="ts">
+import bangladeshDivisions from '#shared/data/bangladesh-divisions.json'
+import bangladeshDistricts from '#shared/data/bangladesh-districts.json'
+import {
+  getCountryLabel,
+  getDivisionLabel,
+  getDistrictLabel,
+  normalizeDivisionValue,
+  normalizeDistrictValue
+} from '#shared/utils/address-display'
+
 definePageMeta({
   middleware: ['auth'],
 })
@@ -479,12 +498,39 @@ const countries = ref([
   {
     label: 'Bangladesh',
     value: 'BD'
-  },
-  {
-    label: 'United States',
-    value: 'US'
   }
 ]);
+
+const stateOptions = computed(() => {
+  if (form.country === 'BD') {
+    return bangladeshDivisions
+  }
+  return []
+})
+
+const districtOptions = computed(() => {
+  if (form.country !== 'BD') return []
+  if (!form.state) return []
+  const normalizedState = normalizeDivisionValue(form.state)
+  return bangladeshDistricts[normalizedState] || []
+})
+
+watch(() => form.country, (nextCountry) => {
+  const validStates = nextCountry === 'BD' ? bangladeshDivisions.map((state) => state.value) : []
+  if (form.state && !validStates.includes(form.state)) {
+    form.state = ''
+  }
+  form.city = ''
+})
+
+watch(() => form.state, (nextState) => {
+  const normalizedState = normalizeDivisionValue(nextState)
+  const validDistricts = bangladeshDistricts[normalizedState] || []
+  const validValues = validDistricts.map((district) => district.value)
+  if (form.city && !validValues.includes(form.city)) {
+    form.city = ''
+  }
+})
 
 const form = reactive({
   type: 'home',
@@ -536,8 +582,8 @@ const handleEdit = (address: any) => {
     last_name: address.last_name || '',
     address_line_1: address.address_line_1 || '',
     address_line_2: address.address_line_2 || '',
-    city: address.city || '',
-    state: address.state || '',
+    state: normalizeDivisionValue(address.state || ''),
+    city: normalizeDistrictValue(address.city || ''),
     postal_code: address.postal_code || '',
     country: address.country || 'BD',
     phone: address.phone || '',

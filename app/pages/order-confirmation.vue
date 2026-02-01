@@ -121,10 +121,10 @@
           </div>
           <div class="flex justify-between text-gray-600 dark:text-gray-400">
             <span>Shipping</span>
-            <span>{{ shipping === 0 ? 'FREE' : formatCurrency(shipping) }}</span>
+            <span>{{ formatCurrency(shipping) }}</span>
           </div>
           <div class="flex justify-between text-gray-600 dark:text-gray-400">
-            <span>Tax</span>
+            <span>VAT (7.5%)</span>
             <span>{{ formatCurrency(tax) }}</span>
           </div>
           <div class="flex justify-between font-bold text-gray-900 dark:text-white pt-2 border-t border-gray-200 dark:border-gray-700">
@@ -146,8 +146,8 @@
             <p class="font-medium text-gray-900 dark:text-white">{{ shippingAddress.name }}</p>
             <p>{{ shippingAddress.address1 }}</p>
             <p v-if="shippingAddress.address2">{{ shippingAddress.address2 }}</p>
-            <p>{{ shippingAddress.city }}, {{ shippingAddress.state }} {{ shippingAddress.zipCode }}</p>
-            <p>{{ shippingAddress.country }}</p>
+            <p>{{ getDistrictLabel(shippingAddress.city) }}, {{ getDivisionLabel(shippingAddress.state) }} {{ shippingAddress.zipCode }}</p>
+            <p>{{ getCountryLabel(shippingAddress.country) }}</p>
           </div>
         </div>
 
@@ -161,8 +161,8 @@
             <p class="font-medium text-gray-900 dark:text-white">{{ billingAddress.name }}</p>
             <p>{{ billingAddress.address1 }}</p>
             <p v-if="billingAddress.address2">{{ billingAddress.address2 }}</p>
-            <p>{{ billingAddress.city }}, {{ billingAddress.state }} {{ billingAddress.zipCode }}</p>
-            <p>{{ billingAddress.country }}</p>
+            <p>{{ getDistrictLabel(billingAddress.city) }}, {{ getDivisionLabel(billingAddress.state) }} {{ billingAddress.zipCode }}</p>
+            <p>{{ getCountryLabel(billingAddress.country) }}</p>
           </div>
         </div>
       </div>
@@ -266,6 +266,7 @@
 </template>
 
 <script setup lang="ts">
+import { getCountryLabel, getDivisionLabel, getDistrictLabel } from '#shared/utils/address-display'
 import { useCurrency } from '#imports'
 const route = useRoute()
 const router = useRouter()
@@ -323,11 +324,13 @@ const subtotal = computed(() => {
   return 0
 })
 
+const VAT_RATE = 7.5
+
 const tax = computed(() => {
   if (orderData.value?.tax_amount && orderData.value.tax_amount >= 0) {
     return Number(orderData.value.tax_amount) || 0
   }
-  return 0
+  return (subtotal.value * VAT_RATE) / 100
 })
 
 const total = computed(() => {

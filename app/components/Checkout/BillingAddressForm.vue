@@ -75,27 +75,19 @@
         />
       </UFormField>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <UFormField label="City" required>
-          <UInput
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <UFormField label="City / District" required>
+          <USelectMenu
               :model-value="modelValue.city"
               @update:model-value="updateField('city', $event)"
+              :items="districtOptions"
               class="w-full"
               size="lg"
-              placeholder="New York"
-          />
-        </UFormField>
-
-        <UFormField label="State/Province" required>
-          <USelectMenu
-              :model-value="modelValue.state"
-              @update:model-value="updateField('state', $event)"
-              :items="states"
-              class="w-full"
-              size="lg"
-              placeholder="Select state"
+              placeholder="Select district"
               value-attribute="value"
               option-attribute="label"
+              searchable
+              :disabled="isDistrictLocked"
           />
         </UFormField>
 
@@ -106,22 +98,40 @@
               class="w-full"
               size="lg"
               placeholder="10001"
+              :disabled="isPostalLocked"
           />
         </UFormField>
       </div>
 
-      <UFormField label="Country" required>
-        <USelectMenu
-            :model-value="modelValue.country"
-            @update:model-value="updateField('country', $event)"
-            :items="countries"
-            class="w-full"
-            size="lg"
-            placeholder="Select country"
-            value-attribute="value"
-            option-attribute="label"
-        />
-      </UFormField>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <UFormField label="Country" required>
+          <USelectMenu
+              :model-value="modelValue.country"
+              @update:model-value="updateField('country', $event)"
+              :items="countries"
+              class="w-full"
+              size="lg"
+              placeholder="Select country"
+              value-attribute="value"
+              option-attribute="label"
+              :disabled="isCountryLocked"
+          />
+        </UFormField>
+
+        <UFormField label="State/Province" required>
+          <USelectMenu
+              :model-value="modelValue.state"
+              @update:model-value="updateField('state', $event)"
+              :items="stateOptions"
+              class="w-full"
+              size="lg"
+              placeholder="Select state"
+              value-attribute="value"
+              option-attribute="label"
+              :disabled="isStateLocked"
+          />
+        </UFormField>
+      </div>
 
       <UFormField label="Phone Number" hint="For billing inquiries">
         <UInput
@@ -138,6 +148,10 @@
 
 <script setup lang="ts">
 import type { Address } from '#shared/types/address'
+import { nextTick, watch } from 'vue'
+import bangladeshDivisions from '#shared/data/bangladesh-divisions.json'
+import bangladeshDistricts from '#shared/data/bangladesh-districts.json'
+import { normalizeDivisionValue, normalizeDistrictValue } from '#shared/utils/address-display'
 
 interface BillingAddress {
   firstName: string
@@ -169,6 +183,8 @@ const savedAddresses = computed(() => props.savedAddresses || [])
 const selectedSavedAddressId = ref<number | null>(null)
 const showSavedAddresses = computed(() => props.showSavedAddresses && savedAddresses.value.length > 0)
 
+const shouldClearPostalOnCityChange = ref(true)
+
 const selectSavedAddress = (addressId: number) => {
   const address = savedAddresses.value.find(a => a.id === addressId)
   if (address) {
@@ -179,44 +195,99 @@ const selectSavedAddress = (addressId: number) => {
       lastName: address.last_name,
       address1: address.address_line_1,
       address2: address.address_line_2 || '',
-      city: address.city,
-      state: address.state,
+      city: normalizeDistrictValue(address.city),
+      state: normalizeDivisionValue(address.state),
       zipCode: address.postal_code,
       country: address.country,
       phone: address.phone
     }
+    shouldClearPostalOnCityChange.value = false
     emit('update:modelValue', formAddress)
+    nextTick(() => {
+      shouldClearPostalOnCityChange.value = true
+    })
     emit('address-selected', address)
   }
 }
 
 // Countries and States
 const countries = [
-  { label: 'United States', value: 'US' },
-  { label: 'Canada', value: 'CA' },
-  { label: 'United Kingdom', value: 'UK' },
-  { label: 'Australia', value: 'AU' },
-  { label: 'Germany', value: 'DE' },
-  { label: 'France', value: 'FR' }
+  { label: 'Bangladesh', value: 'BD' }
 ]
 
-const states = [
-  { label: 'California', value: 'CA' },
-  { label: 'New York', value: 'NY' },
-  { label: 'Texas', value: 'TX' },
-  { label: 'Florida', value: 'FL' },
-  { label: 'Illinois', value: 'IL' },
-  { label: 'Pennsylvania', value: 'PA' },
-  { label: 'Ohio', value: 'OH' },
-  { label: 'Georgia', value: 'GA' },
-  { label: 'North Carolina', value: 'NC' },
-  { label: 'Michigan', value: 'MI' }
-]
+const stateOptions = computed(() => {
+  if (props.modelValue.country === 'BD') {
+    return bangladeshDivisions
+  }
+  return []
+})
+
+const districtOptions = computed(() => {
+  if (props.modelValue.country !== 'BD') return []
+  if (!props.modelValue.state) return []
+  const normalizedState = normalizeDivisionValue(props.modelValue.state)
+  return bangladeshDistricts[normalizedState] || []
+})
+
+const isCountryLocked = computed(() => countries.length === 1)
+const isStateLocked = computed(() => stateOptions.value.length <= 1)
+const isDistrictLocked = computed(() => districtOptions.value.length <= 1)
+const isPostalLocked = computed(() => !Boolean(props.modelValue.city))
 
 const updateField = (field: keyof BillingAddress, value: any) => {
-  emit('update:modelValue', {
+  let fieldValue = value
+  if (value && typeof value === 'object' && 'value' in value) {
+    fieldValue = value.value
+  }
+
+  const nextValue = {
     ...props.modelValue,
-    [field]: value
-  })
+    [field]: fieldValue
+  }
+
+  if (field === 'country') {
+    const validStates = fieldValue === 'BD' ? bangladeshDivisions.map((state) => state.value) : []
+    if (nextValue.state && !validStates.includes(nextValue.state)) {
+      nextValue.state = ''
+    }
+    nextValue.city = ''
+  }
+
+  if (field === 'state') {
+    const normalizedState = normalizeDivisionValue(fieldValue)
+    const validDistricts = bangladeshDistricts[normalizedState] || []
+    const validValues = validDistricts.map((district) => district.value)
+    if (nextValue.city && !validValues.includes(nextValue.city)) {
+      nextValue.city = ''
+    }
+  }
+
+  if (field === 'city') {
+    if (shouldClearPostalOnCityChange.value) {
+      nextValue.zipCode = ''
+    }
+  }
+
+  emit('update:modelValue', nextValue)
 }
+
+watch(
+  () => stateOptions.value,
+  (options) => {
+    if (options.length === 1 && !props.modelValue.state) {
+      updateField('state', options[0].value)
+    }
+  },
+  { immediate: true }
+)
+
+watch(
+  () => districtOptions.value,
+  (options) => {
+    if (options.length === 1 && !props.modelValue.city) {
+      updateField('city', options[0].value)
+    }
+  },
+  { immediate: true }
+)
 </script>

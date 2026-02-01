@@ -73,13 +73,14 @@
               <!-- Product Image -->
               <NuxtLink :to="`/shop/product/${getItemSlug(item)}`" class="flex-shrink-0">
                 <NuxtImg
-                    :src="getItemImage(item)"
+                    :src="getCartItemImageSrc(item)"
                     :alt="getItemName(item)"
                     class="w-24 h-24 object-cover rounded-lg hover:opacity-90 transition-opacity"
                     width="120"
                     height="120"
                     loading="lazy"
                     format="webp"
+                    @error="markCartImageBroken(item)"
                 />
               </NuxtLink>
 
@@ -129,17 +130,6 @@
                   </div>
                 </div>
 
-                <!-- Stock Status -->
-                <div v-if="getStockStatus(getItemStock(item)).showBadge" class="mb-2">
-                  <UBadge
-                      :color="getStockStatus(getItemStock(item)).color"
-                      variant="soft"
-                      size="xs"
-                  >
-                    {{ getStockStatus(getItemStock(item)).message }}
-                  </UBadge>
-                </div>
-
                 <!-- Quantity Controls & Remove Button -->
                 <div class="flex items-center justify-between mt-3">
                   <div class="flex items-center gap-3">
@@ -182,11 +172,6 @@
                   </UButton>
                 </div>
 
-                <!-- Max Stock Warning -->
-                <p v-if="isMaxStockReached(item)" class="text-xs text-orange-500 mt-2">
-                  <UIcon name="i-heroicons-exclamation-triangle" class="inline"/>
-                  Maximum available quantity reached
-                </p>
               </div>
             </div>
           </div>
@@ -270,33 +255,19 @@
               <!-- Shipping -->
               <div class="flex justify-between text-gray-600 dark:text-gray-400">
                 <span>Shipping</span>
-                <span class="font-medium">
-                  {{ shipping === 0 ? 'FREE' : formatCurrency(shipping) }}
-                </span>
+                <span class="font-medium">{{ shippingLabel }}</span>
               </div>
+              <p
+                  v-if="!showShippingAmount"
+                  class="text-xs text-gray-500 dark:text-gray-400 mt-1 max-w-[250px]"
+              >
+                Add a shipping address at checkout to see the exact shipping cost.
+              </p>
 
-              <!-- Tax -->
+              <!-- VAT -->
               <div class="flex justify-between text-gray-600 dark:text-gray-400">
-                <span>Tax ({{ taxRate }}%)</span>
+                <span>VAT ({{ taxRate }}%)</span>
                 <span class="font-medium">{{ formatCurrency(tax) }}</span>
-              </div>
-            </div>
-
-            <!-- Free Shipping Progress -->
-            <div v-if="shipping > 0 && subtotal < freeShippingThreshold" class="mb-6">
-              <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3">
-                <div class="flex items-start gap-2 mb-2">
-                  <UIcon name="i-heroicons-truck" class="text-blue-500 mt-0.5"/>
-                  <p class="text-sm text-blue-700 dark:text-blue-300">
-                    Add {{ formatCurrency(freeShippingThreshold - subtotal) }} more for FREE shipping!
-                  </p>
-                </div>
-                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                  <div
-                      class="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                      :style="{ width: `${(subtotal / freeShippingThreshold) * 100}%` }"
-                  ></div>
-                </div>
               </div>
             </div>
 
@@ -338,8 +309,9 @@
 </template>
 
 <script setup lang="ts">
-import { getItemImage, getItemName, getItemSlug } from '#shared/types/cart'
-import { useCurrency } from '#imports'
+import { getItemName, getItemSlug } from '#shared/types/cart'
+import { calculateShipping, calculateTax, calculateOrderTotal } from '#shared/utils/cart-helpers'
+import { useCurrency, useUserSession, useAddresses } from '#imports'
 
 const toast = useToast()
 const router = useRouter()
@@ -363,12 +335,39 @@ const {
   checkout
 } = cart
 
+const cartImageFailures = ref<Record<string, boolean>>({})
+const fallbackCartImage = 'https://placehold.co/120x120?text=No+Image'
+
+const getCartItemKey = (item: any) => `${getItemSlug(item)}::${item.variation?.id ?? 'default'}`
+
+const getCartItemImageSrc = (item: any) => {
+  const key = getCartItemKey(item)
+  if (cartImageFailures.value[key]) {
+    return fallbackCartImage
+  }
+  return item.variation?.images?.thumb ?? item.product?.images?.featured?.thumb ?? fallbackCartImage
+}
+
+const markCartImageBroken = (item: any) => {
+  const key = getCartItemKey(item)
+  cartImageFailures.value = {
+    ...cartImageFailures.value,
+    [key]: true
+  }
+}
+
 // Constants
-const taxRate = 10 // 10% tax
-const freeShippingThreshold = 50
+const taxRate = 7.5 // 7.5% VAT
+const freeShippingThreshold = Number.POSITIVE_INFINITY
 const shippingRate = 5.99
 
 const { couponState } = useCoupon()
+const { loggedIn } = useUserSession()
+const {
+  addresses,
+  fetchAddresses,
+  getDefaultAddress
+} = useAddresses()
 
 // Coupon state (shared across cart/checkout)
 const appliedCoupon = computed(() => ({
@@ -382,12 +381,18 @@ const subtotal = computed(() => {
   return cartTotal.value || 0
 })
 
+const showShippingAmount = computed(() => {
+  const defaultAddress = getDefaultAddress.value
+  return Boolean(defaultAddress && (defaultAddress.type === 'shipping' || defaultAddress.type === 'both'))
+})
+
 const shipping = computed(() => {
+  if (!showShippingAmount.value) return 0
   return calculateShipping(subtotal.value, freeShippingThreshold, shippingRate)
 })
 
 const tax = computed(() => {
-  // Tax is calculated on subtotal minus coupon discount
+  // VAT is calculated on subtotal minus coupon discount
   const taxableAmount = Math.max(0, subtotal.value - appliedCoupon.value.discount)
   return calculateTax(taxableAmount, taxRate)
 })
@@ -395,6 +400,19 @@ const tax = computed(() => {
 const total = computed(() => {
   const subtotalAfterCoupon = Math.max(0, subtotal.value - appliedCoupon.value.discount)
   return calculateOrderTotal(subtotalAfterCoupon, shipping.value, tax.value)
+})
+
+const shippingLabel = computed(() => {
+  if (showShippingAmount.value) {
+    return formatCurrency(shipping.value)
+  }
+  return 'Shipping calculated at checkout'
+})
+
+onMounted(() => {
+  if (loggedIn.value) {
+    fetchAddresses()
+  }
 })
 
 // Methods
