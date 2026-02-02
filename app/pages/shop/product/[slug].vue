@@ -280,7 +280,7 @@
 
       <!-- Related Products Section -->
       <div v-if="product && relatedProducts.length > 0" class="mt-16">
-        <ProductCarousel :items="relatedProducts" title="Related Products"/>
+        <ProductCarousel :items="relatedProducts" title="Related Products" :view-all-url="`/categories/${product.categories[0].slug}`"/>
       </div>
     </UContainer>
   </div>

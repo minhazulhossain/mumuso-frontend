@@ -39,7 +39,7 @@
       <UContainer class="transition-all duration-1000" :class="sectionStates.featuredGrid">
         <div class="flex items-center justify-between mb-4 sm:mb-6">
           <h2 class="text-2xl font-medium text-gray-900">Featured Picks</h2>
-          <UButton to="/shop" variant="ghost" color="primary" size="sm">
+          <UButton to="/shop?sort_by=featured" variant="ghost" color="primary" size="sm">
             View More
           </UButton>
         </div>
@@ -65,6 +65,7 @@
             title="Best Selling"
             :items="products"
             :loading="loading || productsPending"
+            :view-all-url="`/shop?best_selling=true`"
         />
       </UContainer>
     </section>

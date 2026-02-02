@@ -37,7 +37,8 @@
       "Bash(netstat:*)",
       "Bash(xargs basename:*)",
       "Bash(git checkout:*)",
-      "Bash(npm ci:*)"
+      "Bash(npm ci:*)",
+      "WebFetch(domain:127.0.0.1)"
     ],
     "deny": [],
     "ask": []

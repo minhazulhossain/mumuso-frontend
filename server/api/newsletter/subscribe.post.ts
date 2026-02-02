@@ -1,28 +1,28 @@
-import { z } from 'zod'
-
-const bodySchema = z.object({
-    email: z.string().email(),
-    name: z.string().optional()
-})
-
 export default defineEventHandler(async (event) => {
-    const body = await readValidatedBody(event, bodySchema.parse)
     const backendUrl = process.env.BACKEND_API_BASE || 'https://admin.mumuso.com.bd/api/v1/'
+    const body = await readBody(event)
 
     try {
         return await $fetch(`${backendUrl}newsletter/subscribe`, {
             method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
             body
         })
-    } catch (error: any) {
+    } catch (err: any) {
+        // ✅ forward backend error properly
+        const statusCode = err?.statusCode || err?.response?.status || 500
+        const data = err?.data || err?.response?._data || null
+
+        // pick a friendly message
+        const msg =
+            data?.message ||
+            data?.errors?.email?.[0] ||
+            'Subscription failed'
+
         throw createError({
-            statusCode: error.statusCode || 500,
-            data: error.data,
-            message: error.data?.message || 'Subscription failed'
+            statusCode,
+            statusMessage: err?.statusMessage || 'Validation Error',
+            message: msg,
+            data // ✅ keep full errors object
         })
     }
 })

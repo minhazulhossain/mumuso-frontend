@@ -58,6 +58,12 @@
     height: 36px;
 }
 
+@media (min-width: 992px) {
+    .hero-slider .swiper-pagination-bullet{
+        width: 72px;
+    }
+}
+
 @media (max-width: 640px) {
     .carousel-nav-btn {
         width: 28px;
@@ -103,7 +109,7 @@
 }
 
 .hero-slider .swiper-pagination-bullet {
-    width: 72px;
+    width: 30px;
     height: 6px;
     border-radius: 0;
     background: rgba(255, 255, 255, 0.45);

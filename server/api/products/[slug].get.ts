@@ -10,9 +10,7 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    const response = await $fetch(`${backendUrl}products/${slug}`)
-
-    return response
+    return await $fetch(`${backendUrl}products/${slug}`)
   } catch (error: any) {
     const message = error?.data?.message || error?.message || ''
     const isConversionError =

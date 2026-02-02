@@ -1,8 +1,6 @@
-import type {Ref} from 'vue'
-// import type {Product, Category, Pagination, ProductFilters} from '../../types';
+import type { Ref } from 'vue'
 
 export const useProducts = () => {
-    const config = useRuntimeConfig()
     // Use /api routes to avoid CORS issues on client
     const apiUrl = '/api/'
 
@@ -109,34 +107,62 @@ export const useProducts = () => {
 
     /**
      * Build query parameters from filters
+     * ✅ Sends booleans as 'true'/'false' to match Laravel checks
+     * ✅ Includes sort_by & per_page
+     * ✅ Handles 0 values for min/max price
      */
-    const buildQueryParams = (filters: ProductFilters): Record<string, string> => {
+    const buildQueryParams = (filters: ProductFilters = {}): Record<string, string> => {
         const params: Record<string, string> = {}
 
+        // category
         if (filters.category && filters.category !== 'all') {
-            params.category = filters.category
+            params.category = String(filters.category)
         }
-        if (filters.featured !== undefined) {
-            params.featured = filters.featured ? '1' : '0'
+
+        // featured (accept boolean/1/0/'true'/'false')
+        const featured = normalizeBoolean(filters.featured)
+        if (featured !== null) {
+            params.featured = featured ? 'true' : 'false'
         }
-        if (filters.in_stock !== undefined) {
-            params.in_stock = filters.in_stock ? '1' : '0'
+
+        // in_stock
+        const inStock = normalizeBoolean(filters.in_stock)
+        if (inStock !== null) {
+            params.in_stock = inStock ? 'true' : 'false'
         }
-        if (filters.min_price) {
-            params.min_price = filters.min_price.toString()
+
+        // on_sale
+        const onSale = normalizeBoolean(filters.on_sale)
+        if (onSale !== null) {
+            params.on_sale = onSale ? 'true' : 'false'
         }
-        if (filters.max_price) {
-            params.max_price = filters.max_price.toString()
+
+        // price range (allow 0)
+        if (filters.min_price !== undefined && filters.min_price !== null && filters.min_price !== '') {
+            params.min_price = String(filters.min_price)
         }
+        if (filters.max_price !== undefined && filters.max_price !== null && filters.max_price !== '') {
+            params.max_price = String(filters.max_price)
+        }
+
+        // search
         if (filters.search) {
-            params.search = filters.search
+            params.search = String(filters.search)
         }
-        if (filters.on_sale) {
-            params.on_sale = '1'
+
+        // sort_by ✅ (this was missing)
+        if (filters.sort_by) {
+            params.sort_by = String(filters.sort_by)
         }
-        if (filters.page) {
-            params.page = filters.page.toString()
+
+        // per_page
+        if (filters.per_page !== undefined && filters.per_page !== null && filters.per_page !== '') {
+            params.per_page = String(filters.per_page)
         }
+
+        // page (always)
+        const page = Number(filters.page ?? 1)
+        params.page = Number.isFinite(page) && page > 0 ? String(page) : '1'
 
         return params
     }
@@ -148,6 +174,9 @@ export const useProducts = () => {
 
         try {
             const queryParams = buildQueryParams(filters)
+
+            // ✅ DEBUG: remove later
+            // console.log('useProducts.fetchProducts queryParams =>', queryParams)
 
             const response = await $fetch<{
                 data: Product[]
@@ -165,7 +194,6 @@ export const useProducts = () => {
 
             products.value = (response.data || []).map(normalizeProduct)
 
-            // Set pagination if exists
             if (response.meta) {
                 pagination.value = {
                     total: response.meta.total,
@@ -178,10 +206,8 @@ export const useProducts = () => {
                 }
             }
 
-            // Cache filters
             cachedFilters.value = filters
-
-            return {products: products.value, pagination: pagination.value}
+            return { products: products.value, pagination: pagination.value }
         } catch (err: any) {
             error.value = err.message || 'Failed to fetch products'
             console.error('Error fetching products:', err)
@@ -194,12 +220,8 @@ export const useProducts = () => {
     // Fetch single product
     const fetchProduct = async (slug: string) => {
         error.value = null
-
         try {
-            const response = await $fetch<{ data: Product }>(
-                `${apiUrl}products/${slug}`
-            )
-
+            const response = await $fetch<{ data: Product }>(`${apiUrl}products/${slug}`)
             return normalizeProduct(response.data)
         } catch (err: any) {
             error.value = err.message || 'Failed to fetch product'
@@ -210,10 +232,7 @@ export const useProducts = () => {
     // Fetch categories
     const fetchCategories = async () => {
         try {
-            const response = await $fetch<{ data: Category[] }>(
-                `${apiUrl}content/navigation-items`
-            )
-
+            const response = await $fetch<{ data: Category[] }>(`${apiUrl}content/navigation-items`)
             categories.value = response.data || []
             return categories.value
         } catch (err: any) {
@@ -222,39 +241,25 @@ export const useProducts = () => {
         }
     }
 
-    // Change page
-    const changePage = async (page: number, filters: ProductFilters = {}) => {
-        await fetchProducts({...filters, page})
+    // Change page (keep filters)
+    const changePage = async (page: number, filters: any = {}) => {
+        return await fetchProducts({ ...filters, page })
     }
 
     // Get featured products
     const getFeaturedProducts = async (limit: number = 8) => {
-        return await fetchProducts({featured: true, page: 1})
+        // you can pass per_page if backend supports it
+        return await fetchProducts({ featured: true, page: 1, per_page: limit })
     }
 
     // Get products by category
     const getProductsByCategory = async (categorySlug: string, limit?: number) => {
-        return await fetchProducts({category: categorySlug})
+        return await fetchProducts({ category: categorySlug, page: 1, per_page: limit })
     }
 
     // Search products
     const searchProducts = async (query: string) => {
-        return await fetchProducts({search: query})
-    }
-
-    // Get related products (by category)
-    const getRelatedProducts = async (product: Product, limit: number = 4) => {
-        if (!product.categories || product.categories.length === 0) {
-            return []
-        }
-
-        const categorySlug = product?.categories[0]?.slug
-        const response = await fetchProducts({category: categorySlug})
-
-        // Filter out current product and limit results
-        return response.products
-            .filter(p => p.id !== product.id)
-            .slice(0, limit)
+        return await fetchProducts({ search: query, page: 1 })
     }
 
     // Refresh current products
@@ -282,14 +287,12 @@ export const useProducts = () => {
     }
 
     return {
-        // State
         products: readonly(products),
         categories: readonly(categories),
         pagination: readonly(pagination),
         loading: readonly(loading),
         error: readonly(error),
 
-        // Methods
         fetchProducts,
         fetchProduct,
         fetchCategories,
@@ -297,11 +300,9 @@ export const useProducts = () => {
         getFeaturedProducts,
         getProductsByCategory,
         searchProducts,
-        // getRelatedProducts,
         refresh,
         clear,
 
-        // Computed
         getAllCategories,
         hasProducts,
         totalProducts,

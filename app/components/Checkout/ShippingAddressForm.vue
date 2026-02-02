@@ -319,18 +319,18 @@ const selectSavedAddress = (addressId: number) => {
 
 // Countries and States
 const countries = [
-  { label: 'Bangladesh', value: 'BD' }
+  { label: 'Bangladesh', value: 'Bangladesh' }
 ]
 
 const stateOptions = computed(() => {
-  if (props.modelValue.country === 'BD') {
+  if (props.modelValue.country === 'Bangladesh') {
     return bangladeshDivisions
   }
   return []
 })
 
 const districtOptions = computed(() => {
-  if (props.modelValue.country !== 'BD') return []
+  if (props.modelValue.country !== 'Bangladesh') return []
   if (!props.modelValue.state) return []
   const normalizedState = normalizeDivisionValue(props.modelValue.state)
   return bangladeshDistricts[normalizedState] || []
@@ -354,7 +354,7 @@ const updateField = (field: keyof ShippingAddress, value: any) => {
   }
 
   if (field === 'country') {
-    const validStates = fieldValue === 'BD' ? bangladeshDivisions.map((state) => state.value) : []
+    const validStates = fieldValue === 'Bangladesh' ? bangladeshDivisions.map((state) => state.value) : []
     if (nextValue.state && !validStates.includes(nextValue.state)) {
       nextValue.state = ''
     }

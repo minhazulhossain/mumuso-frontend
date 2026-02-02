@@ -8,25 +8,22 @@
 
       <!-- Mobile Filter Slide Over -->
       <USlideover v-model:open="showMobileFilters" side="left" title="Filters">
-        <!-- Trigger Button (hidden, shown via search controls) -->
         <template #default />
-
-        <!-- Slide Over Content -->
         <template #content>
-        <ShopSidebar
-            v-model:filters="activeFilters"
-            @apply-filters="applyFilters"
-            @clear-filters="clearAllFilters"
-            @close-mobile="showMobileFilters = false"
-            :hide-category-filter="hideCategoryFilter"
-            :is-mobile="true"
-            :loading="isLoading"
-        />
+          <ShopSidebar
+              v-model:filters="activeFilters"
+              @apply-filters="applyFilters"
+              @clear-filters="clearAllFilters"
+              @close-mobile="showMobileFilters = false"
+              :hide-category-filter="hideCategoryFilter"
+              :is-mobile="true"
+              :loading="isLoading"
+          />
         </template>
       </USlideover>
 
       <div class="flex flex-col lg:flex-row gap-8">
-        <!-- Filters Sidebar - Visible on desktop only -->
+        <!-- Filters Sidebar - Desktop -->
         <ShopSidebar
             class="hidden lg:block"
             v-model:filters="activeFilters"
@@ -56,113 +53,115 @@
                 <USkeleton class="h-6 w-24" />
               </div>
             </div>
+
             <template v-else>
-            <div class="flex flex-col sm:flex-row gap-4">
-              <UInput
-                  v-model="searchQuery"
-                  icon="i-heroicons-magnifying-glass"
-                  placeholder="Search products..."
-                  class="flex-1"
-                  @update:model-value="debouncedSearch"
-              />
-              <div class="flex gap-2">
-                <!-- Filter Toggle Button (Mobile only) -->
-                <UButton
-                    class="lg:hidden"
-                    @click="showMobileFilters = !showMobileFilters"
-                    :variant="showMobileFilters ? 'solid' : 'soft'"
-                    color="primary"
-                    icon="i-heroicons-funnel"
-                    size="sm"
-                >
-                  Filters
-                </UButton>
-                <USelect
-                    v-model="sortBy"
-                    :items="sortOptions"
-                    class="sm:w-48"
-                    @update:model-value="loadProducts"
+              <div class="flex flex-col sm:flex-row gap-4">
+                <UInput
+                    v-model="searchQuery"
+                    icon="i-heroicons-magnifying-glass"
+                    placeholder="Search products..."
+                    class="flex-1"
+                    @update:model-value="debouncedSearch"
                 />
+
+                <div class="flex gap-2">
+                  <!-- Filter Toggle Button (Mobile only) -->
+                  <UButton
+                      class="lg:hidden"
+                      @click="showMobileFilters = !showMobileFilters"
+                      :variant="showMobileFilters ? 'solid' : 'soft'"
+                      color="primary"
+                      icon="i-heroicons-funnel"
+                      size="sm"
+                  >
+                    Filters
+                  </UButton>
+
+                  <USelect
+                      v-model="sortBy"
+                      :items="sortOptions"
+                      class="sm:w-48"
+                      @update:model-value="onSortChange"
+                  />
+                </div>
               </div>
-            </div>
 
-            <!-- Active Filters Display -->
-            <div v-if="hasActiveFilters" class="flex flex-wrap gap-2 mt-4">
-              <UBadge
-                  v-if="activeFilters.category && activeFilters.category !== 'all'"
-                  color="primary"
-                  variant="soft"
-                  @click="removeFilter('category')"
-                  class="cursor-pointer"
-              >
-                {{ getCategoryName(activeFilters.category) }}
-                <UIcon name="i-heroicons-x-mark" class="ml-1 w-3 h-3"/>
-              </UBadge>
+              <!-- Active Filters Display -->
+              <div v-if="hasActiveFilters" class="flex flex-wrap gap-2 mt-4">
+                <UBadge
+                    v-if="activeFilters.category && activeFilters.category !== 'all'"
+                    color="primary"
+                    variant="soft"
+                    @click="removeFilter('category')"
+                    class="cursor-pointer"
+                >
+                  {{ getCategoryName(activeFilters.category) }}
+                  <UIcon name="i-heroicons-x-mark" class="ml-1 w-3 h-3"/>
+                </UBadge>
 
-              <UBadge
-                  v-if="activeFilters.featured"
-                  color="warning"
-                  variant="soft"
-                  @click="removeFilter('featured')"
-                  class="cursor-pointer"
-              >
-                Featured
-                <UIcon name="i-heroicons-x-mark" class="ml-1 w-3 h-3"/>
-              </UBadge>
+                <UBadge
+                    v-if="activeFilters.featured"
+                    color="warning"
+                    variant="soft"
+                    @click="removeFilter('featured')"
+                    class="cursor-pointer"
+                >
+                  Featured
+                  <UIcon name="i-heroicons-x-mark" class="ml-1 w-3 h-3"/>
+                </UBadge>
 
-              <UBadge
-                  v-if="activeFilters.in_stock !== undefined"
-                  color="success"
-                  variant="soft"
-                  @click="removeFilter('in_stock')"
-                  class="cursor-pointer"
-              >
-                {{ activeFilters.in_stock ? 'In Stock' : 'Out of Stock' }}
-                <UIcon name="i-heroicons-x-mark" class="ml-1 w-3 h-3"/>
-              </UBadge>
+                <UBadge
+                    v-if="activeFilters.in_stock !== undefined"
+                    color="success"
+                    variant="soft"
+                    @click="removeFilter('in_stock')"
+                    class="cursor-pointer"
+                >
+                  {{ activeFilters.in_stock ? 'In Stock' : 'Out of Stock' }}
+                  <UIcon name="i-heroicons-x-mark" class="ml-1 w-3 h-3"/>
+                </UBadge>
 
-              <UBadge
-                  v-if="activeFilters.min_price"
-                  color="primary"
-                  variant="soft"
-                  @click="removeFilter('min_price')"
-                  class="cursor-pointer"
-              >
-                Min: {{ formatCurrency(Number(activeFilters.min_price)) }}
-                <UIcon name="i-heroicons-x-mark" class="ml-1 w-3 h-3"/>
-              </UBadge>
+                <UBadge
+                    v-if="activeFilters.min_price"
+                    color="primary"
+                    variant="soft"
+                    @click="removeFilter('min_price')"
+                    class="cursor-pointer"
+                >
+                  Min: {{ formatCurrency(Number(activeFilters.min_price)) }}
+                  <UIcon name="i-heroicons-x-mark" class="ml-1 w-3 h-3"/>
+                </UBadge>
 
-              <UBadge
-                  v-if="activeFilters.max_price"
-                  color="primary"
-                  variant="soft"
-                  @click="removeFilter('max_price')"
-                  class="cursor-pointer"
-              >
-                Max: {{ formatCurrency(Number(activeFilters.max_price)) }}
-                <UIcon name="i-heroicons-x-mark" class="ml-1 w-3 h-3"/>
-              </UBadge>
+                <UBadge
+                    v-if="activeFilters.max_price"
+                    color="primary"
+                    variant="soft"
+                    @click="removeFilter('max_price')"
+                    class="cursor-pointer"
+                >
+                  Max: {{ formatCurrency(Number(activeFilters.max_price)) }}
+                  <UIcon name="i-heroicons-x-mark" class="ml-1 w-3 h-3"/>
+                </UBadge>
 
-              <UButton
-                  size="xs"
-                  color="secondary"
-                  variant="ghost"
-                  @click="clearAllFilters"
-              >
-                Clear All
-              </UButton>
-            </div>
+                <UButton
+                    size="xs"
+                    color="secondary"
+                    variant="ghost"
+                    @click="clearAllFilters"
+                >
+                  Clear All
+                </UButton>
+              </div>
             </template>
           </div>
+
           <!-- Loading State -->
           <div v-if="isLoading">
-            <!-- Grid Skeleton -->
             <template v-if="viewMode === 'grid'">
               <div class="grid grid-cols-2 md:grid-cols-2 xl:grid-cols-3 gap-3">
                 <ShopProductCardSkeleton v-for="i in 9" :key="i" />
               </div>
             </template>
-            <!-- List Skeleton -->
             <template v-else>
               <div class="space-y-4">
                 <ShopProductListSkeleton v-for="i in 6" :key="i" />
@@ -174,7 +173,7 @@
           <div v-else-if="error" class="text-center py-16">
             <UIcon name="i-heroicons-exclamation-triangle" class="text-4xl text-red-500 mb-4"/>
             <p class="text-red-600 dark:text-red-400">{{ error }}</p>
-            <UButton @click="loadProducts" color="primary" class="mt-4">Try Again</UButton>
+            <UButton @click="loadProductsFromUI(1)" color="primary" class="mt-4">Try Again</UButton>
           </div>
 
           <!-- Content -->
@@ -187,7 +186,6 @@
                 products
               </div>
 
-              <!-- View Toggle -->
               <div class="flex gap-2">
                 <UButton
                     :variant="viewMode === 'grid' ? 'solid' : 'soft'"
@@ -206,7 +204,7 @@
               </div>
             </div>
 
-            <!-- Products Grid View -->
+            <!-- Grid -->
             <div
                 v-if="viewMode === 'grid' && products.length > 0"
                 class="grid grid-cols-2 xl:grid-cols-3 gap-3"
@@ -219,7 +217,7 @@
               />
             </div>
 
-            <!-- Products List View -->
+            <!-- List -->
             <div
                 v-else-if="viewMode === 'list' && products.length > 0"
                 class="space-y-4"
@@ -243,12 +241,10 @@
             <!-- Pagination -->
             <div v-if="pagination && pagination.lastPage > 1" class="mt-8">
               <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-                <!-- Page Info -->
                 <div class="text-sm text-gray-600 dark:text-gray-400">
                   Showing {{ pagination.from }} to {{ pagination.to }} of {{ pagination.total }} results
                 </div>
 
-                <!-- Pagination Controls -->
                 <div class="flex gap-2">
                   <UButton
                       @click="changePage(1)"
@@ -305,6 +301,9 @@
 
 <script setup lang="ts">
 import { useCurrency } from '#imports'
+
+type ProductFilters = Record<string, any>
+
 const props = withDefaults(defineProps<{
   title?: string
   subTitle?: string
@@ -324,19 +323,20 @@ const {
   changePage: apiChangePage,
   getAllCategories
 } = useProducts()
-const cart = inject('cart')
-const {addToCart} = cart
+
+const cart = inject('cart') as any
+const { addToCart } = cart
 const toast = useToast()
 const route = useRoute()
 const router = useRouter()
 const { formatCurrency } = useCurrency()
-const isLoading = computed(() => Boolean(props.loadingContent || pageLoading.value || productsLoading.value))
 
 // State
 const searchQuery = ref('')
 const sortBy = ref('featured')
 const viewMode = ref<'grid' | 'list'>('grid')
 const showMobileFilters = ref(false)
+
 const activeFilters = ref<any>({
   category: props.initialCategory || 'all',
   featured: undefined,
@@ -345,16 +345,17 @@ const activeFilters = ref<any>({
   max_price: undefined,
 })
 
-
 // Options
 const sortOptions = [
-  {value: 'newest', label: 'Newest First'},
-  {value: 'featured', label: 'Featured First'},
-  {value: 'price-asc', label: 'Price: Low to High'},
-  {value: 'price-desc', label: 'Price: High to Low'},
-  {value: 'name-asc', label: 'Name: A-Z'},
-  {value: 'name-desc', label: 'Name: Z-A'},
+  { value: 'newest', label: 'Newest First' },
+  { value: 'featured', label: 'Featured First' },
+  { value: 'price-asc', label: 'Price: Low to High' },
+  { value: 'price-desc', label: 'Price: High to Low' },
+  { value: 'name-asc', label: 'Name: A-Z' },
+  { value: 'name-desc', label: 'Name: Z-A' },
 ]
+
+const isLoading = computed(() => Boolean(props.loadingContent || pagePending.value || productsLoading.value))
 
 const hasActiveFilters = computed(() => {
   return (
@@ -362,73 +363,127 @@ const hasActiveFilters = computed(() => {
       activeFilters.value.featured !== undefined ||
       activeFilters.value.in_stock !== undefined ||
       activeFilters.value.min_price ||
-      activeFilters.value.max_price
+      activeFilters.value.max_price ||
+      !!searchQuery.value ||
+      (sortBy.value && sortBy.value !== 'featured')
   )
 })
 
-// Methods
 const getCategoryName = (slug: string) => {
-  const category = getAllCategories.value.find(c => c.slug === slug)
+  const category = getAllCategories.value.find((c: any) => c.slug === slug)
   return category?.name || slug
 }
 
-const buildFiltersObject = () => {
-  const filters: any = {}
+/** UI state -> raw filters */
+const buildFiltersFromUI = (): ProductFilters => {
+  const f: ProductFilters = {}
 
-  // Category filter
   if (activeFilters.value.category && activeFilters.value.category !== 'all') {
-    filters.category = activeFilters.value.category
+    f.category = activeFilters.value.category
   }
-
-  // Featured filter
   if (activeFilters.value.featured !== undefined) {
-    filters.featured = activeFilters.value.featured
+    f.featured = activeFilters.value.featured
   }
-
-  // Stock filter
   if (activeFilters.value.in_stock !== undefined) {
-    filters.in_stock = activeFilters.value.in_stock
+    f.in_stock = activeFilters.value.in_stock
   }
-
-  // Price range
   if (activeFilters.value.min_price) {
-    filters.min_price = activeFilters.value.min_price
+    f.min_price = activeFilters.value.min_price
   }
   if (activeFilters.value.max_price) {
-    filters.max_price = activeFilters.value.max_price
+    f.max_price = activeFilters.value.max_price
   }
-
-  // Search
   if (searchQuery.value) {
-    filters.search = searchQuery.value
+    f.search = searchQuery.value
   }
-
-  // Sort
   if (sortBy.value) {
-    filters.sort_by = sortBy.value
+    f.sort_by = sortBy.value
   }
 
-  return filters
+  return f
 }
 
-const loadProducts = async () => {
+/** normalize -> backend expects 'true'/'false' */
+const normalizeQueryParams = (filters: ProductFilters = {}) => {
+  const params: Record<string, any> = {}
 
-  const filters = buildFiltersObject()
+  if (filters.search) params.search = String(filters.search).trim()
+  if (filters.category) params.category = String(filters.category)
+  if (filters.sort_by) params.sort_by = String(filters.sort_by)
 
-  // Update URL query params
+  if (filters.min_price !== undefined && filters.min_price !== null && filters.min_price !== '') {
+    params.min_price = Number(filters.min_price)
+  }
+  if (filters.max_price !== undefined && filters.max_price !== null && filters.max_price !== '') {
+    params.max_price = Number(filters.max_price)
+  }
+
+  if (filters.featured !== undefined && filters.featured !== null) {
+    params.featured = filters.featured ? 'true' : 'false'
+  }
+  if (filters.in_stock !== undefined && filters.in_stock !== null) {
+    params.in_stock = filters.in_stock ? 'true' : 'false'
+  }
+
+  return params
+}
+
+const getInitialPage = () => {
+  const p = Number(route.query.page || 1)
+  return Number.isFinite(p) && p > 0 ? p : 1
+}
+
+/** ✅ IMPORTANT: Only fetch (NO router.push), used by route watcher/SSR */
+const fetchFromRoute = async () => {
+  const q = route.query
+
+  // sync UI state from URL
+  if (q.category) activeFilters.value.category = q.category as string
+  if (q.featured) activeFilters.value.featured = q.featured === 'true'
+  if (q.in_stock) activeFilters.value.in_stock = q.in_stock === 'true'
+  if (q.min_price) activeFilters.value.min_price = q.min_price as string
+  if (q.max_price) activeFilters.value.max_price = q.max_price as string
+  if (q.search) searchQuery.value = q.search as string
+  if (q.sort_by) sortBy.value = q.sort_by as string
+
+  const page = getInitialPage()
+
+  // fetch using URL query directly
+  await fetchProducts({
+    ...q,
+    page
+  })
+}
+
+/** ✅ User action: update URL + fetch */
+const syncUrlAndFetch = async (page: number = 1) => {
+  const raw = buildFiltersFromUI()
+  const filters = normalizeQueryParams(raw)
+
+  // ✅ safety: sort_by কখনও missing হবে না
+  if (!filters.sort_by) filters.sort_by = sortBy.value || 'featured'
+
+  console.log('RAW(UI) =>', raw)
+  console.log('FILTERS(query) =>', filters)
+
   await router.push({
     query: {
       ...filters,
-      page: pagination.value?.currentPage || 1
+      page: String(page)
     }
   })
-
-  await fetchProducts(filters)
 }
 
+
+/** sort change => reset page */
+const onSortChange = async () => {
+  await syncUrlAndFetch(1)
+}
+
+/** apply filters from sidebar => reset page */
 const applyFilters = async (filters: any) => {
-  activeFilters.value = {...filters}
-  await loadProducts()
+  activeFilters.value = { ...filters }
+  await syncUrlAndFetch(1)
 }
 
 const clearAllFilters = async () => {
@@ -442,30 +497,48 @@ const clearAllFilters = async () => {
   searchQuery.value = ''
   sortBy.value = 'featured'
 
-  await router.push({query: {}})
-  await loadProducts()
+  await router.push({ query: {} })
+  // watcher will fetch
 }
 
 const removeFilter = async (filterKey: string) => {
-  if (filterKey === 'category') {
-    activeFilters.value.category = 'all'
-  } else {
-    activeFilters.value[filterKey] = undefined
-  }
-  await loadProducts()
+  if (filterKey === 'category') activeFilters.value.category = 'all'
+  else activeFilters.value[filterKey] = undefined
+
+  await syncUrlAndFetch(1)
 }
 
 const changePage = async (page: number) => {
-  await apiChangePage(page, buildFiltersObject())
-  window.scrollTo({top: 0, behavior: 'smooth'})
+  await syncUrlAndFetch(page)
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
+
+// Debounced search => reset page
+let searchTimeout: NodeJS.Timeout
+const debouncedSearch = () => {
+  clearTimeout(searchTimeout)
+  searchTimeout = setTimeout(() => {
+    syncUrlAndFetch(1)
+  }, 500)
+}
+
+// SSR + route watcher (NO router.push inside)
+const { pending: pagePending } = await useAsyncData(async () => {
+  await fetchFromRoute()
+  return products.value
+}, {
+  server: true,
+  watch: [() => route.query]
+})
 
 const handleAddToCart = async (productId: number | string, quantity: number = 1) => {
   const product =
-    typeof productId === 'number'
-      ? products.value.find((item) => item.id === productId)
-      : products.value.find((item) => item.slug === productId)
+      typeof productId === 'number'
+          ? products.value.find((item: any) => item.id === productId)
+          : products.value.find((item: any) => item.slug === productId)
+
   const slug = product?.slug ?? (typeof productId === 'string' ? productId : '')
+
   if (!slug) {
     toast.add({
       title: 'Error',
@@ -475,6 +548,7 @@ const handleAddToCart = async (productId: number | string, quantity: number = 1)
     })
     return
   }
+
   try {
     await addToCart(slug, quantity)
     toast.add({
@@ -493,47 +567,23 @@ const handleAddToCart = async (productId: number | string, quantity: number = 1)
   }
 }
 
-// Debounced search
-let searchTimeout: NodeJS.Timeout
-const debouncedSearch = () => {
-  clearTimeout(searchTimeout)
-  searchTimeout = setTimeout(() => {
-    loadProducts()
-  }, 500)
-}
-
-
-// Initialize from URL params
-const initializeFromUrl = () => {
-  const query = route.query
-
-  if (query.category) activeFilters.value.category = query.category as string
-  if (query.featured) activeFilters.value.featured = query.featured === 'true'
-  if (query.in_stock) activeFilters.value.in_stock = query.in_stock === 'true'
-  if (query.min_price) activeFilters.value.min_price = query.min_price as string
-  if (query.max_price) activeFilters.value.max_price = query.max_price as string
-  if (query.search) searchQuery.value = query.search as string
-  if (query.sort_by) sortBy.value = query.sort_by as string
-}
-
-// Fetch products on server and client
-// Using pending from useAsyncData as the single source of truth for loading state
-const { pending: pageLoading } = await useAsyncData(async () => {
-  initializeFromUrl()
-  await loadProducts()
-  return products.value
-}, {
-  server: true,
-  watch: [() => route.query]
+onMounted(async () => {
+  if (!route.query.sort_by) {
+    await router.replace({
+      query: {
+        ...route.query,
+        sort_by: sortBy.value,   // 'featured'
+        page: route.query.page || '1'
+      }
+    })
+  }
 })
+
 
 // SEO
 useHead({
   title: 'Shop - Premium Products',
-  meta: [
-    {name: 'description', content: 'Browse our collection of premium products'}
-  ]
+  meta: [{ name: 'description', content: 'Browse our collection of premium products' }]
 })
-
-
 </script>
+

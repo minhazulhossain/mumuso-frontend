@@ -1,5 +1,7 @@
 <template>
-  <footer class="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 pb-[calc(76px+env(safe-area-inset-bottom))] md:pb-0" v-if="settings">
+  <footer
+      class="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 pb-[calc(76px+env(safe-area-inset-bottom))] md:pb-0"
+      v-if="settings">
     <UContainer>
       <!-- Main Footer Content -->
       <div class="py-8 md:py-16">
@@ -41,58 +43,67 @@
                 Follow Us
               </h3>
               <div class="flex justify-center sm:justify-start">
-                <SocialMediaLinks icon-size="w-5 h-5" />
+                <SocialMediaLinks icon-size="w-5 h-5"/>
               </div>
             </div>
           </div>
 
-          <!-- Footer Navigation Sections -->
-          <div v-for="section in footerSections" :key="section.title" class="space-y-4">
-            <div class="hidden sm:block">
-              <h3 class="font-semibold text-gray-900 dark:text-white text-sm uppercase tracking-wider mb-2">
-                {{ section.title }}
-              </h3>
+          <!-- Footer Navigation Sections (Dynamic from Menu Builder) -->
+          <template v-if="loadingMenus">
+            <div v-for="i in 2" :key="'sk-'+i" class="space-y-4">
+              <USkeleton class="h-4 w-32" />
               <ul class="space-y-3">
-                <li v-for="link in section.links" :key="link.name">
-                  <NuxtLink
-                    :to="link.to"
-                    :external="link.external"
-                    :target="link.external ? '_blank' : undefined"
-                    class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm transition-colors flex items-center"
-                  >
-                    {{ link.name }}
-                    <UIcon
-                      v-if="link.external"
-                      name="i-heroicons-arrow-top-right-on-square"
-                      class="w-3 h-3 ml-1"
-                    />
-                  </NuxtLink>
+                <li v-for="j in 4" :key="'sk-item-'+i+'-'+j">
+                  <USkeleton class="h-3 w-40" />
                 </li>
               </ul>
             </div>
-            <details class="sm:hidden border-b border-gray-200 dark:border-gray-800 pb-3">
-              <summary class="font-semibold text-gray-900 dark:text-white text-sm uppercase tracking-wider cursor-pointer mb-2">
-                {{ section.title }}
-              </summary>
-              <ul class="space-y-3 mt-3">
-                <li v-for="link in section.links" :key="link.name">
-                  <NuxtLink
-                    :to="link.to"
-                    :external="link.external"
-                    :target="link.external ? '_blank' : undefined"
-                    class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm transition-colors flex items-center"
-                  >
-                    {{ link.name }}
-                    <UIcon
-                      v-if="link.external"
-                      name="i-heroicons-arrow-top-right-on-square"
-                      class="w-3 h-3 ml-1"
-                    />
-                  </NuxtLink>
-                </li>
-              </ul>
-            </details>
-          </div>
+          </template>
+          <template v-else>
+            <div v-for="menu in displayMenus" :key="menu.slug" class="space-y-4">
+              <div class="hidden sm:block">
+                <h3 class="font-semibold text-gray-900 dark:text-white text-sm uppercase tracking-wider mb-2">
+                  {{ menu.name }}
+                </h3>
+                <ul class="space-y-3">
+                  <li v-for="item in menu.items" :key="item.id">
+                    <NuxtLink
+                        :to="item.url || '#'"
+                        :external="isExternalUrl(item.url)"
+                        :target="isExternalUrl(item.url) ? '_blank' : undefined"
+                        class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm transition-colors flex items-center"
+                    >
+                      {{ item.title }}
+
+                    </NuxtLink>
+                  </li>
+                </ul>
+              </div>
+              <details class="sm:hidden border-b border-gray-200 dark:border-gray-800 pb-3">
+                <summary
+                    class="font-semibold text-gray-900 dark:text-white text-sm uppercase tracking-wider cursor-pointer mb-2">
+                  {{ menu.name }}
+                </summary>
+                <ul class="space-y-3 mt-3">
+                  <li v-for="item in menu.items" :key="item.id">
+                    <NuxtLink
+                        :to="item.url || '#'"
+                        :external="isExternalUrl(item.url)"
+                        :target="isExternalUrl(item.url) ? '_blank' : undefined"
+                        class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm transition-colors flex items-center"
+                    >
+                      {{ item.label }}
+                      <UIcon
+                          v-if="isExternalUrl(item.url)"
+                          name="i-heroicons-arrow-top-right-on-square"
+                          class="w-3 h-3 ml-1"
+                      />
+                    </NuxtLink>
+                  </li>
+                </ul>
+              </details>
+            </div>
+          </template>
 
           <div class="space-y-4">
             <h3 class="font-semibold text-gray-900 dark:text-white text-sm uppercase tracking-wider">
@@ -109,26 +120,21 @@
           <p class="text-gray-600 dark:text-gray-400 text-sm">
             {{ settings?.footer?.copyright || `© ${currentYear} All rights reserved.` }}
           </p>
+          <div class="flex items-center space-x-6" v-if="settings?.footer?.menu_items">
+            <NuxtLink
+                v-for="item in settings.footer.menu_items"
+                :key="item.id"
+                :to="item.url"
+                class="text-sm transition-colors"
+                :class="[
+                $route.path === item.url
+                  ? 'text-indigo-600 dark:text-indigo-400 font-medium'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+              ]"
+            >
+              {{ item.label }}
+            </NuxtLink>
 
-          <div class="flex items-center space-x-6">
-            <NuxtLink
-              to="/"
-              class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm transition-colors"
-            >
-              Privacy Policy
-            </NuxtLink>
-            <NuxtLink
-              to="/"
-              class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm transition-colors"
-            >
-              Terms of Service
-            </NuxtLink>
-            <NuxtLink
-              to="/"
-              class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm transition-colors"
-            >
-              Cookies
-            </NuxtLink>
           </div>
         </div>
       </div>
@@ -140,32 +146,44 @@
 import type {Settings} from '#shared/types'
 
 const settings = inject<Settings>('settings')
+const {fetchMenus} = useMenus()
 
 const currentYear = new Date().getFullYear()
-const newsletterEmail = ref('')
-const isSubscribing = ref(false)
-
 const toast = useToast()
 
+// Dynamic menus from backend
+const displayMenus = ref<any[]>([])
+const loadingMenus = ref(true)
 
-const subscribeNewsletter = async () => {
-  if (!newsletterEmail.value) return
+// Define which footer menus to display (adjust these menu slugs as needed)
+const FOOTER_MENU_SLUGS = ['footer-product-menu', 'footer-company-menu']
 
-  isSubscribing.value = true
+// Check if URL is external
+const isExternalUrl = (url: string): boolean => {
+  if (!url) return false
+  return url.startsWith('http://') || url.startsWith('https://') || url.startsWith('//')
+}
 
-  // Simulate API call
-  await new Promise(resolve => setTimeout(resolve, 1000))
+// Fetch footer menus on mount
+const loadFooterMenus = async () => {
+  loadingMenus.value = true
+  try {
+    const menus = await fetchMenus(FOOTER_MENU_SLUGS)
 
-  const toast = useToast()
-  toast.add({
-    title: 'Subscribed!',
-    description: 'Thank you for subscribing to our newsletter.',
-    icon: 'i-heroicons-check-circle',
-    color: 'success'
-  })
+    // Filter and limit to 3 menus
+    displayMenus.value = FOOTER_MENU_SLUGS
+      .map(slug => menus[slug])
+      .filter(menu => menu)
+      .slice(0, 3)
 
-  newsletterEmail.value = ''
-  isSubscribing.value = false
+    console.log('[footer] Loaded menus:', displayMenus.value)
+  } catch (err) {
+    console.error('[footer] Error loading menus:', err)
+    // Fallback to empty menus
+    displayMenus.value = []
+  } finally {
+    loadingMenus.value = false
+  }
 }
 
 const handleNewsLetterSuccess = () => {
@@ -176,26 +194,8 @@ const handleNewsLetterSuccess = () => {
   })
 }
 
-const footerSections = [
-  {
-    title: 'Product',
-    links: [
-      { name: 'Shop', to: '/shop' },
-      { name: 'Pricing', to: '/' },
-      { name: 'Documentation', to: '/' },
-      { name: 'API Reference', to: '/' },
-      { name: 'Changelog', to: '/' }
-    ]
-  },
-  {
-    title: 'Company',
-    links: [
-      { name: 'About', to: '/' },
-      { name: 'Blog', to: '/blog' },
-      { name: 'Careers', to: '/' },
-      { name: 'Press Kit', to: '/' },
-      { name: 'Contact', to: '/contact' }
-    ]
-  },
-]
+// Load menus on mount
+onMounted(async () => {
+  await loadFooterMenus()
+})
 </script>

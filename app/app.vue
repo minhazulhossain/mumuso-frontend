@@ -48,6 +48,16 @@ watch(() => settings.value?.site.active, (isActive) => {
   }
 }, {immediate: true})
 
+useHead(() => ({
+  link: [
+    {
+      rel: 'icon',
+      type: 'image/png',
+      href: settings.value?.branding?.favicon || '/favicon.ico'
+    }
+  ]
+}))
+
 useSEO({
   title: `${settings.value?.company.name || settings.value?.site.name || 'us'}`,
   description: ``,

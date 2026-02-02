@@ -3,11 +3,9 @@ export default defineEventHandler(async (event) => {
   const query = getQuery(event)
 
   try {
-    const response = await $fetch(`${backendUrl}products`, {
+    return await $fetch(`${backendUrl}products`, {
       query
     })
-
-    return response
   } catch (error: any) {
     throw createError({
       statusCode: error.statusCode || 500,
