@@ -1,0 +1,660 @@
+{
+  "Barishal": [
+    { "label": "Agailjhara", "value": "Agailjhara", "postCode": "8240" },
+    { "label": "Babuganj", "value": "Babuganj", "postCode": "8210" },
+    { "label": "Bakerganj", "value": "Bakerganj", "postCode": "8230" },
+    { "label": "Banaripara", "value": "Banaripara", "postCode": "8530" },
+    { "label": "Barishal Sadar", "value": "Barishal Sadar", "postCode": "8200" },
+    { "label": "Gournadi", "value": "Gournadi", "postCode": "8220" },
+    { "label": "Hizla", "value": "Hizla", "postCode": "8250" },
+    { "label": "Mehendiganj", "value": "Mehendiganj", "postCode": "8280" },
+    { "label": "Muladi", "value": "Muladi", "postCode": "8240" },
+    { "label": "Wazirpur", "value": "Wazirpur", "postCode": "8260" }
+  ],
+  "Barguna": [
+    { "label": "Amtali", "value": "Amtali", "postCode": "8710" },
+    { "label": "Bamna", "value": "Bamna", "postCode": "8730" },
+    { "label": "Barguna Sadar", "value": "Barguna Sadar", "postCode": "8700" },
+    { "label": "Betagi", "value": "Betagi", "postCode": "8720" },
+    { "label": "Patharghata", "value": "Patharghata", "postCode": "8740" },
+    { "label": "Taltali", "value": "Taltali", "postCode": "8750" }
+  ],
+  "Bhola": [
+    { "label": "Bhola Sadar", "value": "Bhola Sadar", "postCode": "8300" },
+    { "label": "Burhanuddin", "value": "Burhanuddin", "postCode": "8320" },
+    { "label": "Char Fasson", "value": "Char Fasson", "postCode": "8340" },
+    { "label": "Daulatkhan", "value": "Daulatkhan", "postCode": "8310" },
+    { "label": "Lalmohan", "value": "Lalmohan", "postCode": "8330" },
+    { "label": "Manpura", "value": "Manpura", "postCode": "8350" },
+    { "label": "Tazumuddin", "value": "Tazumuddin", "postCode": "8360" }
+  ],
+  "Jhalokati": [
+    { "label": "Jhalokati Sadar", "value": "Jhalokati Sadar", "postCode": "8400" },
+    { "label": "Kathalia", "value": "Kathalia", "postCode": "8420" },
+    { "label": "Nalchity", "value": "Nalchity", "postCode": "8410" },
+    { "label": "Rajapur", "value": "Rajapur", "postCode": "8430" }
+  ],
+  "Patuakhali": [
+    { "label": "Bauphal", "value": "Bauphal", "postCode": "8620" },
+    { "label": "Dashmina", "value": "Dashmina", "postCode": "8630" },
+    { "label": "Dumki", "value": "Dumki", "postCode": "8602" },
+    { "label": "Galachipa", "value": "Galachipa", "postCode": "8640" },
+    { "label": "Kalapara", "value": "Kalapara", "postCode": "8650" },
+    { "label": "Mirzaganj", "value": "Mirzaganj", "postCode": "8612" },
+    { "label": "Patuakhali Sadar", "value": "Patuakhali Sadar", "postCode": "8600" },
+    { "label": "Rangabali", "value": "Rangabali", "postCode": "8610" }
+  ],
+  "Pirojpur": [
+    { "label": "Bhandaria", "value": "Bhandaria", "postCode": "8530" },
+    { "label": "Kawkhali", "value": "Kawkhali", "postCode": "8510" },
+    { "label": "Mathbaria", "value": "Mathbaria", "postCode": "8520" },
+    { "label": "Nazirpur", "value": "Nazirpur", "postCode": "8540" },
+    { "label": "Nesarabad", "value": "Nesarabad", "postCode": "8550" },
+    { "label": "Pirojpur Sadar", "value": "Pirojpur Sadar", "postCode": "8500" },
+    { "label": "Zianagar", "value": "Zianagar", "postCode": "8560" }
+  ],
+  "Bandarban": [
+    { "label": "Alikadam", "value": "Alikadam", "postCode": "4650" },
+    { "label": "Bandarban Sadar", "value": "Bandarban Sadar", "postCode": "4600" },
+    { "label": "Lama", "value": "Lama", "postCode": "4641" },
+    { "label": "Naikhongchhari", "value": "Naikhongchhari", "postCode": "4660" },
+    { "label": "Rowangchhari", "value": "Rowangchhari", "postCode": "4610" },
+    { "label": "Ruma", "value": "Ruma", "postCode": "4620" },
+    { "label": "Thanchi", "value": "Thanchi", "postCode": "4630" }
+  ],
+  "Brahmanbaria": [
+    { "label": "Akhaura", "value": "Akhaura", "postCode": "3450" },
+    { "label": "Ashuganj", "value": "Ashuganj", "postCode": "3402" },
+    { "label": "Bancharampur", "value": "Bancharampur", "postCode": "3420" },
+    { "label": "Bijoynagar", "value": "Bijoynagar", "postCode": "3411" },
+    { "label": "Brahmanbaria Sadar", "value": "Brahmanbaria Sadar", "postCode": "3400" },
+    { "label": "Kasba", "value": "Kasba", "postCode": "3460" },
+    { "label": "Nabinagar", "value": "Nabinagar", "postCode": "3410" },
+    { "label": "Nasirnagar", "value": "Nasirnagar", "postCode": "3440" },
+    { "label": "Sarail", "value": "Sarail", "postCode": "3430" }
+  ],
+  "Chandpur": [
+    { "label": "Chandpur Sadar", "value": "Chandpur Sadar", "postCode": "3600" },
+    { "label": "Faridganj", "value": "Faridganj", "postCode": "3610" },
+    { "label": "Haimchar", "value": "Haimchar", "postCode": "3641" },
+    { "label": "Haziganj", "value": "Haziganj", "postCode": "3650" },
+    { "label": "Kachua", "value": "Kachua", "postCode": "3630" },
+    { "label": "Matlab Dakshin", "value": "Matlab Dakshin", "postCode": "3602" },
+    { "label": "Matlab Uttar", "value": "Matlab Uttar", "postCode": "3601" },
+    { "label": "Shahrasti", "value": "Shahrasti", "postCode": "3620" }
+  ],
+  "Chattogram": [
+    { "label": "Anwara", "value": "Anwara", "postCode": "4376" },
+    { "label": "Banshkhali", "value": "Banshkhali", "postCode": "4350" },
+    { "label": "Boalkhali", "value": "Boalkhali", "postCode": "4366" },
+    { "label": "Chandanaish", "value": "Chandanaish", "postCode": "4323" },
+    { "label": "Fatikchhari", "value": "Fatikchhari", "postCode": "4315" },
+    { "label": "Hathazari", "value": "Hathazari", "postCode": "4330" },
+    { "label": "Lohagara", "value": "Lohagara", "postCode": "4391" },
+    { "label": "Mirsharai", "value": "Mirsharai", "postCode": "4320" },
+    { "label": "Patiya", "value": "Patiya", "postCode": "4370" },
+    { "label": "Rangunia", "value": "Rangunia", "postCode": "4360" },
+    { "label": "Raozan", "value": "Raozan", "postCode": "4346" },
+    { "label": "Sandwip", "value": "Sandwip", "postCode": "4300" },
+    { "label": "Satkania", "value": "Satkania", "postCode": "4387" },
+    { "label": "Sitakunda", "value": "Sitakunda", "postCode": "4310" }
+  ],
+  "Cumilla": [
+    { "label": "Barura", "value": "Barura", "postCode": "3560" },
+    { "label": "Brahmanpara", "value": "Brahmanpara", "postCode": "3526" },
+    { "label": "Burichang", "value": "Burichang", "postCode": "3520" },
+    { "label": "Chandina", "value": "Chandina", "postCode": "3510" },
+    { "label": "Chauddagram", "value": "Chauddagram", "postCode": "3550" },
+    { "label": "Cumilla Sadar", "value": "Cumilla Sadar", "postCode": "3500" },
+    { "label": "Daudkandi", "value": "Daudkandi", "postCode": "3516" },
+    { "label": "Debidwar", "value": "Debidwar", "postCode": "3503" },
+    { "label": "Homna", "value": "Homna", "postCode": "3544" },
+    { "label": "Laksam", "value": "Laksam", "postCode": "3570" },
+    { "label": "Meghna", "value": "Meghna", "postCode": "3587" },
+    { "label": "Muradnagar", "value": "Muradnagar", "postCode": "3530" },
+    { "label": "Nangalkot", "value": "Nangalkot", "postCode": "3581" },
+    { "label": "Titas", "value": "Titas", "postCode": "3540" }
+  ],
+  "Cox's Bazar": [
+    { "label": "Chakaria", "value": "Chakaria", "postCode": "4740" },
+    { "label": "Cox's Bazar Sadar", "value": "Cox's Bazar Sadar", "postCode": "4700" },
+    { "label": "Kutubdia", "value": "Kutubdia", "postCode": "4711" },
+    { "label": "Maheshkhali", "value": "Maheshkhali", "postCode": "4710" },
+    { "label": "Pekua", "value": "Pekua", "postCode": "4730" },
+    { "label": "Ramu", "value": "Ramu", "postCode": "4750" },
+    { "label": "Teknaf", "value": "Teknaf", "postCode": "4760" },
+    { "label": "Ukhia", "value": "Ukhia", "postCode": "4720" }
+  ],
+  "Feni": [
+    { "label": "Chhagalnaiya", "value": "Chhagalnaiya", "postCode": "3910" },
+    { "label": "Daganbhuiyan", "value": "Daganbhuiyan", "postCode": "3930" },
+    { "label": "Feni Sadar", "value": "Feni Sadar", "postCode": "3900" },
+    { "label": "Fulgazi", "value": "Fulgazi", "postCode": "3942" },
+    { "label": "Parshuram", "value": "Parshuram", "postCode": "3950" },
+    { "label": "Sonagazi", "value": "Sonagazi", "postCode": "3920" }
+  ],
+  "Khagrachari": [
+    { "label": "Dighinala", "value": "Dighinala", "postCode": "4420" },
+    { "label": "Khagrachari Sadar", "value": "Khagrachari Sadar", "postCode": "4400" },
+    { "label": "Lakshmichhari", "value": "Lakshmichhari", "postCode": "4470" },
+    { "label": "Mahalchhari", "value": "Mahalchhari", "postCode": "4430" },
+    { "label": "Manikchhari", "value": "Manikchhari", "postCode": "4460" },
+    { "label": "Matiranga", "value": "Matiranga", "postCode": "4450" },
+    { "label": "Panchhari", "value": "Panchhari", "postCode": "4410" },
+    { "label": "Ramgarh", "value": "Ramgarh", "postCode": "4440" }
+  ],
+  "Lakshmipur": [
+    { "label": "Kamalnagar", "value": "Kamalnagar", "postCode": "3710" },
+    { "label": "Lakshmipur Sadar", "value": "Lakshmipur Sadar", "postCode": "3700" },
+    { "label": "Raipur", "value": "Raipur", "postCode": "3720" },
+    { "label": "Ramganj", "value": "Ramganj", "postCode": "3750" },
+    { "label": "Ramgati", "value": "Ramgati", "postCode": "3730" }
+  ],
+  "Noakhali": [
+    { "label": "Begumganj", "value": "Begumganj", "postCode": "3860" },
+    { "label": "Chatkhil", "value": "Chatkhil", "postCode": "3870" },
+    { "label": "Companiganj", "value": "Companiganj", "postCode": "3820" },
+    { "label": "Hatiya", "value": "Hatiya", "postCode": "3800" },
+    { "label": "Kabirhat", "value": "Kabirhat", "postCode": "3831" },
+    { "label": "Noakhali Sadar", "value": "Noakhali Sadar", "postCode": "3801" },
+    { "label": "Senbagh", "value": "Senbagh", "postCode": "3840" },
+    { "label": "Sonaimuri", "value": "Sonaimuri", "postCode": "3850" },
+    { "label": "Subarnachar", "value": "Subarnachar", "postCode": "3810" }
+  ],
+  "Rangamati": [
+    { "label": "Baghaichhari", "value": "Baghaichhari", "postCode": "4560" },
+    { "label": "Barkal", "value": "Barkal", "postCode": "4560" },
+    { "label": "Juraichhari", "value": "Juraichhari", "postCode": "4510" },
+    { "label": "Kaptai", "value": "Kaptai", "postCode": "4550" },
+    { "label": "Kawkhali", "value": "Kawkhali", "postCode": "4570" },
+    { "label": "Langadu", "value": "Langadu", "postCode": "4530" },
+    { "label": "Naniarchar", "value": "Naniarchar", "postCode": "4520" },
+    { "label": "Rajasthali", "value": "Rajasthali", "postCode": "4540" },
+    { "label": "Rangamati Sadar", "value": "Rangamati Sadar", "postCode": "4500" }
+  ],
+  "Dhaka": [
+    { "label": "Adabar", "value": "Adabar", "postCode": "1207" },
+    { "label": "Badda", "value": "Badda", "postCode": "1212" },
+    { "label": "Banani", "value": "Banani", "postCode": "1213" },
+    { "label": "Bangshal", "value": "Bangshal", "postCode": "1100" },
+    { "label": "Biman Bandar", "value": "Biman Bandar", "postCode": "1229" },
+    { "label": "Cantonment", "value": "Cantonment", "postCode": "1206" },
+    { "label": "Chackbazar", "value": "Chackbazar", "postCode": "1211" },
+    { "label": "Dakshinkhan", "value": "Dakshinkhan", "postCode": "1230" },
+    { "label": "Darus Salam", "value": "Darus Salam", "postCode": "1216" },
+    { "label": "Demra", "value": "Demra", "postCode": "1360" },
+    { "label": "Dhamrai", "value": "Dhamrai", "postCode": "1350" },
+    { "label": "Dhanmondi", "value": "Dhanmondi", "postCode": "1209" },
+    { "label": "Dohar", "value": "Dohar", "postCode": "1330" },
+    { "label": "Gendaria", "value": "Gendaria", "postCode": "1204" },
+    { "label": "Gulshan", "value": "Gulshan", "postCode": "1212" },
+    { "label": "Hazaribag", "value": "Hazaribag", "postCode": "1209" },
+    { "label": "Jatrabari", "value": "Jatrabari", "postCode": "1236" },
+    { "label": "Kafrul", "value": "Kafrul", "postCode": "1216" },
+    { "label": "Kalabagan", "value": "Kalabagan", "postCode": "1205" },
+    { "label": "Kamrangirchar", "value": "Kamrangirchar", "postCode": "1211" },
+    { "label": "Keraniganj", "value": "Keraniganj", "postCode": "1310" },
+    { "label": "Khilgaon", "value": "Khilgaon", "postCode": "1219" },
+    { "label": "Khilkhet", "value": "Khilkhet", "postCode": "1229" },
+    { "label": "Kotwali", "value": "Kotwali", "postCode": "1100" },
+    { "label": "Lalbag", "value": "Lalbag", "postCode": "1211" },
+    { "label": "Mirpur", "value": "Mirpur", "postCode": "1216" },
+    { "label": "Mohammadpur", "value": "Mohammadpur", "postCode": "1207" },
+    { "label": "Motijheel", "value": "Motijheel", "postCode": "1000" },
+    { "label": "Nawabganj", "value": "Nawabganj", "postCode": "1320" },
+    { "label": "New Market", "value": "New Market", "postCode": "1205" },
+    { "label": "Pallabi", "value": "Pallabi", "postCode": "1216" },
+    { "label": "Paltan", "value": "Paltan", "postCode": "1000" },
+    { "label": "Ramna", "value": "Ramna", "postCode": "1217" },
+    { "label": "Rampura", "value": "Rampura", "postCode": "1219" },
+    { "label": "Sabujbag", "value": "Sabujbag", "postCode": "1214" },
+    { "label": "Savar", "value": "Savar", "postCode": "1340" },
+    { "label": "Shah Ali", "value": "Shah Ali", "postCode": "1217" },
+    { "label": "Shahbag", "value": "Shahbag", "postCode": "1000" },
+    { "label": "Shahjahanpur", "value": "Shahjahanpur", "postCode": "1217" },
+    { "label": "Sher-e-Bangla Nagar", "value": "Sher-e-Bangla Nagar", "postCode": "1207" },
+    { "label": "Shyampur", "value": "Shyampur", "postCode": "1204" },
+    { "label": "Sutrapur", "value": "Sutrapur", "postCode": "1203" },
+    { "label": "Tejgaon", "value": "Tejgaon", "postCode": "1215" },
+    { "label": "Tejgaon Industrial Area", "value": "Tejgaon Industrial Area", "postCode": "1208" },
+    { "label": "Turag", "value": "Turag", "postCode": "1230" },
+    { "label": "Uttara", "value": "Uttara", "postCode": "1230" },
+    { "label": "Uttarkhan", "value": "Uttarkhan", "postCode": "1230" },
+    { "label": "Vatara", "value": "Vatara", "postCode": "1212" }
+  ],
+  "Faridpur": [
+    { "label": "Alfadanga", "value": "Alfadanga", "postCode": "7870" },
+    { "label": "Bhanga", "value": "Bhanga", "postCode": "7830" },
+    { "label": "Boalmari", "value": "Boalmari", "postCode": "7860" },
+    { "label": "Charbhadrasan", "value": "Charbhadrasan", "postCode": "7810" },
+    { "label": "Faridpur Sadar", "value": "Faridpur Sadar", "postCode": "7800" },
+    { "label": "Madhukhali", "value": "Madhukhali", "postCode": "7850" },
+    { "label": "Nagarkanda", "value": "Nagarkanda", "postCode": "7840" },
+    { "label": "Sadarpur", "value": "Sadarpur", "postCode": "7820" },
+    { "label": "Saltha", "value": "Saltha", "postCode": "7802" }
+  ],
+  "Gazipur": [
+    { "label": "Gazipur Sadar", "value": "Gazipur Sadar", "postCode": "1700" },
+    { "label": "Kaliakair", "value": "Kaliakair", "postCode": "1750" },
+    { "label": "Kaliganj", "value": "Kaliganj", "postCode": "1720" },
+    { "label": "Kapasia", "value": "Kapasia", "postCode": "1730" },
+    { "label": "Sreepur", "value": "Sreepur", "postCode": "1740" }
+  ],
+  "Gopalganj": [
+    { "label": "Gopalganj Sadar", "value": "Gopalganj Sadar", "postCode": "8100" },
+    { "label": "Kashiani", "value": "Kashiani", "postCode": "8130" },
+    { "label": "Kotalipara", "value": "Kotalipara", "postCode": "8110" },
+    { "label": "Muksudpur", "value": "Muksudpur", "postCode": "8121" },
+    { "label": "Tungipara", "value": "Tungipara", "postCode": "8140" }
+  ],
+  "Kishoreganj": [
+    { "label": "Austagram", "value": "Austagram", "postCode": "2360" },
+    { "label": "Bajitpur", "value": "Bajitpur", "postCode": "2336" },
+    { "label": "Bhairab", "value": "Bhairab", "postCode": "2350" },
+    { "label": "Hossainpur", "value": "Hossainpur", "postCode": "2320" },
+    { "label": "Itna", "value": "Itna", "postCode": "2390" },
+    { "label": "Karimganj", "value": "Karimganj", "postCode": "2310" },
+    { "label": "Katiadi", "value": "Katiadi", "postCode": "2340" },
+    { "label": "Kishoreganj Sadar", "value": "Kishoreganj Sadar", "postCode": "2300" },
+    { "label": "Kuliarchar", "value": "Kuliarchar", "postCode": "2362" },
+    { "label": "Mithamain", "value": "Mithamain", "postCode": "2371" },
+    { "label": "Nikli", "value": "Nikli", "postCode": "2330" },
+    { "label": "Pakundia", "value": "Pakundia", "postCode": "2326" },
+    { "label": "Tarail", "value": "Tarail", "postCode": "2316" }
+  ],
+  "Madaripur": [
+    { "label": "Kalkini", "value": "Kalkini", "postCode": "7920" },
+    { "label": "Madaripur Sadar", "value": "Madaripur Sadar", "postCode": "7900" },
+    { "label": "Rajoir", "value": "Rajoir", "postCode": "7910" },
+    { "label": "Shibchar", "value": "Shibchar", "postCode": "7940" }
+  ],
+  "Manikganj": [
+    { "label": "Daulatpur", "value": "Daulatpur", "postCode": "1860" },
+    { "label": "Ghior", "value": "Ghior", "postCode": "1820" },
+    { "label": "Harirampur", "value": "Harirampur", "postCode": "1840" },
+    { "label": "Manikganj Sadar", "value": "Manikganj Sadar", "postCode": "1800" },
+    { "label": "Saturia", "value": "Saturia", "postCode": "1810" },
+    { "label": "Shivalaya", "value": "Shivalaya", "postCode": "1850" },
+    { "label": "Singair", "value": "Singair", "postCode": "1830" }
+  ],
+  "Munshiganj": [
+    { "label": "Gazaria", "value": "Gazaria", "postCode": "1510" },
+    { "label": "Lohajang", "value": "Lohajang", "postCode": "1540" },
+    { "label": "Munshiganj Sadar", "value": "Munshiganj Sadar", "postCode": "1500" },
+    { "label": "Sirajdikhan", "value": "Sirajdikhan", "postCode": "1530" },
+    { "label": "Sreenagar", "value": "Sreenagar", "postCode": "1520" },
+    { "label": "Tongibari", "value": "Tongibari", "postCode": "1560" }
+  ],
+  "Narayanganj": [
+    { "label": "Araihazar", "value": "Araihazar", "postCode": "1450" },
+    { "label": "Bandar", "value": "Bandar", "postCode": "1410" },
+    { "label": "Narayanganj Sadar", "value": "Narayanganj Sadar", "postCode": "1400" },
+    { "label": "Rupganj", "value": "Rupganj", "postCode": "1460" },
+    { "label": "Sonargaon", "value": "Sonargaon", "postCode": "1440" }
+  ],
+  "Narsingdi": [
+    { "label": "Belabo", "value": "Belabo", "postCode": "1640" },
+    { "label": "Manohardi", "value": "Manohardi", "postCode": "1650" },
+    { "label": "Narsingdi Sadar", "value": "Narsingdi Sadar", "postCode": "1600" },
+    { "label": "Palash", "value": "Palash", "postCode": "1612" },
+    { "label": "Raipura", "value": "Raipura", "postCode": "1630" },
+    { "label": "Shibpur", "value": "Shibpur", "postCode": "1620" }
+  ],
+  "Rajbari": [
+    { "label": "Baliakandi", "value": "Baliakandi", "postCode": "7730" },
+    { "label": "Goalandaghat", "value": "Goalandaghat", "postCode": "7710" },
+    { "label": "Pangsha", "value": "Pangsha", "postCode": "7720" },
+    { "label": "Rajbari Sadar", "value": "Rajbari Sadar", "postCode": "7700" },
+    { "label": "Kalukhali", "value": "Kalukhali", "postCode": "7751" }
+  ],
+  "Shariatpur": [
+    { "label": "Bhedarganj", "value": "Bhedarganj", "postCode": "8040" },
+    { "label": "Damudya", "value": "Damudya", "postCode": "8030" },
+    { "label": "Gosairhat", "value": "Gosairhat", "postCode": "8050" },
+    { "label": "Naria", "value": "Naria", "postCode": "8020" },
+    { "label": "Shariatpur Sadar", "value": "Shariatpur Sadar", "postCode": "8010" },
+    { "label": "Zajira", "value": "Zajira", "postCode": "8060" }
+  ],
+  "Tangail": [
+    { "label": "Basail", "value": "Basail", "postCode": "1922" },
+    { "label": "Bhuapur", "value": "Bhuapur", "postCode": "1960" },
+    { "label": "Delduar", "value": "Delduar", "postCode": "1910" },
+    { "label": "Dhanbari", "value": "Dhanbari", "postCode": "1970" },
+    { "label": "Ghatail", "value": "Ghatail", "postCode": "1980" },
+    { "label": "Gopalpur", "value": "Gopalpur", "postCode": "1990" },
+    { "label": "Kalihati", "value": "Kalihati", "postCode": "1940" },
+    { "label": "Madhupur", "value": "Madhupur", "postCode": "1996" },
+    { "label": "Mirzapur", "value": "Mirzapur", "postCode": "1910" },
+    { "label": "Nagarpur", "value": "Nagarpur", "postCode": "1904" },
+    { "label": "Sakhipur", "value": "Sakhipur", "postCode": "1951" },
+    { "label": "Tangail Sadar", "value": "Tangail Sadar", "postCode": "1900" }
+  ],
+  "Bagerhat": [
+    { "label": "Bagerhat Sadar", "value": "Bagerhat Sadar", "postCode": "9300" },
+    { "label": "Chitalmari", "value": "Chitalmari", "postCode": "9340" },
+    { "label": "Fakirhat", "value": "Fakirhat", "postCode": "9310" },
+    { "label": "Kachua", "value": "Kachua", "postCode": "9320" },
+    { "label": "Mollahat", "value": "Mollahat", "postCode": "9350" },
+    { "label": "Mongla", "value": "Mongla", "postCode": "9351" },
+    { "label": "Morrelganj", "value": "Morrelganj", "postCode": "9360" },
+    { "label": "Rampal", "value": "Rampal", "postCode": "9220" },
+    { "label": "Sarankhola", "value": "Sarankhola", "postCode": "9370" }
+  ],
+  "Chuadanga": [
+    { "label": "Alamdanga", "value": "Alamdanga", "postCode": "7210" },
+    { "label": "Chuadanga Sadar", "value": "Chuadanga Sadar", "postCode": "7200" },
+    { "label": "Damurhuda", "value": "Damurhuda", "postCode": "7220" },
+    { "label": "Jibannagar", "value": "Jibannagar", "postCode": "7250" }
+  ],
+  "Jashore": [
+    { "label": "Abhaynagar", "value": "Abhaynagar", "postCode": "7460" },
+    { "label": "Bagherpara", "value": "Bagherpara", "postCode": "7470" },
+    { "label": "Chaugachha", "value": "Chaugachha", "postCode": "7410" },
+    { "label": "Jashore Sadar", "value": "Jashore Sadar", "postCode": "7400" },
+    { "label": "Jhikargachha", "value": "Jhikargachha", "postCode": "7420" },
+    { "label": "Keshabpur", "value": "Keshabpur", "postCode": "7450" },
+    { "label": "Manirampur", "value": "Manirampur", "postCode": "7440" },
+    { "label": "Sharsha", "value": "Sharsha", "postCode": "7430" }
+  ],
+  "Jhenaidah": [
+    { "label": "Harinakunda", "value": "Harinakunda", "postCode": "7310" },
+    { "label": "Jhenaidah Sadar", "value": "Jhenaidah Sadar", "postCode": "7300" },
+    { "label": "Kaliganj", "value": "Kaliganj", "postCode": "7320" },
+    { "label": "Kotchandpur", "value": "Kotchandpur", "postCode": "7330" },
+    { "label": "Maheshpur", "value": "Maheshpur", "postCode": "7340" },
+    { "label": "Shailkupa", "value": "Shailkupa", "postCode": "7350" }
+  ],
+  "Khulna": [
+    { "label": "Batiaghata", "value": "Batiaghata", "postCode": "9260" },
+    { "label": "Dacope", "value": "Dacope", "postCode": "9270" },
+    { "label": "Dumuria", "value": "Dumuria", "postCode": "9240" },
+    { "label": "Dighalia", "value": "Dighalia", "postCode": "9200" },
+    { "label": "Khalishpur", "value": "Khalishpur", "postCode": "9100" },
+    { "label": "Khan Jahan Ali", "value": "Khan Jahan Ali", "postCode": "9100" },
+    { "label": "Khulna Sadar", "value": "Khulna Sadar", "postCode": "9000" },
+    { "label": "Koyra", "value": "Koyra", "postCode": "9280" },
+    { "label": "Paikgachha", "value": "Paikgachha", "postCode": "9250" },
+    { "label": "Phultala", "value": "Phultala", "postCode": "9210" },
+    { "label": "Rupsa", "value": "Rupsa", "postCode": "9203" },
+    { "label": "Sonadanga", "value": "Sonadanga", "postCode": "9100" },
+    { "label": "Terokhada", "value": "Terokhada", "postCode": "9230" }
+  ],
+  "Kushtia": [
+    { "label": "Bheramara", "value": "Bheramara", "postCode": "7040" },
+    { "label": "Daulatpur", "value": "Daulatpur", "postCode": "7020" },
+    { "label": "Khoksa", "value": "Khoksa", "postCode": "7000" },
+    { "label": "Kumarkhali", "value": "Kumarkhali", "postCode": "7010" },
+    { "label": "Kushtia Sadar", "value": "Kushtia Sadar", "postCode": "7000" },
+    { "label": "Mirpur", "value": "Mirpur", "postCode": "7061" }
+  ],
+  "Magura": [
+    { "label": "Magura Sadar", "value": "Magura Sadar", "postCode": "7600" },
+    { "label": "Mohammadpur", "value": "Mohammadpur", "postCode": "7610" },
+    { "label": "Shalikha", "value": "Shalikha", "postCode": "7620" },
+    { "label": "Sreepur", "value": "Sreepur", "postCode": "7630" }
+  ],
+  "Meherpur": [
+    { "label": "Gangni", "value": "Gangni", "postCode": "7110" },
+    { "label": "Meherpur Sadar", "value": "Meherpur Sadar", "postCode": "7100" },
+    { "label": "Mujibnagar", "value": "Mujibnagar", "postCode": "7102" }
+  ],
+  "Narail": [
+    { "label": "Kalia", "value": "Kalia", "postCode": "7520" },
+    { "label": "Lohagara", "value": "Lohagara", "postCode": "7510" },
+    { "label": "Narail Sadar", "value": "Narail Sadar", "postCode": "7500" }
+  ],
+  "Satkhira": [
+    { "label": "Assasuni", "value": "Assasuni", "postCode": "9420" },
+    { "label": "Debhata", "value": "Debhata", "postCode": "9430" },
+    { "label": "Kalaroa", "value": "Kalaroa", "postCode": "9410" },
+    { "label": "Kaliganj", "value": "Kaliganj", "postCode": "9440" },
+    { "label": "Satkhira Sadar", "value": "Satkhira Sadar", "postCode": "9400" },
+    { "label": "Shyamnagar", "value": "Shyamnagar", "postCode": "9450" },
+    { "label": "Tala", "value": "Tala", "postCode": "9460" }
+  ],
+  "Jamalpur": [
+    { "label": "Baksiganj", "value": "Baksiganj", "postCode": "2020" },
+    { "label": "Dewanganj", "value": "Dewanganj", "postCode": "2030" },
+    { "label": "Islampur", "value": "Islampur", "postCode": "2050" },
+    { "label": "Jamalpur Sadar", "value": "Jamalpur Sadar", "postCode": "2000" },
+    { "label": "Madarganj", "value": "Madarganj", "postCode": "2011" },
+    { "label": "Melandaha", "value": "Melandaha", "postCode": "2010" },
+    { "label": "Sarishabari", "value": "Sarishabari", "postCode": "2041" }
+  ],
+  "Mymensingh": [
+    { "label": "Bhaluka", "value": "Bhaluka", "postCode": "2240" },
+    { "label": "Dhobaura", "value": "Dhobaura", "postCode": "2216" },
+    { "label": "Fulbaria", "value": "Fulbaria", "postCode": "2216" },
+    { "label": "Gaffargaon", "value": "Gaffargaon", "postCode": "2230" },
+    { "label": "Gauripur", "value": "Gauripur", "postCode": "2270" },
+    { "label": "Haluaghat", "value": "Haluaghat", "postCode": "2260" },
+    { "label": "Ishwarganj", "value": "Ishwarganj", "postCode": "2280" },
+    { "label": "Mymensingh Sadar", "value": "Mymensingh Sadar", "postCode": "2200" },
+    { "label": "Muktagachha", "value": "Muktagachha", "postCode": "2210" },
+    { "label": "Nandail", "value": "Nandail", "postCode": "2290" },
+    { "label": "Phulpur", "value": "Phulpur", "postCode": "2271" },
+    { "label": "Trishal", "value": "Trishal", "postCode": "2220" }
+  ],
+  "Netrokona": [
+    { "label": "Atpara", "value": "Atpara", "postCode": "2470" },
+    { "label": "Barhatta", "value": "Barhatta", "postCode": "2440" },
+    { "label": "Durgapur", "value": "Durgapur", "postCode": "2430" },
+    { "label": "Kalmakanda", "value": "Kalmakanda", "postCode": "2460" },
+    { "label": "Kendua", "value": "Kendua", "postCode": "2480" },
+    { "label": "Khaliajuri", "value": "Khaliajuri", "postCode": "2420" },
+    { "label": "Madan", "value": "Madan", "postCode": "2490" },
+    { "label": "Mohanganj", "value": "Mohanganj", "postCode": "2446" },
+    { "label": "Netrokona Sadar", "value": "Netrokona Sadar", "postCode": "2400" },
+    { "label": "Purbadhala", "value": "Purbadhala", "postCode": "2410" }
+  ],
+  "Sherpur": [
+    { "label": "Jhenaigati", "value": "Jhenaigati", "postCode": "2120" },
+    { "label": "Nakla", "value": "Nakla", "postCode": "2150" },
+    { "label": "Nalitabari", "value": "Nalitabari", "postCode": "2130" },
+    { "label": "Sherpur Sadar", "value": "Sherpur Sadar", "postCode": "2100" },
+    { "label": "Sreebardi", "value": "Sreebardi", "postCode": "2140" }
+  ],
+  "Bogura": [
+    { "label": "Adamdighi", "value": "Adamdighi", "postCode": "5890" },
+    { "label": "Bogura Sadar", "value": "Bogura Sadar", "postCode": "5800" },
+    { "label": "Dhunat", "value": "Dhunat", "postCode": "5850" },
+    { "label": "Dhupchanchia", "value": "Dhupchanchia", "postCode": "5820" },
+    { "label": "Gabtali", "value": "Gabtali", "postCode": "5830" },
+    { "label": "Kahaloo", "value": "Kahaloo", "postCode": "5840" },
+    { "label": "Nandigram", "value": "Nandigram", "postCode": "5860" },
+    { "label": "Sariakandi", "value": "Sariakandi", "postCode": "5880" },
+    { "label": "Shajahanpur", "value": "Shajahanpur", "postCode": "5810" },
+    { "label": "Sherpur", "value": "Sherpur", "postCode": "5841" },
+    { "label": "Shibganj", "value": "Shibganj", "postCode": "5870" },
+    { "label": "Sonatola", "value": "Sonatola", "postCode": "5855" }
+  ],
+  "Jaipurhat": [
+    { "label": "Akkelpur", "value": "Akkelpur", "postCode": "5910" },
+    { "label": "Jaipurhat Sadar", "value": "Jaipurhat Sadar", "postCode": "5900" },
+    { "label": "Kalai", "value": "Kalai", "postCode": "5920" },
+    { "label": "Khetlal", "value": "Khetlal", "postCode": "5880" },
+    { "label": "Panchbibi", "value": "Panchbibi", "postCode": "5840" }
+  ],
+  "Naogaon": [
+    { "label": "Atrai", "value": "Atrai", "postCode": "6570" },
+    { "label": "Badalgachhi", "value": "Badalgachhi", "postCode": "6550" },
+    { "label": "Dhamoirhat", "value": "Dhamoirhat", "postCode": "6580" },
+    { "label": "Manda", "value": "Manda", "postCode": "6540" },
+    { "label": "Mahadebpur", "value": "Mahadebpur", "postCode": "6530" },
+    { "label": "Naogaon Sadar", "value": "Naogaon Sadar", "postCode": "6500" },
+    { "label": "Niamatpur", "value": "Niamatpur", "postCode": "6520" },
+    { "label": "Patnitala", "value": "Patnitala", "postCode": "6521" },
+    { "label": "Porsha", "value": "Porsha", "postCode": "6560" },
+    { "label": "Raninagar", "value": "Raninagar", "postCode": "6511" },
+    { "label": "Sapahar", "value": "Sapahar", "postCode": "6590" }
+  ],
+  "Natore": [
+    { "label": "Bagatipara", "value": "Bagatipara", "postCode": "6470" },
+    { "label": "Baraigram", "value": "Baraigram", "postCode": "6460" },
+    { "label": "Gurudaspur", "value": "Gurudaspur", "postCode": "6440" },
+    { "label": "Lalpur", "value": "Lalpur", "postCode": "6450" },
+    { "label": "Natore Sadar", "value": "Natore Sadar", "postCode": "6400" },
+    { "label": "Singra", "value": "Singra", "postCode": "6420" }
+  ],
+  "Nawabganj": [
+    { "label": "Bholahat", "value": "Bholahat", "postCode": "6350" },
+    { "label": "Gomastapur", "value": "Gomastapur", "postCode": "6320" },
+    { "label": "Nawabganj Sadar", "value": "Nawabganj Sadar", "postCode": "6300" },
+    { "label": "Nachole", "value": "Nachole", "postCode": "6360" },
+    { "label": "Shibganj", "value": "Shibganj", "postCode": "6340" }
+  ],
+  "Pabna": [
+    { "label": "Atgharia", "value": "Atgharia", "postCode": "6650" },
+    { "label": "Bera", "value": "Bera", "postCode": "6680" },
+    { "label": "Bhangura", "value": "Bhangura", "postCode": "6640" },
+    { "label": "Chatmohar", "value": "Chatmohar", "postCode": "6630" },
+    { "label": "Faridpur", "value": "Faridpur", "postCode": "6631" },
+    { "label": "Ishwardi", "value": "Ishwardi", "postCode": "6620" },
+    { "label": "Pabna Sadar", "value": "Pabna Sadar", "postCode": "6600" },
+    { "label": "Santhia", "value": "Santhia", "postCode": "6610" },
+    { "label": "Sujanagar", "value": "Sujanagar", "postCode": "6670" }
+  ],
+  "Rajshahi": [
+    { "label": "Bagha", "value": "Bagha", "postCode": "6280" },
+    { "label": "Bagmara", "value": "Bagmara", "postCode": "6210" },
+    { "label": "Charghat", "value": "Charghat", "postCode": "6270" },
+    { "label": "Durgapur", "value": "Durgapur", "postCode": "6240" },
+    { "label": "Godagari", "value": "Godagari", "postCode": "6040" },
+    { "label": "Mohanpur", "value": "Mohanpur", "postCode": "6030" },
+    { "label": "Paba", "value": "Paba", "postCode": "6020" },
+    { "label": "Puthia", "value": "Puthia", "postCode": "6260" },
+    { "label": "Rajshahi Sadar", "value": "Rajshahi Sadar", "postCode": "6000" },
+    { "label": "Tanore", "value": "Tanore", "postCode": "6230" }
+  ],
+  "Sirajganj": [
+    { "label": "Belkuchi", "value": "Belkuchi", "postCode": "6740" },
+    { "label": "Chauhali", "value": "Chauhali", "postCode": "6710" },
+    { "label": "Kamarkhanda", "value": "Kamarkhanda", "postCode": "6750" },
+    { "label": "Kazipur", "value": "Kazipur", "postCode": "6730" },
+    { "label": "Raiganj", "value": "Raiganj", "postCode": "6760" },
+    { "label": "Shahjadpur", "value": "Shahjadpur", "postCode": "6770" },
+    { "label": "Sirajganj Sadar", "value": "Sirajganj Sadar", "postCode": "6700" },
+    { "label": "Tarash", "value": "Tarash", "postCode": "6780" },
+    { "label": "Ullahpara", "value": "Ullahpara", "postCode": "6790" }
+  ],
+  "Dinajpur": [
+    { "label": "Birampur", "value": "Birampur", "postCode": "5266" },
+    { "label": "Birganj", "value": "Birganj", "postCode": "5220" },
+    { "label": "Biral", "value": "Biral", "postCode": "5210" },
+    { "label": "Bochaganj", "value": "Bochaganj", "postCode": "5240" },
+    { "label": "Chirirbandar", "value": "Chirirbandar", "postCode": "5270" },
+    { "label": "Dinajpur Sadar", "value": "Dinajpur Sadar", "postCode": "5200" },
+    { "label": "Fulbari", "value": "Fulbari", "postCode": "5260" },
+    { "label": "Ghoraghat", "value": "Ghoraghat", "postCode": "5291" },
+    { "label": "Hakimpur", "value": "Hakimpur", "postCode": "5250" },
+    { "label": "Kaharole", "value": "Kaharole", "postCode": "5280" },
+    { "label": "Khansama", "value": "Khansama", "postCode": "5230" },
+    { "label": "Nawabganj", "value": "Nawabganj", "postCode": "5281" },
+    { "label": "Parbatipur", "value": "Parbatipur", "postCode": "5250" }
+  ],
+  "Gaibandha": [
+    { "label": "Fulchhari", "value": "Fulchhari", "postCode": "5740" },
+    { "label": "Gaibandha Sadar", "value": "Gaibandha Sadar", "postCode": "5700" },
+    { "label": "Gobindaganj", "value": "Gobindaganj", "postCode": "5770" },
+    { "label": "Palashbari", "value": "Palashbari", "postCode": "5730" },
+    { "label": "Sadullapur", "value": "Sadullapur", "postCode": "5710" },
+    { "label": "Saghata", "value": "Saghata", "postCode": "5751" },
+    { "label": "Sundarganj", "value": "Sundarganj", "postCode": "5720" }
+  ],
+  "Kurigram": [
+    { "label": "Bhurungamari", "value": "Bhurungamari", "postCode": "5670" },
+    { "label": "Char Rajibpur", "value": "Char Rajibpur", "postCode": "5641" },
+    { "label": "Chilmari", "value": "Chilmari", "postCode": "5630" },
+    { "label": "Kurigram Sadar", "value": "Kurigram Sadar", "postCode": "5600" },
+    { "label": "Nageshwari", "value": "Nageshwari", "postCode": "5610" },
+    { "label": "Phulbari", "value": "Phulbari", "postCode": "5680" },
+    { "label": "Rajarhat", "value": "Rajarhat", "postCode": "5620" },
+    { "label": "Raomari", "value": "Raomari", "postCode": "5660" },
+    { "label": "Ulipur", "value": "Ulipur", "postCode": "5650" }
+  ],
+  "Lalmonirhat": [
+    { "label": "Aditmari", "value": "Aditmari", "postCode": "5510" },
+    { "label": "Hatibandha", "value": "Hatibandha", "postCode": "5530" },
+    { "label": "Kaliganj", "value": "Kaliganj", "postCode": "5540" },
+    { "label": "Lalmonirhat Sadar", "value": "Lalmonirhat Sadar", "postCode": "5500" },
+    { "label": "Patgram", "value": "Patgram", "postCode": "5520" }
+  ],
+  "Nilphamari": [
+    { "label": "Dimla", "value": "Dimla", "postCode": "5350" },
+    { "label": "Domar", "value": "Domar", "postCode": "5340" },
+    { "label": "Jaldhaka", "value": "Jaldhaka", "postCode": "5330" },
+    { "label": "Kishoreganj", "value": "Kishoreganj", "postCode": "5320" },
+    { "label": "Nilphamari Sadar", "value": "Nilphamari Sadar", "postCode": "5300" },
+    { "label": "Saidpur", "value": "Saidpur", "postCode": "5310" }
+  ],
+  "Panchagarh": [
+    { "label": "Atwari", "value": "Atwari", "postCode": "5050" },
+    { "label": "Boda", "value": "Boda", "postCode": "5010" },
+    { "label": "Debiganj", "value": "Debiganj", "postCode": "5020" },
+    { "label": "Panchagarh Sadar", "value": "Panchagarh Sadar", "postCode": "5000" },
+    { "label": "Tetulia", "value": "Tetulia", "postCode": "5030" }
+  ],
+  "Rangpur": [
+    { "label": "Badarganj", "value": "Badarganj", "postCode": "5430" },
+    { "label": "Gangachhara", "value": "Gangachhara", "postCode": "5410" },
+    { "label": "Kaunia", "value": "Kaunia", "postCode": "5440" },
+    { "label": "Mithapukur", "value": "Mithapukur", "postCode": "5460" },
+    { "label": "Pirgachha", "value": "Pirgachha", "postCode": "5450" },
+    { "label": "Pirganj", "value": "Pirganj", "postCode": "5470" },
+    { "label": "Rangpur Sadar", "value": "Rangpur Sadar", "postCode": "5400" },
+    { "label": "Taraganj", "value": "Taraganj", "postCode": "5420" }
+  ],
+  "Thakurgaon": [
+    { "label": "Baliadangi", "value": "Baliadangi", "postCode": "5140" },
+    { "label": "Haripur", "value": "Haripur", "postCode": "5150" },
+    { "label": "Pirganj", "value": "Pirganj", "postCode": "5110" },
+    { "label": "Ranisankail", "value": "Ranisankail", "postCode": "5130" },
+    { "label": "Thakurgaon Sadar", "value": "Thakurgaon Sadar", "postCode": "5100" }
+  ],
+  "Habiganj": [
+    { "label": "Ajmiriganj", "value": "Ajmiriganj", "postCode": "3360" },
+    { "label": "Bahubal", "value": "Bahubal", "postCode": "3310" },
+    { "label": "Baniachong", "value": "Baniachong", "postCode": "3350" },
+    { "label": "Chunarughat", "value": "Chunarughat", "postCode": "3330" },
+    { "label": "Habiganj Sadar", "value": "Habiganj Sadar", "postCode": "3300" },
+    { "label": "Lakhai", "value": "Lakhai", "postCode": "3340" },
+    { "label": "Madhabpur", "value": "Madhabpur", "postCode": "3326" },
+    { "label": "Nabiganj", "value": "Nabiganj", "postCode": "3370" },
+    { "label": "Shaistagonj", "value": "Shaistagonj", "postCode": "3380" }
+  ],
+  "Moulvibazar": [
+    { "label": "Barlekha", "value": "Barlekha", "postCode": "3250" },
+    { "label": "Juri", "value": "Juri", "postCode": "3270" },
+    { "label": "Kamalganj", "value": "Kamalganj", "postCode": "3220" },
+    { "label": "Kulaura", "value": "Kulaura", "postCode": "3230" },
+    { "label": "Moulvibazar Sadar", "value": "Moulvibazar Sadar", "postCode": "3200" },
+    { "label": "Rajnagar", "value": "Rajnagar", "postCode": "3240" },
+    { "label": "Sreemangal", "value": "Sreemangal", "postCode": "3210" }
+  ],
+  "Sunamganj": [
+    { "label": "Bishwamvarpur", "value": "Bishwamvarpur", "postCode": "3070" },
+    { "label": "Chhatak", "value": "Chhatak", "postCode": "3080" },
+    { "label": "Derai", "value": "Derai", "postCode": "3020" },
+    { "label": "Dharampasha", "value": "Dharampasha", "postCode": "3011" },
+    { "label": "Dowarabazar", "value": "Dowarabazar", "postCode": "3050" },
+    { "label": "Jagannathpur", "value": "Jagannathpur", "postCode": "3060" },
+    { "label": "Jamalganj", "value": "Jamalganj", "postCode": "3030" },
+    { "label": "Shalla", "value": "Shalla", "postCode": "3040" },
+    { "label": "Sunamganj Sadar", "value": "Sunamganj Sadar", "postCode": "3000" },
+    { "label": "Tahirpur", "value": "Tahirpur", "postCode": "3090" }
+  ],
+  "Sylhet": [
+    { "label": "Balaganj", "value": "Balaganj", "postCode": "3120" },
+    { "label": "Beanibazar", "value": "Beanibazar", "postCode": "3140" },
+    { "label": "Bishwanath", "value": "Bishwanath", "postCode": "3130" },
+    { "label": "Companiganj", "value": "Companiganj", "postCode": "3150" },
+    { "label": "Dakshin Surma", "value": "Dakshin Surma", "postCode": "3102" },
+    { "label": "Fenchuganj", "value": "Fenchuganj", "postCode": "3116" },
+    { "label": "Golapganj", "value": "Golapganj", "postCode": "3160" },
+    { "label": "Gowainghat", "value": "Gowainghat", "postCode": "3113" },
+    { "label": "Jaintiapur", "value": "Jaintiapur", "postCode": "3156" },
+    { "label": "Kanaighat", "value": "Kanaighat", "postCode": "3110" },
+    { "label": "Sylhet Sadar", "value": "Sylhet Sadar", "postCode": "3100" },
+    { "label": "Zakiganj", "value": "Zakiganj", "postCode": "3170" }
+  ]
+}

@@ -3,6 +3,8 @@ import { z } from 'zod'
 const bodySchema = z.object({
   country: z.string(),
   state: z.string().optional(),
+  district: z.string().optional(),
+  thana: z.string().optional(),
   postal_code: z.string().optional()
 })
 

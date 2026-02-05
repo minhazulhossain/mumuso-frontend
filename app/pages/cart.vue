@@ -309,7 +309,7 @@
 </template>
 
 <script setup lang="ts">
-import { getItemName, getItemSlug } from '#shared/types/cart'
+import { getItemImage, getItemName, getItemSlug } from '#shared/types/cart'
 import { calculateShipping, calculateTax, calculateOrderTotal } from '#shared/utils/cart-helpers'
 import { useCurrency, useUserSession, useAddresses } from '#imports'
 
@@ -345,7 +345,7 @@ const getCartItemImageSrc = (item: any) => {
   if (cartImageFailures.value[key]) {
     return fallbackCartImage
   }
-  return item.variation?.images?.thumb ?? item.product?.images?.featured?.thumb ?? fallbackCartImage
+  return getItemImage(item) || fallbackCartImage
 }
 
 const markCartImageBroken = (item: any) => {

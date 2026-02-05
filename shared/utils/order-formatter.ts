@@ -14,6 +14,7 @@ export interface AddressInput {
   last_name: string
   address_line_1: string
   city: string
+  thana?: string
   state: string
   postal_code: string
   country: string
@@ -129,6 +130,7 @@ const formatAddress = (address: AddressInput): AddressInput => {
     last_name: address.last_name.trim(),
     address_line_1: address.address_line_1.trim(),
     city: address.city.trim(),
+    ...(address.thana && { thana: address.thana.trim() }),
     state: address.state.trim(),
     postal_code: address.postal_code.trim(),
     country: address.country.trim(),

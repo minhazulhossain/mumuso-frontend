@@ -12,8 +12,8 @@
         <div class="relative">
 
           <NuxtImg
-              :src="item.variation?.images?.thumb ?? item.product?.images?.featured?.thumb ?? 'https://placehold.co/80x80'"
-              :alt="item.variation?.name ?? item.product?.name ?? 'Product'"
+              :src="getItemImage(item)"
+              :alt="getItemName(item)"
               class="w-16 h-16 object-cover rounded-lg"
               width="64"
               height="64"
@@ -51,7 +51,7 @@
         <span class="font-medium">-{{ formatCurrency(props.appliedCoupon.discount) }}</span>
       </div>
 
-      <div class="flex justify-between text-gray-600 dark:text-gray-400">
+      <div v-if="props.showShipping" class="flex justify-between text-gray-600 dark:text-gray-400">
         <span>Shipping</span>
         <span class="font-medium">
           {{ formatCurrency(props.shippingCost || 0) }}
@@ -93,33 +93,14 @@
 
 <script setup lang="ts">
 import { useCurrency } from '#imports'
-interface CartItem {
-  slug?: string
-  productId?: string
-  quantity: number
-  product?: {
-    name: string
-    price: number
-    image?: string
-    images?: {
-      featured?: {
-        thumb?: string
-      }
-    }
-  }
-  variation?: {
-    name: string
-    price: number
-    images?: {
-      thumb?: string
-    }
-  }
-}
+import type { CartItem } from '#shared/types/cart'
+import { getItemImage, getItemName } from '#shared/types/cart'
 
 const props = withDefaults(defineProps<{
   cartItems?: CartItem[]
   shippingCost?: number
   taxRate?: number
+  showShipping?: boolean
   appliedCoupon?: {
     code: string
     discount: number
@@ -128,6 +109,7 @@ const props = withDefaults(defineProps<{
   cartItems: () => [],
   shippingCost: 0,
   taxRate: 7.5,
+  showShipping: true,
   appliedCoupon: () => ({ code: '', discount: 0 })
 })
 const { formatCurrency } = useCurrency()

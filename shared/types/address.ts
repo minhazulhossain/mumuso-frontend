@@ -13,6 +13,7 @@ export interface AddressFormData {
     address_line_1: string
     address_line_2?: string
     city: string
+    thana?: string
     state: string
     postal_code: string
     country: string
@@ -44,6 +45,7 @@ export interface AddressResponse {
     address_line_1: string
     address_line_2?: string
     city: string
+    thana?: string
     state: string
     postal_code: string
     country: string
@@ -79,6 +81,7 @@ export interface OrderAddress {
     address_line_1: string
     address_line_2?: string
     city: string
+    thana?: string
     state: string
     postal_code: string
     country: string
@@ -96,6 +99,7 @@ export interface CheckoutAddress {
     address1: string
     address2?: string
     city: string
+    thana?: string
     state: string
     zipCode: string
     country: string

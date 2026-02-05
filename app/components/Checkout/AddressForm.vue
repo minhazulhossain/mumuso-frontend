@@ -14,8 +14,8 @@
             :items="addressTypes"
             size="lg"
             placeholder="Select address type"
-            value-attribute="value"
-            option-attribute="label"
+            value-key="value"
+            label-key="label"
         />
       </UFormField>
 
@@ -64,52 +64,68 @@
         />
       </UFormField>
 
-      <!-- City, ZIP -->
+      <!-- Country, State -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <UFormField label="City / District" required>
-          <USelectMenu
-              v-model="form.city"
-              :items="districtOptions"
-              size="lg"
-              placeholder="Select district"
-              value-attribute="value"
-              option-attribute="label"
-              searchable
-          />
+        <UFormField label="Country" required>
+        <USelectMenu
+            v-model="form.country"
+            :items="countries"
+            size="lg"
+            placeholder="Select country"
+            value-key="value"
+            label-key="label"
+            searchable
+        />
         </UFormField>
 
+        <UFormField label="State/Province" required>
+        <USelectMenu
+            v-model="form.state"
+            :items="stateOptions"
+            size="lg"
+            placeholder="Select state"
+            value-key="value"
+            label-key="label"
+            searchable
+        />
+        </UFormField>
+      </div>
+
+      <!-- City, Thana, ZIP -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <UFormField label="City / District" required>
+        <USelectMenu
+            v-model="form.city"
+            :items="districtOptions"
+            size="lg"
+            placeholder="Select district"
+            value-key="value"
+            label-key="label"
+            searchable
+        />
+        </UFormField>
+
+        <UFormField label="Thana / Upazila">
+        <USelectMenu
+            v-model="form.thana"
+            :items="thanaOptions"
+            size="lg"
+            placeholder="Select thana"
+            value-key="value"
+            label-key="label"
+            searchable
+            :disabled="isThanaLocked"
+        />
+        </UFormField>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <UFormField label="ZIP/Postal Code" required>
           <UInput
               v-model="form.postal_code"
               size="lg"
               placeholder="10001"
-          />
-        </UFormField>
-      </div>
-
-      <!-- Country, State -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <UFormField label="Country" required>
-          <USelectMenu
-              v-model="form.country"
-              :items="countries"
-              size="lg"
-              placeholder="Select country"
-              value-attribute="value"
-              option-attribute="label"
-              searchable
-          />
-        </UFormField>
-
-        <UFormField label="State/Province" required>
-          <USelectMenu
-              v-model="form.state"
-              :items="stateOptions"
-              size="lg"
-              placeholder="Select state"
-              value-attribute="value"
-              option-attribute="label"
-              searchable
+              :disabled="isPostalLocked"
           />
         </UFormField>
       </div>
@@ -163,6 +179,7 @@
 import type { AddressFormData } from '#shared/types/address'
 import bangladeshDivisions from '#shared/data/bangladesh-divisions.json'
 import bangladeshDistricts from '#shared/data/bangladesh-districts.json'
+import bangladeshThanas from '#shared/data/bangladesh-thanas.json'
 import { normalizeDivisionValue, normalizeDistrictValue } from '#shared/utils/address-display'
 
 interface Props {
@@ -191,6 +208,7 @@ const form = ref<AddressFormData>({
     address_line_1: '',
     address_line_2: '',
     city: '',
+    thana: '',
     state: '',
     postal_code: '',
     country: 'BD',
@@ -238,12 +256,24 @@ const districtOptions = computed(() => {
     return bangladeshDistricts[normalizedState] || []
 })
 
+const thanaOptions = computed(() => {
+    if (form.value.country !== 'BD') return []
+    if (!form.value.city) return []
+    const normalizedDistrict = normalizeDistrictValue(form.value.city)
+    return (bangladeshThanas as Record<string, { label: string; value: string; postCode?: string }[]>)[normalizedDistrict] || []
+})
+
+const isThanaLocked = computed(() => thanaOptions.value.length <= 1)
+const isPostalLocked = computed(() => true)
+
 watch(() => form.value.country, (nextCountry) => {
     const validStates = nextCountry === 'BD' ? bangladeshDivisions.map((state) => state.value) : []
     if (form.value.state && !validStates.includes(form.value.state)) {
         form.value.state = ''
     }
     form.value.city = ''
+    form.value.thana = ''
+    form.value.postal_code = ''
 })
 
 watch(() => form.value.state, (nextState) => {
@@ -252,6 +282,44 @@ watch(() => form.value.state, (nextState) => {
     const validValues = validDistricts.map((district) => district.value)
     if (form.value.city && !validValues.includes(form.value.city)) {
         form.value.city = ''
+    }
+    form.value.thana = ''
+    form.value.postal_code = ''
+})
+
+watch(() => form.value.city, (nextCity) => {
+    if (!nextCity) {
+        form.value.thana = ''
+        form.value.postal_code = ''
+        return
+    }
+
+    const normalizedState = normalizeDivisionValue(form.value.state)
+    const districtList = (bangladeshDistricts as Record<string, { label: string; value: string; postCode?: string }[]>)[normalizedState] || []
+    const districtMatch = districtList.find((district) => district.value === nextCity || district.value === normalizeDistrictValue(nextCity))
+    form.value.postal_code = districtMatch?.postCode || ''
+
+    const normalizedDistrict = normalizeDistrictValue(nextCity)
+    const validThanas = (bangladeshThanas as Record<string, { label: string; value: string }[]>)[normalizedDistrict] || []
+    const validThanaValues = validThanas.map((thana) => thana.value)
+    if (form.value.thana && !validThanaValues.includes(form.value.thana)) {
+        form.value.thana = ''
+    }
+})
+
+watch(() => form.value.thana, (nextThana) => {
+    const normalizedDistrict = normalizeDistrictValue(form.value.city)
+    if (!nextThana) {
+        const normalizedState = normalizeDivisionValue(form.value.state)
+        const districtList = (bangladeshDistricts as Record<string, { label: string; value: string; postCode?: string }[]>)[normalizedState] || []
+        const districtMatch = districtList.find((district) => district.value === normalizedDistrict || district.value === form.value.city)
+        form.value.postal_code = districtMatch?.postCode || ''
+        return
+    }
+    const thanaList = (bangladeshThanas as Record<string, { label: string; value: string; postCode?: string }[]>)[normalizedDistrict] || []
+    const thanaMatch = thanaList.find((thana) => thana.value === nextThana)
+    if (thanaMatch?.postCode) {
+        form.value.postal_code = thanaMatch.postCode
     }
 })
 

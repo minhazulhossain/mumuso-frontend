@@ -14,6 +14,7 @@ interface ShippingLocation {
   country: string
   state?: string
   district?: string
+  thana?: string
   postal_code?: string
 }
 

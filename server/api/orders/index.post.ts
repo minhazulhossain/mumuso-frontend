@@ -15,6 +15,7 @@ const transformAddressForBackend = (frontendAddress: any) => {
     address_line_1: frontendAddress.address1 || frontendAddress.address_line_1 || '',
     address_line_2: frontendAddress.address2 || frontendAddress.address_line_2 || '',
     city: frontendAddress.city || '',
+    ...(frontendAddress.thana && { thana: frontendAddress.thana }),
     state: frontendAddress.state || '',
     postal_code: frontendAddress.zipCode || frontendAddress.postal_code || '',
     country: frontendAddress.country || '',
@@ -43,7 +44,21 @@ export default defineEventHandler(async (event) => {
     console.log('[Server API] Full body:', JSON.stringify(body, null, 2))
 
     // Transform addresses to backend format
-    const billingAddr = body.billing || (body.sameAsShipping && body.shipping) || null
+    const shippingInput = body.shipping_address || body.shipping || null
+    const billingInput = body.billing_address
+      || body.billing
+      || (body.sameAsShipping ? shippingInput : null)
+
+    const shippingTransformed = transformAddressForBackend(shippingInput)
+    const billingTransformed = transformAddressForBackend(billingInput)
+
+    const fallbackEmail = body?.user?.email || body?.contact?.email || ''
+    if (shippingTransformed && !shippingTransformed.email && fallbackEmail) {
+      shippingTransformed.email = fallbackEmail
+    }
+    if (billingTransformed && !billingTransformed.email && fallbackEmail) {
+      billingTransformed.email = fallbackEmail
+    }
 
     // Build the transformed order with only backend-expected fields
     const transformedOrder: any = {
@@ -59,8 +74,8 @@ export default defineEventHandler(async (event) => {
       }),
 
       // Addresses (required)
-      shipping_address: transformAddressForBackend(body.shipping),
-      billing_address: transformAddressForBackend(billingAddr),
+      shipping_address: shippingTransformed,
+      billing_address: billingTransformed,
 
       // Items (required)
       items: body.items || [],

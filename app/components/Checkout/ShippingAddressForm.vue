@@ -81,8 +81,8 @@
                 :items="countries"
                 size="lg"
                 placeholder="Select country"
-                value-attribute="value"
-                option-attribute="label"
+                value-key="value"
+                label-key="label"
                 class="w-full"
                 :disabled="isCountryLocked"
             />
@@ -95,8 +95,8 @@
                 :items="stateOptions"
                 size="lg"
                 placeholder="Select state"
-                value-attribute="value"
-                option-attribute="label"
+                value-key="value"
+                label-key="label"
                 class="w-full"
                 :disabled="isStateLocked"
             />
@@ -111,14 +111,31 @@
                 :items="districtOptions"
                 size="lg"
                 placeholder="Select district"
-                value-attribute="value"
-                option-attribute="label"
+                value-key="value"
+                label-key="label"
                 class="w-full"
                 :disabled="isDistrictLocked"
                 searchable
             />
           </UFormField>
 
+          <UFormField label="Thana / Upazila">
+            <USelectMenu
+                :model-value="modelValue.thana"
+                @update:model-value="updateField('thana', $event)"
+                :items="thanaOptions"
+                size="lg"
+                placeholder="Select thana"
+                value-key="value"
+                label-key="label"
+                class="w-full"
+                :disabled="isThanaLocked"
+                searchable
+            />
+          </UFormField>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <UFormField label="ZIP/Postal Code" required>
             <UInput
                 :model-value="modelValue.zipCode"
@@ -224,7 +241,13 @@
       <UButton @click="$emit('previous')" variant="soft" size="lg" icon="i-heroicons-arrow-left">
         {{ props.previousLabel }}
       </UButton>
-      <UButton @click="$emit('next')" size="lg" icon="i-heroicons-arrow-right" trailing>
+      <UButton
+          @click="$emit('next')"
+          size="lg"
+          icon="i-heroicons-arrow-right"
+          trailing
+          :disabled="props.disableNext"
+      >
         Continue to Payment
       </UButton>
     </div>
@@ -237,6 +260,7 @@ import { nextTick, watch } from 'vue'
 import { useCurrency } from '#imports'
 import bangladeshDivisions from '#shared/data/bangladesh-divisions.json'
 import bangladeshDistricts from '#shared/data/bangladesh-districts.json'
+import bangladeshThanas from '#shared/data/bangladesh-thanas.json'
 import { normalizeDivisionValue, normalizeDistrictValue } from '#shared/utils/address-display'
 
 interface ShippingAddress {
@@ -246,6 +270,7 @@ interface ShippingAddress {
   address1: string
   address2: string
   city: string
+  thana?: string
   state: string
   zipCode: string
   country: string
@@ -271,8 +296,10 @@ const props = withDefaults(defineProps<{
   loading?: boolean
   showEmail?: boolean
   previousLabel?: string
+  disableNext?: boolean
 }>(), {
-  previousLabel: 'Back'
+  previousLabel: 'Back',
+  disableNext: false
 })
 
 const emit = defineEmits<{
@@ -303,6 +330,7 @@ const selectSavedAddress = (addressId: number) => {
       address1: address.address_line_1,
       address2: address.address_line_2 || '',
       city: normalizeDistrictValue(address.city),
+      thana: address.thana || '',
       state: normalizeDivisionValue(address.state),
       zipCode: address.postal_code,
       country: address.country,
@@ -319,27 +347,35 @@ const selectSavedAddress = (addressId: number) => {
 
 // Countries and States
 const countries = [
-  { label: 'Bangladesh', value: 'Bangladesh' }
+  { label: 'Bangladesh', value: 'BD' }
 ]
 
 const stateOptions = computed(() => {
-  if (props.modelValue.country === 'Bangladesh') {
+  if (props.modelValue.country === 'BD') {
     return bangladeshDivisions
   }
   return []
 })
 
 const districtOptions = computed(() => {
-  if (props.modelValue.country !== 'Bangladesh') return []
+  if (props.modelValue.country !== 'BD') return []
   if (!props.modelValue.state) return []
   const normalizedState = normalizeDivisionValue(props.modelValue.state)
   return bangladeshDistricts[normalizedState] || []
 })
 
+const thanaOptions = computed(() => {
+  if (props.modelValue.country !== 'BD') return []
+  if (!props.modelValue.city) return []
+  const normalizedDistrict = normalizeDistrictValue(props.modelValue.city)
+  return (bangladeshThanas as Record<string, { label: string; value: string; postCode?: string }[]>)[normalizedDistrict] || []
+})
+
 const isCountryLocked = computed(() => countries.length === 1)
 const isStateLocked = computed(() => stateOptions.value.length <= 1)
 const isDistrictLocked = computed(() => districtOptions.value.length <= 1)
-const isPostalLocked = computed(() => !Boolean(props.modelValue.city))
+const isThanaLocked = computed(() => thanaOptions.value.length <= 1)
+const isPostalLocked = computed(() => true)
 
 const updateField = (field: keyof ShippingAddress, value: any) => {
   // Handle select menu objects - extract the value property
@@ -354,11 +390,13 @@ const updateField = (field: keyof ShippingAddress, value: any) => {
   }
 
   if (field === 'country') {
-    const validStates = fieldValue === 'Bangladesh' ? bangladeshDivisions.map((state) => state.value) : []
+    const validStates = fieldValue === 'BD' ? bangladeshDivisions.map((state) => state.value) : []
     if (nextValue.state && !validStates.includes(nextValue.state)) {
       nextValue.state = ''
     }
     nextValue.city = ''
+    nextValue.thana = ''
+    nextValue.zipCode = ''
   }
 
   if (field === 'state') {
@@ -368,11 +406,34 @@ const updateField = (field: keyof ShippingAddress, value: any) => {
     if (nextValue.city && !validValues.includes(nextValue.city)) {
       nextValue.city = ''
     }
+    nextValue.thana = ''
+    nextValue.zipCode = ''
   }
 
   if (field === 'city') {
+    const normalizedDistrict = normalizeDistrictValue(fieldValue)
+    const districtList = (bangladeshDistricts as Record<string, { label: string; value: string; postCode?: string }[]>)[normalizeDivisionValue(nextValue.state)] || []
+    const districtMatch = districtList.find((district) => district.value === normalizedDistrict || district.value === fieldValue)
     if (shouldClearPostalOnCityChange.value) {
-      nextValue.zipCode = ''
+      nextValue.zipCode = districtMatch?.postCode || ''
+    }
+    const validThanas = (bangladeshThanas as Record<string, { label: string; value: string }[]>)[normalizedDistrict] || []
+    const validThanaValues = validThanas.map((thana) => thana.value)
+    if (nextValue.thana && !validThanaValues.includes(nextValue.thana)) {
+      nextValue.thana = ''
+    }
+  }
+
+  if (field === 'thana') {
+    const normalizedDistrict = normalizeDistrictValue(nextValue.city)
+    const thanaList = (bangladeshThanas as Record<string, { label: string; value: string; postCode?: string }[]>)[normalizedDistrict] || []
+    if (!fieldValue) {
+      const districtList = (bangladeshDistricts as Record<string, { label: string; value: string; postCode?: string }[]>)[normalizeDivisionValue(nextValue.state)] || []
+      const districtMatch = districtList.find((district) => district.value === normalizedDistrict || district.value === nextValue.city)
+      nextValue.zipCode = districtMatch?.postCode || ''
+    } else {
+      const thanaMatch = thanaList.find((thana) => thana.value === fieldValue)
+      nextValue.zipCode = thanaMatch?.postCode || nextValue.zipCode || ''
     }
   }
 
@@ -394,6 +455,16 @@ watch(
   (options) => {
     if (options.length === 1 && !props.modelValue.city) {
       updateField('city', options[0].value)
+    }
+  },
+  { immediate: true }
+)
+
+watch(
+  () => thanaOptions.value,
+  (options) => {
+    if (options.length === 1 && !props.modelValue.thana) {
+      updateField('thana', options[0].value)
     }
   },
   { immediate: true }

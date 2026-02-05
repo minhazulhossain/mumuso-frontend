@@ -59,7 +59,7 @@
               <span v-if="address.address_line_2" class="block">{{ address.address_line_2 }}</span>
             </p>
             <p>
-              {{ getDistrictLabel(address.city) }}, {{ getDivisionLabel(address.state) }} {{ address.postal_code }}
+              {{ address.thana ? `${address.thana}, ` : '' }}{{ getDistrictLabel(address.city) }}, {{ getDivisionLabel(address.state) }} {{ address.postal_code }}
             </p>
             <p>{{ getCountryLabel(address.country) }}</p>
             <p v-if="address.phone">{{ address.phone }}</p>

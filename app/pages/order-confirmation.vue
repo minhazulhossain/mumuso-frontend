@@ -146,7 +146,7 @@
             <p class="font-medium text-gray-900 dark:text-white">{{ shippingAddress.name }}</p>
             <p>{{ shippingAddress.address1 }}</p>
             <p v-if="shippingAddress.address2">{{ shippingAddress.address2 }}</p>
-            <p>{{ getDistrictLabel(shippingAddress.city) }}, {{ getDivisionLabel(shippingAddress.state) }} {{ shippingAddress.zipCode }}</p>
+            <p>{{ shippingAddress.thana ? `${shippingAddress.thana}, ` : '' }}{{ getDistrictLabel(shippingAddress.city) }}, {{ getDivisionLabel(shippingAddress.state) }} {{ shippingAddress.zipCode }}</p>
             <p>{{ getCountryLabel(shippingAddress.country) }}</p>
           </div>
         </div>
@@ -161,7 +161,7 @@
             <p class="font-medium text-gray-900 dark:text-white">{{ billingAddress.name }}</p>
             <p>{{ billingAddress.address1 }}</p>
             <p v-if="billingAddress.address2">{{ billingAddress.address2 }}</p>
-            <p>{{ getDistrictLabel(billingAddress.city) }}, {{ getDivisionLabel(billingAddress.state) }} {{ billingAddress.zipCode }}</p>
+            <p>{{ billingAddress.thana ? `${billingAddress.thana}, ` : '' }}{{ getDistrictLabel(billingAddress.city) }}, {{ getDivisionLabel(billingAddress.state) }} {{ billingAddress.zipCode }}</p>
             <p>{{ getCountryLabel(billingAddress.country) }}</p>
           </div>
         </div>
@@ -294,6 +294,7 @@ const shippingAddress = ref({
   address1: '',
   address2: '',
   city: '',
+  thana: '',
   state: '',
   zipCode: '',
   country: ''
@@ -303,6 +304,7 @@ const billingAddress = ref({
   address1: '',
   address2: '',
   city: '',
+  thana: '',
   state: '',
   zipCode: '',
   country: ''
@@ -436,6 +438,7 @@ const loadOrder = async () => {
           address1: addr.address1 || addr.address_line_1 || '',
           address2: addr.address2 || addr.address_line_2 || '',
           city: addr.city || '',
+          thana: addr.thana || '',
           state: addr.state || '',
           zipCode: addr.zip_code || addr.postal_code || addr.zipCode || '',
           country: addr.country || ''
@@ -450,6 +453,7 @@ const loadOrder = async () => {
           address1: addr.address1 || addr.address_line_1 || '',
           address2: addr.address2 || addr.address_line_2 || '',
           city: addr.city || '',
+          thana: addr.thana || '',
           state: addr.state || '',
           zipCode: addr.zip_code || addr.postal_code || addr.zipCode || '',
           country: addr.country || ''

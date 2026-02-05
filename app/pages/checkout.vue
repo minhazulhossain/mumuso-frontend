@@ -75,6 +75,7 @@
               :show-saved-addresses="loggedIn"
               :show-email="!loggedIn"
               :loading="shippingLoading"
+              :disable-next="!canProceedToPayment"
               @next="handleNext"
               @previous="handlePrevious"
               previous-label="Back to cart"
@@ -142,6 +143,7 @@
           <CheckoutOrderSummary
               :cart-items="cartItems || []"
               :shipping-cost="shippingCost"
+              :show-shipping="showShippingLine"
               :tax-rate="VAT_RATE"
               :applied-coupon="appliedCoupon"
           />
@@ -224,6 +226,7 @@ const shippingAddress = ref({
   address1: '',
   address2: '',
   city: '',
+  thana: '',
   state: '',
   zipCode: '',
   country: 'BD',
@@ -237,6 +240,7 @@ const billingAddress = ref({
   address1: '',
   address2: '',
   city: '',
+  thana: '',
   state: '',
   zipCode: '',
   country: 'BD',
@@ -254,15 +258,17 @@ watch(
     shippingAddress.value.country,
     shippingAddress.value.state,
     shippingAddress.value.city,
+    shippingAddress.value.thana,
     shippingAddress.value.zipCode
   ],
-  async ([country, state, district, postalCode]) => {
-    if (!country) return
+  async ([country, state, district, thana, postalCode]) => {
+    if (!country || !district) return
 
     await fetchMethodsByLocation({
       country,
       state,
       district,
+      thana,
       postal_code: postalCode
     })
   }
@@ -272,6 +278,8 @@ watch(
 watch(shippingMethods, (methods) => {
   if (methods.length > 0 && selectedShippingMethod.value === null) {
     selectedShippingMethod.value = methods[0].id
+  } else if (!methods.length) {
+    selectedShippingMethod.value = null
   }
 }, { immediate: true })
 
@@ -356,6 +364,29 @@ const shippingCost = computed(() => {
   return method?.cost || 0
 })
 
+const selectedShippingMethodDetails = computed(() => {
+  return shippingMethods.value.find(m => m.id === selectedShippingMethod.value)
+})
+
+const isFreeShippingSelected = computed(() => {
+  const method = selectedShippingMethodDetails.value
+  if (!method) return false
+  const cost = Number(method.cost ?? method.price ?? 0)
+  return method.is_free === true || cost === 0
+})
+
+const showShippingLine = computed(() => {
+  if (shippingCost.value > 0) return true
+  return isFreeShippingSelected.value
+})
+
+const hasShippingMethods = computed(() => Array.isArray(shippingMethods.value) && shippingMethods.value.length > 0)
+const isShippingMethodSelected = computed(() => {
+  if (!hasShippingMethods.value) return false
+  return shippingMethods.value.some((method) => method.id === selectedShippingMethod.value)
+})
+const canProceedToPayment = computed(() => !shippingLoading.value && hasShippingMethods.value && isShippingMethodSelected.value)
+
 // Validation functions
 // const validateStep1 = () => {
 //   if (!contactInfo.value.email || !contactInfo.value.phone) {
@@ -412,6 +443,33 @@ const validateStep1 = () => {
       })
       return false
     }
+  }
+
+  if (shippingLoading.value) {
+    toast.add({
+      title: 'Shipping methods loading',
+      description: 'Please wait until shipping methods are available.',
+      color: 'warning'
+    })
+    return false
+  }
+
+  if (!hasShippingMethods.value) {
+    toast.add({
+      title: 'Shipping method required',
+      description: 'No shipping methods are available for this address.',
+      color: 'error'
+    })
+    return false
+  }
+
+  if (!isShippingMethodSelected.value) {
+    toast.add({
+      title: 'Select a shipping method',
+      description: 'Please choose a shipping method to continue.',
+      color: 'error'
+    })
+    return false
   }
 
   return true
