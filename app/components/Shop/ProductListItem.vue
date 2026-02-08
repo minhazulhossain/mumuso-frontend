@@ -134,12 +134,36 @@ defineEmits<{
 }>()
 
 const { formatCurrency } = useCurrency()
-const listImage = computed(() =>
-  props.product?.images?.featured?.medium ||
-  props.product?.image ||
-  props.product?.image_thumb ||
-  'https://placehold.co/600x600'
-)
+const toMediumVariant = (url?: string): string => {
+  if (!url) return ''
+
+  try {
+    const parsed = new URL(url)
+    const hasConversion = /-(thumb|small|medium|large)\.[^./?]+$/i.test(parsed.pathname)
+    if (hasConversion) return /-medium\.[^./?]+$/i.test(parsed.pathname) ? parsed.toString() : ''
+    parsed.pathname = parsed.pathname.replace(/(\.[^./?]+)$/i, '-medium$1')
+    return parsed.toString()
+  } catch {
+    const hasConversion = /-(thumb|small|medium|large)\.[^./?]+$/i.test(url)
+    if (hasConversion) return /-medium\.[^./?]+$/i.test(url) ? url : ''
+    return url.replace(/(\.[^./?]+)$/i, '-medium$1')
+  }
+}
+
+const listImage = computed(() => {
+  const mediumCandidates = [
+    props.product?.images?.featured?.medium,
+    ...(props.product?.images?.all || []).map((img: any) => img?.medium),
+    ...(props.product?.variations || []).map((v: any) => v?.images?.medium),
+    toMediumVariant(props.product?.images?.featured?.original),
+    toMediumVariant(props.product?.image),
+  ]
+
+  const medium = mediumCandidates.find((url: string) => !!url)
+  if (medium) return medium
+
+  return props.product?.image_thumb || props.product?.image || 'https://placehold.co/600x600'
+})
 
 const handleImageError = (event: Event) => {
   const target = event.target as HTMLImageElement

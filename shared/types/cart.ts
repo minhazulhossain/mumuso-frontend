@@ -154,13 +154,35 @@ export function getItemOriginalPrice(item: CartItem): number {
 /**
  * Get safe product image from cart item
  */
+function toThumbVariant(url?: string): string {
+    if (!url) return ''
+
+    try {
+        const parsed = new URL(url)
+        const hasConversion = /-(thumb|small|medium|large)\.[^./?]+$/i.test(parsed.pathname)
+        if (hasConversion) return /-thumb\.[^./?]+$/i.test(parsed.pathname) ? parsed.toString() : ''
+        parsed.pathname = parsed.pathname.replace(/(\.[^./?]+)$/i, '-thumb$1')
+        return parsed.toString()
+    } catch {
+        const hasConversion = /-(thumb|small|medium|large)\.[^./?]+$/i.test(url)
+        if (hasConversion) return /-thumb\.[^./?]+$/i.test(url) ? url : ''
+        return url.replace(/(\.[^./?]+)$/i, '-thumb$1')
+    }
+}
+
 export function getItemImage(item: CartItem): string {
+    const derivedThumbFromFeatured = toThumbVariant(item.product?.featured_image_url)
+    const derivedThumbFromImage = toThumbVariant(item.product?.image)
+
     return (
         item.variation?.images?.thumb ||
+        item.product?.images?.featured?.thumb ||
+        item.product?.image_thumb ||
+        item.product?.images?.all?.[0]?.thumb ||
+        derivedThumbFromFeatured ||
+        derivedThumbFromImage ||
         item.product?.featured_image_url ||
         item.product?.image ||
-        item.product?.image_thumb ||
-        item.product?.images?.featured?.thumb ||
         'https://placehold.co/400x400?text=No+Image'
     )
 }

@@ -61,9 +61,9 @@
             <button
                 v-for="image in product.images.all"
                 :key="image.id"
-                @click="selectedImage = image.url"
+                @click="selectedImage = getGalleryLargeImage(image)"
                 class="aspect-square overflow-hidden rounded-lg bg-gray-100 border-2 transition-colors"
-                :class="selectedImage === image.url ? 'border-primary-500' : 'border-transparent hover:border-gray-300'"
+                :class="selectedImage === getGalleryLargeImage(image) ? 'border-primary-500' : 'border-transparent hover:border-gray-300'"
             >
               <img
                   :src="image.thumb || image.url || image.original || image.medium || image.large || selectedImage"
@@ -308,6 +308,34 @@ const relatedProducts = ref<Product[]>([])
 const selectedVariationId = ref<number | null>(null)
 const selectedVariation = ref<ProductVariation | null>(null)
 
+const toLargeVariant = (url?: string): string => {
+  if (!url) return ''
+
+  try {
+    const parsed = new URL(url)
+    const hasConversion = /-(thumb|small|medium|large)\.[^./?]+$/i.test(parsed.pathname)
+    if (hasConversion) return /-large\.[^./?]+$/i.test(parsed.pathname) ? parsed.toString() : ''
+    parsed.pathname = parsed.pathname.replace(/(\.[^./?]+)$/i, '-large$1')
+    return parsed.toString()
+  } catch {
+    const hasConversion = /-(thumb|small|medium|large)\.[^./?]+$/i.test(url)
+    if (hasConversion) return /-large\.[^./?]+$/i.test(url) ? url : ''
+    return url.replace(/(\.[^./?]+)$/i, '-large$1')
+  }
+}
+
+const getGalleryLargeImage = (image: any): string => {
+  return (
+    image?.large ||
+    toLargeVariant(image?.url) ||
+    toLargeVariant(image?.original) ||
+    image?.medium ||
+    image?.url ||
+    image?.thumb ||
+    selectedImage.value
+  )
+}
+
 // Fetch product on server and client
 // Using pending from useAsyncData as the single source of truth for loading state
 const { data: asyncProduct, pending: loading, error } = await useAsyncData(
@@ -338,8 +366,11 @@ watch(() => asyncProduct.value, (newProduct) => {
     product.value = newProduct
     relatedProducts.value = newProduct.related_products || []
     selectedImage.value =
+        newProduct.images?.featured?.large ||
+        toLargeVariant(newProduct.images?.featured?.original) ||
         newProduct.images?.featured?.medium ||
         newProduct.images?.featured?.original ||
+        toLargeVariant(newProduct.image) ||
         newProduct.image ||
         newProduct.image_thumb ||
         'https://placehold.co/600x600'
@@ -447,7 +478,9 @@ const handleVariationSelected = (variation: ProductVariation) => {
   selectedVariationId.value = variation.id
 
   // Update selected image to variation image
-  if (variation.images?.medium) {
+  if (variation.images?.large) {
+    selectedImage.value = variation.images.large
+  } else if (variation.images?.medium) {
     selectedImage.value = variation.images.medium
   }
 
