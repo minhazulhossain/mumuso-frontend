@@ -99,13 +99,10 @@ const normalizeImageKey = (url: string) => {
 const primaryImage = computed(() => {
   const featured = product.value.images?.featured
   return (
+    featured?.medium ||
     product.value.image ||
     product.value.image_webp ||
     product.value.image_thumb ||
-    featured?.medium ||
-    featured?.original ||
-    featured?.large ||
-    featured?.thumb ||
     ''
   )
 })
@@ -121,21 +118,13 @@ const secondaryImage = computed(() => {
 
   const images = product.value.images?.all ?? []
   images.forEach((image) => {
-    pushIfValid(image.url)
-    pushIfValid(image.thumb)
-    // Fallbacks for APIs that use different keys
-    pushIfValid((image as any).original)
     pushIfValid((image as any).medium)
-    pushIfValid((image as any).large)
   })
 
   const variations = product.value.variations ?? []
   variations.forEach((variation) => {
     const variationImages = variation?.images
     pushIfValid(variationImages?.medium)
-    pushIfValid(variationImages?.original)
-    pushIfValid(variationImages?.large)
-    pushIfValid(variationImages?.thumb)
   })
 
   const seenKeys = new Set<string>()

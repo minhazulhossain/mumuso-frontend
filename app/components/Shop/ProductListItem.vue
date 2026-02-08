@@ -7,20 +7,15 @@
       <div class="flex gap-4">
         <!-- Product Image -->
         <div class="w-32 h-32 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 relative">
-          <picture>
-            <source
-                v-if="product.image_webp"
-                :srcset="product.image_webp"
-                type="image/webp"
-            />
-            <img
-                :src="product.image || product.image_thumb"
-                :alt="product.name"
-                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                loading="lazy"
-                @error="handleImageError"
-            />
-          </picture>
+          <NuxtImg
+              :src="listImage"
+              :alt="product.name"
+              class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+              sizes="128px"
+              format="webp"
+              loading="lazy"
+              @error="handleImageError"
+          />
 
           <!-- Discount Badge -->
           <div v-if="product.has_discount" class="absolute top-2 right-2">
@@ -128,7 +123,8 @@
 
 <script setup lang="ts">
 import { useCurrency } from '#imports'
-defineProps<{
+
+const props = defineProps<{
   product: any
 }>()
 
@@ -138,6 +134,12 @@ defineEmits<{
 }>()
 
 const { formatCurrency } = useCurrency()
+const listImage = computed(() =>
+  props.product?.images?.featured?.medium ||
+  props.product?.image ||
+  props.product?.image_thumb ||
+  'https://placehold.co/600x600'
+)
 
 const handleImageError = (event: Event) => {
   const target = event.target as HTMLImageElement

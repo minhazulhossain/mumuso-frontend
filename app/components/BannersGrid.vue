@@ -60,8 +60,6 @@ const items = [
   { src: '/banners/1.jpg', title: 'Seasonal Favorites' },
   { src: '/banners/2.png', title: 'Everyday Essentials' },
   { src: '/banners/3.jpg', title: 'Fresh Finds' },
-  // { src: '/banners/4.png', title: 'Beauty Picks' },
-  // { src: '/banners/5.png', title: 'Home Edit' }
 ]
 
 // Track loading state for each image
