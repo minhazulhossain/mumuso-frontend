@@ -4,6 +4,19 @@ export const useContent = () => {
     // Use /api routes to avoid CORS issues on client
     const apiBase = '/api/'
 
+    const fetchHome = () => {
+        return useFetch(`${apiBase}content/home`, {
+            key: 'home-sections',
+            server: true,
+            transform: (response: ApiResponse) => {
+                return response?.data?.sections || []
+            },
+            getCachedData: (key) => {
+                return useNuxtApp().static.data[key] ?? useNuxtApp().payload.data[key]
+            },
+        })
+    }
+
     const fetchHeroBanners = () => {
         return useFetch(`${apiBase}content/hero-banners`, {
             key: 'hero-banners',
@@ -59,6 +72,7 @@ export const useContent = () => {
     }
 
     return {
+        fetchHome,
         fetchHeroBanners,
         fetchCategories,
         fetchFeaturedCategories,
