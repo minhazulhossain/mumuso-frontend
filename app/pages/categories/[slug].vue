@@ -116,6 +116,17 @@
                 </UBadge>
 
                 <UBadge
+                  v-if="activeFilters.best_selling"
+                  color="secondary"
+                  variant="soft"
+                  @click="removeFilter('best_selling')"
+                  class="cursor-pointer"
+                >
+                  Best Selling
+                  <UIcon name="i-heroicons-x-mark" class="ml-1 w-3 h-3" />
+                </UBadge>
+
+                <UBadge
                   v-if="activeFilters.min_price"
                   color="primary"
                   variant="soft"
@@ -325,6 +336,7 @@ const showMobileFilters = ref(false)
 const activeFilters = ref<any>({
   featured: undefined,
   in_stock: undefined,
+  best_selling: undefined,
   min_price: undefined,
   max_price: undefined,
 })
@@ -335,6 +347,7 @@ const isLoading = computed(() => loadingCategory.value || productsLoading.value)
 const sortOptions = [
   { value: 'newest', label: 'Newest First' },
   { value: 'featured', label: 'Featured First' },
+  { value: 'best-selling', label: 'Best Selling' },
   { value: 'price-asc', label: 'Price: Low to High' },
   { value: 'price-desc', label: 'Price: High to Low' },
   { value: 'name-asc', label: 'Name: A-Z' },
@@ -345,6 +358,7 @@ const hasActiveFilters = computed(() => {
   return (
       activeFilters.value.featured !== undefined ||
       activeFilters.value.in_stock !== undefined ||
+      activeFilters.value.best_selling === true ||
       activeFilters.value.min_price !== undefined && activeFilters.value.min_price !== null && activeFilters.value.min_price !== '' ||
       activeFilters.value.max_price !== undefined && activeFilters.value.max_price !== null && activeFilters.value.max_price !== '' ||
       !!searchQuery.value ||
@@ -381,6 +395,9 @@ const buildQueryFromUI = (page: number): QueryParams => {
 
   const inStock = normalizeBooleanToQuery(activeFilters.value.in_stock)
   if (inStock !== undefined) q.in_stock = inStock
+
+  const bestSelling = normalizeBooleanToQuery(activeFilters.value.best_selling)
+  if (bestSelling === 'true') q.best_selling = bestSelling
 
   // numbers (allow 0)
   if (activeFilters.value.min_price !== undefined && activeFilters.value.min_price !== null && activeFilters.value.min_price !== '') {
@@ -501,6 +518,7 @@ const clearAllFilters = async () => {
   activeFilters.value = {
     featured: undefined,
     in_stock: undefined,
+    best_selling: undefined,
     min_price: undefined,
     max_price: undefined,
   }
@@ -583,6 +601,7 @@ const initializeFromUrl = () => {
 
   if (q.featured !== undefined) activeFilters.value.featured = String(q.featured) === 'true'
   if (q.in_stock !== undefined) activeFilters.value.in_stock = String(q.in_stock) === 'true'
+  if (q.best_selling !== undefined) activeFilters.value.best_selling = String(q.best_selling) === 'true' ? true : undefined
 
   if (q.min_price !== undefined) activeFilters.value.min_price = String(q.min_price)
   if (q.max_price !== undefined) activeFilters.value.max_price = String(q.max_price)
@@ -630,6 +649,7 @@ watch(() => route.params.slug, async (newSlug, oldSlug) => {
     activeFilters.value = {
       featured: undefined,
       in_stock: undefined,
+      best_selling: undefined,
       min_price: undefined,
       max_price: undefined,
     }

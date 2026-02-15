@@ -47,9 +47,12 @@ export const useContent = () => {
         return useFetch(`${apiBase}categories/featured`, {
             key: 'featured-categories',
             server: true,
-            // Make sure this returns the data immediately
-            transform: (response: ApiResponse) => {
-                return response?.data || []
+            // Support multiple backend shapes: [] | { data: [] } | { data: { data: [] } }
+            transform: (response: any) => {
+                if (Array.isArray(response)) return response
+                if (Array.isArray(response?.data)) return response.data
+                if (Array.isArray(response?.data?.data)) return response.data.data
+                return []
             },
             getCachedData: (key) => {
                 return useNuxtApp().static.data[key] ?? useNuxtApp().payload.data[key]

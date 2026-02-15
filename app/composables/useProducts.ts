@@ -131,10 +131,10 @@ export const useProducts = () => {
             params.in_stock = inStock ? 'true' : 'false'
         }
 
-        // on_sale
-        const onSale = normalizeBoolean(filters.on_sale)
-        if (onSale !== null) {
-            params.on_sale = onSale ? 'true' : 'false'
+        // best_selling
+        const bestSelling = normalizeBoolean(filters.best_selling)
+        if (bestSelling !== null) {
+            params.best_selling = bestSelling ? 'true' : 'false'
         }
 
         // price range (allow 0)
@@ -158,6 +158,19 @@ export const useProducts = () => {
         // per_page
         if (filters.per_page !== undefined && filters.per_page !== null && filters.per_page !== '') {
             params.per_page = String(filters.per_page)
+        }
+
+        // top (used with best_selling=true)
+        if (filters.top !== undefined && filters.top !== null) {
+            params.top = String(filters.top)
+        }
+
+        // optional date range
+        if (filters.from) {
+            params.from = String(filters.from)
+        }
+        if (filters.to) {
+            params.to = String(filters.to)
         }
 
         // page (always)

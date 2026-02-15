@@ -78,8 +78,12 @@ export interface ProductFilters {
     max_price?: number | string
     search?: string
     sort_by?: string
-    on_sale?: boolean
+    best_selling?: boolean
+    top?: number
+    from?: string
+    to?: string
     page?: number
+    per_page?: number
 }
 
 export interface Category {

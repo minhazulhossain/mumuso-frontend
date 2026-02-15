@@ -1,95 +1,115 @@
 <template>
   <div>
+    <!-- Hero Section -->
     <section
-      v-if="homePending"
-      class="py-16 bg-gradient-to-br from-white via-primary-50 to-primary-100 dark:from-gray-950 dark:via-primary-950 dark:to-gray-900"
+        class="relative overflow-hidden bg-gradient-to-br from-white via-primary-50 to-primary-100 dark:from-gray-950 dark:via-primary-950 dark:to-gray-900"
     >
-      <UContainer class="flex flex-col gap-6">
-        <USkeleton class="h-10 w-52" />
-        <USkeleton class="h-64 w-full" />
+      <HeroSlider
+          :banners="heroBanners || []"
+          :autoplay="true"
+          :loading="homePending"
+      />
+    </section>
+
+    <!-- Categories Section -->
+    <section
+        ref="categoriesSection"
+        class="py-6 sm:py-8 md:py-12 lg:py-16 bg-white dark:bg-gray-950"
+    >
+      <UContainer class="transition-all duration-1000" :class="sectionStates.categories">
+        <CategoriesGrid />
       </UContainer>
     </section>
 
+    <!-- Promotions Section -->
     <section
-      v-else
-      v-for="section in sections"
-      :key="section.id"
-      :class="sectionBackground(section.type)"
-      class="py-8 sm:py-10 md:py-14 lg:py-16"
+        ref="promotionsSection"
+        class="py-6 sm:py-10 md:py-14 lg:py-16 bg-gray-50 dark:bg-gray-900"
     >
-      <!-- Hero -->
-      <template v-if="section.type === 'hero_banners'">
-        <HeroSlider
-          :banners="section.data || []"
-          :autoplay="true"
-          :loading="false"
+      <UContainer class="transition-all duration-1000" :class="sectionStates.promotions">
+        <PromotionGrid />
+      </UContainer>
+    </section>
+
+    <!-- Featured Grid Section -->
+    <section
+        ref="featuredGridSection"
+        class="py-8 sm:py-10 md:py-14 lg:py-16 bg-primary-50"
+    >
+      <UContainer class="transition-all duration-1000" :class="sectionStates.featuredGrid">
+        <div class="flex items-center justify-between mb-4 sm:mb-6">
+          <h2 class="text-2xl font-medium text-gray-900">Featured Picks</h2>
+          <UButton to="/shop?sort_by=featured" variant="ghost" color="primary" size="sm">
+            View More
+          </UButton>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+          <div
+              v-for="(item, index) in featuredProducts"
+              :key="item.id"
+              :class="index >= 6 ? 'hidden lg:block' : ''"
+          >
+            <ShopProductCard :product="item" />
+          </div>
+        </div>
+      </UContainer>
+    </section>
+
+    <!-- Best Selling Section -->
+    <section
+        ref="bestSellingSection"
+        class="py-8 sm:py-10 md:py-14 lg:py-16 bg-white dark:bg-gray-950"
+    >
+      <UContainer class="transition-all duration-1000" :class="sectionStates.bestSelling">
+        <ProductCarousel
+            title="Best Selling"
+            :items="bestSellingProducts"
+            :loading="productsPending"
+            :view-all-url="`/shop?best_selling=true`"
         />
-      </template>
+      </UContainer>
+    </section>
 
-      <!-- Featured / Latest Products -->
-      <template v-else-if="section.type === 'featured_products' || section.type === 'latest_products'">
-        <UContainer>
-          <div class="flex items-center justify-between mb-4 sm:mb-6">
-            <div>
-              <p v-if="section.subtitle" class="text-sm uppercase tracking-wide text-primary-600">{{ section.subtitle }}</p>
-              <h2 class="text-2xl font-semibold text-gray-900 dark:text-white">{{ section.title }}</h2>
-            </div>
-            <UButton
-              :to="section.type === 'featured_products' ? '/shop?sort_by=featured' : '/shop?sort_by=newest'"
-              variant="ghost"
-              color="primary"
-              size="sm"
-            >
-              View More
-            </UButton>
-          </div>
-          <ProductCarousel
-            :title="section.title"
-            :items="section.data || []"
-            :loading="false"
-            :view-all-url="section.type === 'featured_products' ? '/shop?sort_by=featured' : '/shop?sort_by=newest'"
-          />
-        </UContainer>
-      </template>
+    <!-- New Arrivals Section -->
+    <section
+        ref="newArrivalsSection"
+        class="py-6 sm:py-10 md:py-14 lg:py-16 bg-[#33b68f] dark:bg-success-600"
+    >
+      <UContainer class="transition-all duration-1000" :class="sectionStates.newArrivals">
+        <ProductCarousel
+            title="New Arrivals"
+            :items="newArrivalProducts"
+            :loading="productsPending"
+            :view-all-url="`/shop?sort_by=newest`"
+            title-class="text-white"
+            link-class="text-white/90 hover:text-white"
+        />
+      </UContainer>
+    </section>
 
-      <!-- Category Grid -->
-      <template v-else-if="section.type === 'category_grid'">
-        <UContainer>
-          <div class="flex items-center justify-between mb-4 sm:mb-6" v-if="section.title">
-            <div>
-              <p v-if="section.subtitle" class="text-sm uppercase tracking-wide text-primary-600">{{ section.subtitle }}</p>
-              <h2 class="text-2xl font-semibold text-gray-900 dark:text-white">{{ section.title }}</h2>
-            </div>
-          </div>
-          <CategoriesGrid :categories="section.data || []" />
-        </UContainer>
-      </template>
+    <!-- Banners Section -->
+    <section
+        ref="bannersSection"
+        class="py-6 sm:py-10 md:py-14 lg:py-16 bg-white dark:bg-gray-950"
+    >
+      <UContainer class="transition-all duration-1000" :class="sectionStates.banners">
+        <BannersGrid />
+      </UContainer>
+    </section>
 
-      <!-- Custom HTML -->
-      <template v-else-if="section.type === 'custom_html'">
-        <UContainer>
-          <div class="prose prose-primary dark:prose-invert max-w-none" v-html="section.data?.html"></div>
-        </UContainer>
-      </template>
-
-      <!-- Page Content -->
-      <template v-else-if="section.type === 'page_content'">
-        <UContainer>
-          <div class="prose prose-primary dark:prose-invert max-w-none">
-            <h2 class="text-2xl font-semibold mb-2">{{ section.data?.title || section.title }}</h2>
-            <div v-html="section.data?.content"></div>
-          </div>
-        </UContainer>
-      </template>
-
-      <!-- Fallback -->
-      <template v-else>
-        <UContainer>
-          <div class="bg-white dark:bg-gray-900 rounded-2xl border border-dashed border-gray-200 dark:border-gray-700 p-6">
-            <p class="text-sm text-gray-500">Unhandled section type: {{ section.type }}</p>
-          </div>
-        </UContainer>
-      </template>
+    <!-- Trending Section -->
+    <section
+        ref="trendingSection"
+        class="py-6 sm:py-10 md:py-14 lg:py-16 bg-gray-50 dark:bg-gray-900"
+    >
+      <UContainer class="transition-all duration-1000" :class="sectionStates.trending">
+        <ProductCarousel
+            title="Trending"
+            :items="trendingProducts"
+            :loading="productsPending"
+            :view-all-url="`/shop?sort_by=best-selling`"
+        />
+      </UContainer>
     </section>
   </div>
 </template>
@@ -99,19 +119,148 @@ const { fetchHome } = useContent()
 const { data: homeSections, pending: homePending } = await fetchHome()
 
 const sections = computed(() => homeSections.value || [])
+const heroBanners = computed(() =>
+    sections.value.find((section: any) => section.type === 'hero_banners')?.data || []
+)
 
-const sectionBackground = (type: string) => {
-  switch (type) {
-    case 'hero_banners':
-      return 'relative overflow-hidden bg-gradient-to-br from-white via-primary-50 to-primary-100 dark:from-gray-950 dark:via-primary-950 dark:to-gray-900'
-    case 'featured_products':
-      return 'bg-primary-50'
-    case 'latest_products':
-      return 'bg-white dark:bg-gray-950'
-    case 'category_grid':
-      return 'bg-gray-50 dark:bg-gray-900'
-    default:
-      return 'bg-white dark:bg-gray-950'
+const HOME_PRODUCTS_LIMIT = 10
+const findSectionData = (types: string[]) => {
+  for (const type of types) {
+    const data = sections.value.find((section: any) => section.type === type)?.data
+    if (Array.isArray(data) && data.length > 0) {
+      return data
+    }
   }
+  return []
 }
+
+const fetchHomeProducts = async (query: Record<string, string>) => {
+  const response = await $fetch<{ data?: any[] }>('/api/products', {
+    query: {
+      page: '1',
+      per_page: String(HOME_PRODUCTS_LIMIT),
+      ...query
+    }
+  })
+  return Array.isArray(response?.data) ? response.data : []
+}
+
+const { data: homeProductData, pending: productsPending } = await useAsyncData('home-products-sections', async () => {
+  const [featuredFallback, bestSelling, newest, trending] = await Promise.all([
+    fetchHomeProducts({ featured: 'true', sort_by: 'featured' }),
+    fetchHomeProducts({ best_selling: 'true', top: String(HOME_PRODUCTS_LIMIT), sort_by: 'best-selling' }),
+    fetchHomeProducts({ sort_by: 'newest' }),
+    fetchHomeProducts({ sort_by: 'best-selling' })
+  ])
+
+  return { featuredFallback, bestSelling, newest, trending }
+})
+
+// Section references
+const categoriesSection = ref(null)
+const promotionsSection = ref(null)
+const bestSellingSection = ref(null)
+const newArrivalsSection = ref(null)
+const bannersSection = ref(null)
+const trendingSection = ref(null)
+const featuredGridSection = ref(null)
+
+// Section animation states
+const sectionStates = ref({
+  categories: '',
+  promotions: '',
+  featuredGrid: '',
+  bestSelling: '',
+  newArrivals: '',
+  banners: '',
+  trending: ''
+})
+
+// Ref for observer instance
+let observer: IntersectionObserver | null = null
+
+// Intersection Observer for scroll animations
+const setupScrollAnimations = () => {
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  }
+
+  observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        // Add animation classes when section enters viewport
+        const element = entry.target as HTMLElement
+        const sectionKey = element.getAttribute('data-section')
+
+        if (sectionKey) {
+          sectionStates.value[sectionKey as keyof typeof sectionStates.value] = 'opacity-100 translate-y-0'
+        }
+      }
+    })
+  }, observerOptions)
+
+  // Observe all section elements
+const sections = [
+    { ref: categoriesSection, key: 'categories' },
+    { ref: promotionsSection, key: 'promotions' },
+    { ref: featuredGridSection, key: 'featuredGrid' },
+    { ref: bestSellingSection, key: 'bestSelling' },
+    { ref: newArrivalsSection, key: 'newArrivals' },
+    { ref: bannersSection, key: 'banners' },
+    { ref: trendingSection, key: 'trending' }
+  ]
+
+  sections.forEach(({ ref: sectionRef, key }) => {
+    if (sectionRef.value && observer) {
+      sectionRef.value.setAttribute('data-section', key)
+      observer.observe(sectionRef.value)
+    }
+  })
+}
+
+onMounted(() => {
+  // Initialize section states with initial animation classes
+  sectionStates.value = {
+    categories: 'opacity-0 translate-y-8',
+    promotions: 'opacity-0 translate-y-8',
+    featuredGrid: 'opacity-0 translate-y-8',
+    bestSelling: 'opacity-0 translate-y-8',
+    newArrivals: 'opacity-0 translate-y-8',
+    banners: 'opacity-0 translate-y-8',
+    trending: 'opacity-0 translate-y-8'
+  }
+
+  setupScrollAnimations()
+})
+
+onUnmounted(() => {
+  if (observer) {
+    observer.disconnect()
+  }
+})
+
+const featuredProducts = computed(() => {
+  const fromSections = findSectionData(['featured_products'])
+  if (fromSections.length > 0) return fromSections
+  return homeProductData.value?.featuredFallback || []
+})
+
+const bestSellingProducts = computed(() => {
+  const fromSections = findSectionData(['best_selling_products', 'best_selling'])
+  if (fromSections.length > 0) return fromSections
+  return homeProductData.value?.bestSelling || []
+})
+
+const newArrivalProducts = computed(() => {
+  const fromSections = findSectionData(['latest_products', 'new_arrivals_products'])
+  if (fromSections.length > 0) return fromSections
+  return homeProductData.value?.newest || []
+})
+
+const trendingProducts = computed(() => {
+  const fromSections = findSectionData(['trending_products', 'trending'])
+  if (fromSections.length > 0) return fromSections
+  return homeProductData.value?.trending || []
+})
 </script>

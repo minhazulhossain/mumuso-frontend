@@ -10,7 +10,7 @@
             :modules="[Pagination]"
             :slides-per-view="4"
             :space-between="12"
-            :loop="categories.length > 8"
+            :loop="(categoriesToRender?.length || 0) > 8"
             :pagination="paginationOptions"
             :breakpoints="{
               768: { slidesPerView: 6, spaceBetween: 16 },
@@ -91,11 +91,11 @@ const handleImageLoad = (src: string) => {
 
 const categoryImage = (item: CategoryItem): string => {
   if (!item) return ''
-  // Support both { image: 'url' } and { image: { original: 'url' } }
+  // Support both { image: 'url' } and { image: { thumb/original/url/... } }
   const img = (item as any).image
   if (!img) return ''
   if (typeof img === 'string') return img
-  return img.original || img.url || ''
+  return img.thumb || img.medium || img.large || img.original || img.url || ''
 }
 
 const navId = useId()

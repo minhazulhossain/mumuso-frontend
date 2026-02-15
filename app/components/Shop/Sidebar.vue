@@ -181,16 +181,16 @@
         </div>
       </div>
 
-      <!-- Discount Filter -->
+      <!-- Best Selling Filter -->
       <div class="mb-6">
         <label class="flex items-center gap-2 cursor-pointer">
           <input
               type="checkbox"
-              v-model="localFilters.on_sale"
+              v-model="localFilters.best_selling"
               class="form-checkbox text-primary-500 rounded"
           />
           <span class="flex items-center gap-2">
-            <span class="text-sm text-gray-700 dark:text-gray-300">On Sale / Discounted</span>
+            <span class="text-sm text-gray-700 dark:text-gray-300">Best Selling Only</span>
             <UIcon name="i-heroicons-tag" class="text-red-500 w-4 h-4" />
           </span>
         </label>
@@ -236,8 +236,8 @@
           <div v-if="localFilters.min_price || localFilters.max_price">
             • Price: {{ formatCurrency(localFilters.min_price || 0) }} - {{ formatCurrency(localFilters.max_price || maxPriceLimit) }}
           </div>
-          <div v-if="localFilters.on_sale">
-            • On Sale Only
+          <div v-if="localFilters.best_selling">
+            • Best Selling Only
           </div>
         </div>
       </div>
@@ -259,7 +259,7 @@ interface Filters {
   in_stock?: boolean | undefined
   min_price?: string | number
   max_price?: string | number
-  on_sale?: boolean
+  best_selling?: boolean | undefined
 }
 
 const props = defineProps<{
@@ -286,7 +286,7 @@ const localFilters = ref<Filters>({
   in_stock: undefined,
   min_price: undefined,
   max_price: undefined,
-  on_sale: false,
+  best_selling: undefined,
 })
 
 // Temporary price values for input fields
@@ -353,7 +353,7 @@ const hasActiveFilters = computed(() => {
       localFilters.value.in_stock !== undefined ||
       localFilters.value.min_price ||
       localFilters.value.max_price ||
-      localFilters.value.on_sale === true
+      localFilters.value.best_selling === true
   )
 })
 
@@ -363,7 +363,7 @@ const activeFilterCount = computed(() => {
   if (localFilters.value.featured !== undefined) count++
   if (localFilters.value.in_stock !== undefined) count++
   if (localFilters.value.min_price || localFilters.value.max_price) count++
-  if (localFilters.value.on_sale === true) count++
+  if (localFilters.value.best_selling === true) count++
   return count
 })
 
@@ -431,8 +431,8 @@ const handleApplyFilters = () => {
   if (filtersToApply.category === 'all') {
     filtersToApply.category = undefined
   }
-  if (filtersToApply.on_sale === false) {
-    filtersToApply.on_sale = undefined
+  if (filtersToApply.best_selling === false) {
+    filtersToApply.best_selling = undefined
   }
 
   emit('apply-filters', filtersToApply)
@@ -451,7 +451,7 @@ const handleClearFilters = () => {
     in_stock: undefined,
     min_price: undefined,
     max_price: undefined,
-    on_sale: false,
+    best_selling: undefined,
   }
 
   tempMinPrice.value = ''
@@ -494,7 +494,7 @@ watch(
           in_stock: newFilters.in_stock,
           min_price: newFilters.min_price,
           max_price: newFilters.max_price,
-          on_sale: newFilters.on_sale || false,
+          best_selling: newFilters.best_selling,
         }
 
         // Update temp prices

@@ -122,6 +122,17 @@
                 </UBadge>
 
                 <UBadge
+                    v-if="activeFilters.best_selling"
+                    color="secondary"
+                    variant="soft"
+                    @click="removeFilter('best_selling')"
+                    class="cursor-pointer"
+                >
+                  Best Selling
+                  <UIcon name="i-heroicons-x-mark" class="ml-1 w-3 h-3"/>
+                </UBadge>
+
+                <UBadge
                     v-if="activeFilters.min_price"
                     color="primary"
                     variant="soft"
@@ -341,6 +352,7 @@ const activeFilters = ref<any>({
   category: props.initialCategory || 'all',
   featured: undefined,
   in_stock: undefined,
+  best_selling: undefined,
   min_price: undefined,
   max_price: undefined,
 })
@@ -349,6 +361,7 @@ const activeFilters = ref<any>({
 const sortOptions = [
   { value: 'newest', label: 'Newest First' },
   { value: 'featured', label: 'Featured First' },
+  { value: 'best-selling', label: 'Best Selling' },
   { value: 'price-asc', label: 'Price: Low to High' },
   { value: 'price-desc', label: 'Price: High to Low' },
   { value: 'name-asc', label: 'Name: A-Z' },
@@ -362,6 +375,7 @@ const hasActiveFilters = computed(() => {
       (activeFilters.value.category && activeFilters.value.category !== 'all') ||
       activeFilters.value.featured !== undefined ||
       activeFilters.value.in_stock !== undefined ||
+      activeFilters.value.best_selling === true ||
       activeFilters.value.min_price ||
       activeFilters.value.max_price ||
       !!searchQuery.value ||
@@ -386,6 +400,9 @@ const buildFiltersFromUI = (): ProductFilters => {
   }
   if (activeFilters.value.in_stock !== undefined) {
     f.in_stock = activeFilters.value.in_stock
+  }
+  if (activeFilters.value.best_selling === true) {
+    f.best_selling = activeFilters.value.best_selling
   }
   if (activeFilters.value.min_price) {
     f.min_price = activeFilters.value.min_price
@@ -424,6 +441,9 @@ const normalizeQueryParams = (filters: ProductFilters = {}) => {
   if (filters.in_stock !== undefined && filters.in_stock !== null) {
     params.in_stock = filters.in_stock ? 'true' : 'false'
   }
+  if (filters.best_selling !== undefined && filters.best_selling !== null) {
+    params.best_selling = filters.best_selling ? 'true' : 'false'
+  }
 
   return params
 }
@@ -439,12 +459,15 @@ const fetchFromRoute = async () => {
 
   // sync UI state from URL
   if (q.category) activeFilters.value.category = q.category as string
-  if (q.featured) activeFilters.value.featured = q.featured === 'true'
-  if (q.in_stock) activeFilters.value.in_stock = q.in_stock === 'true'
+  if (q.featured !== undefined) activeFilters.value.featured = q.featured === 'true'
+  if (q.in_stock !== undefined) activeFilters.value.in_stock = q.in_stock === 'true'
+  if (q.best_selling !== undefined) {
+    activeFilters.value.best_selling = q.best_selling === 'true' ? true : undefined
+  }
   if (q.min_price) activeFilters.value.min_price = q.min_price as string
   if (q.max_price) activeFilters.value.max_price = q.max_price as string
-  if (q.search) searchQuery.value = q.search as string
-  if (q.sort_by) sortBy.value = q.sort_by as string
+  if (q.search !== undefined) searchQuery.value = q.search as string
+  if (q.sort_by !== undefined) sortBy.value = q.sort_by as string
 
   const page = getInitialPage()
 
@@ -491,6 +514,7 @@ const clearAllFilters = async () => {
     category: 'all',
     featured: undefined,
     in_stock: undefined,
+    best_selling: undefined,
     min_price: undefined,
     max_price: undefined,
   }

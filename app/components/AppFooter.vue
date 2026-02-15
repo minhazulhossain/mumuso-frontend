@@ -73,7 +73,7 @@
                         :target="isExternalUrl(item.url) ? '_blank' : undefined"
                         class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm transition-colors flex items-center"
                     >
-                      {{ item.title }}
+                      {{ item.label }}
 
                     </NuxtLink>
                   </li>

@@ -2,9 +2,7 @@
   const backendUrl = process.env.BACKEND_API_BASE || 'https://admin.mumuso.com.bd/api/v1/'
 
   try {
-    const response = await $fetch(`${backendUrl}categories/featured`)
-
-    return response
+    return await $fetch(`${backendUrl}categories/featured`)
   } catch (error: any) {
     throw createError({
       statusCode: error.statusCode || 500,
