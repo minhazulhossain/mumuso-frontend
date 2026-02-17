@@ -7,7 +7,7 @@
       <HeroSlider
           :banners="heroBanners || []"
           :autoplay="true"
-          :loading="homePending"
+          :loading="homePending || heroFallbackPending"
       />
     </section>
 
@@ -115,13 +115,28 @@
 </template>
 
 <script setup lang="ts">
-const { fetchHome } = useContent()
+const { fetchHome, fetchHeroBanners } = useContent()
 const { data: homeSections, pending: homePending } = await fetchHome()
+const { data: fallbackHeroBanners, pending: heroFallbackPending } = await fetchHeroBanners()
 
 const sections = computed(() => homeSections.value || [])
-const heroBanners = computed(() =>
-    sections.value.find((section: any) => section.type === 'hero_banners')?.data || []
-)
+const heroBanners = computed(() => {
+  const heroSection = sections.value.find((section: any) =>
+    ['hero_banners', 'hero_slider', 'hero_banner'].includes(String(section?.type || ''))
+  )
+
+  const sectionData = heroSection?.data
+  if (Array.isArray(sectionData) && sectionData.length > 0) {
+    return sectionData
+  }
+
+  const fallback = fallbackHeroBanners.value
+  if (Array.isArray(fallback) && fallback.length > 0) {
+    return fallback
+  }
+
+  return []
+})
 
 const HOME_PRODUCTS_LIMIT = 10
 const findSectionData = (types: string[]) => {

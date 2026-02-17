@@ -17,7 +17,7 @@
           @swiper="onSwiper"
           @slideChange="onSlideChange"
       >
-        <SwiperSlide v-for="(banner, index) in banners" :key="banner.id">
+        <SwiperSlide v-for="(banner, index) in normalizedBanners" :key="banner.id ?? index">
           <div class="relative w-full h-full">
             <div class="relative w-full h-full bg-gray-100">
               <picture>
@@ -89,6 +89,8 @@ const props = withDefaults(defineProps<Props>(), {
   loading: false
 })
 
+const config = useRuntimeConfig()
+
 const emit = defineEmits<{
   'slide-change': [index: number]
 }>()
@@ -100,6 +102,78 @@ const readyVideos = ref<Record<string | number, boolean>>({})
 
 // Track loaded images to prevent layout shift
 const loadedImages = ref<Record<string | number, boolean>>({})
+
+const mediaBase = computed(() => {
+  const apiBase = config.public.apiBase || ''
+  return String(apiBase).replace(/\/api\/v\d+\/?$/i, '').replace(/\/$/, '')
+})
+
+const isAbsoluteUrl = (value: string) => /^(https?:)?\/\//i.test(value)
+
+const unwrapMediaValue = (value: any): string => {
+  if (!value) return ''
+  if (typeof value === 'string') return value
+  if (typeof value === 'number') return String(value)
+  if (typeof value === 'object') {
+    return (
+      value.url ||
+      value.src ||
+      value.path ||
+      value.image_url ||
+      value.desktop_image ||
+      value.mobile_image ||
+      value.desktop ||
+      value.mobile ||
+      value.original ||
+      ''
+    )
+  }
+  return ''
+}
+
+const resolveMediaUrl = (value: any) => {
+  const raw = unwrapMediaValue(value)
+  if (!raw) return ''
+  if (isAbsoluteUrl(raw)) return raw
+  const base = mediaBase.value
+  const path = raw.startsWith('/') ? raw : `/${raw}`
+  return base ? `${base}${path}` : path
+}
+
+const resolveBannerImage = (image: any) => {
+  if (!image) return { desktop: '', mobile: '', thumb: '' }
+
+  // Backend can return image as string or as an object with different keys.
+  if (typeof image === 'string') {
+    const resolved = resolveMediaUrl(image)
+    return { desktop: resolved, mobile: resolved, thumb: resolved }
+  }
+
+  const desktopRaw =
+    image.desktop ||
+    image.desktop_image ||
+    image.url ||
+    image.src ||
+    image.image_url ||
+    image.original ||
+    ''
+  const mobileRaw = image.mobile || image.mobile_image || desktopRaw
+  const thumbRaw = image.thumb || image.thumbnail || image.thumb_url || desktopRaw
+
+  return {
+    desktop: resolveMediaUrl(desktopRaw),
+    mobile: resolveMediaUrl(mobileRaw),
+    thumb: resolveMediaUrl(thumbRaw)
+  }
+}
+
+const normalizedBanners = computed(() => {
+  return (props.banners || []).map((banner: any) => ({
+    ...banner,
+    image: resolveBannerImage(banner?.image || banner?.images || banner?.media),
+    video: resolveMediaUrl(banner?.video || banner?.video_url || '')
+  }))
+})
 
 const handleImageLoad = (bannerId: string | number) => {
   loadedImages.value[bannerId] = true
