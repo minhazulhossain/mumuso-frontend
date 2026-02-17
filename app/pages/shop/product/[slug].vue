@@ -26,17 +26,13 @@
                 :src="selectedImage"
                 :alt="product.name"
                 class="w-full h-full object-cover transition-transform duration-300"
-                :class="{ 'scale-150': isZoomed }"
-                :style="zoomStyle"
                 @error="handleImageError"
-                @click="toggleZoom"
-                @mousemove="handleMouseMove"
-                @mouseleave="isZoomed = false"
+                @click="openImageViewerByUrl(selectedImage)"
             />
             <!-- Zoom Hint -->
             <div
                  class="absolute inset-0 bg-opacity-0 group-hover:bg-opacity-10 transition-all flex items-center justify-center pointer-events-none"
-                 :class="{ 'hidden': isZoomed }">
+            >
               <div
                   class="bg-white dark:bg-gray-800 rounded-full p-3 opacity-0 group-hover:opacity-100 transition-opacity">
                 <UIcon name="i-heroicons-magnifying-glass-plus-20-solid" class="text-2xl text-gray-700 dark:text-gray-300"/>
@@ -61,7 +57,7 @@
             <button
                 v-for="image in product.images.all"
                 :key="image.id"
-                @click="selectedImage = getGalleryLargeImage(image)"
+                @click="setSelectedImageAndOpen(image)"
                 class="aspect-square overflow-hidden rounded-lg bg-gray-100 border-2 transition-colors"
                 :class="selectedImage === getGalleryLargeImage(image) ? 'border-primary-500' : 'border-transparent hover:border-gray-300'"
             >
@@ -151,14 +147,6 @@
             </p>
           </div>
 
-          <!-- Description -->
-          <div v-if="product.description">
-            <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Description</h2>
-            <div class="text-gray-600 dark:text-gray-400 leading-relaxed whitespace-pre-line">
-              {{ product.description }}
-            </div>
-          </div>
-
           <!-- Variation Selector -->
           <ProductVariationSelector
               v-if="product.variations && product.variations.length > 0"
@@ -168,25 +156,25 @@
           />
 
           <!-- Product Info -->
-          <div class="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 space-y-2">
-            <div v-if="product.weight" class="flex justify-between">
-              <span class="text-gray-600 dark:text-gray-400">Weight:</span>
-              <span class="font-medium text-gray-900 dark:text-white">{{ product.weight }} kg</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-gray-600 dark:text-gray-400">Status:</span>
-              <span class="font-medium text-gray-900 dark:text-white">{{ product.status }}</span>
-            </div>
-            <div v-if="product.variations && product.variations.length > 0" class="flex justify-between">
-              <span class="text-gray-600 dark:text-gray-400">Variations:</span>
-              <span class="font-medium text-gray-900 dark:text-white">{{ product.variations.length }} available</span>
-            </div>
-          </div>
+<!--          <div class="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 space-y-2">-->
+<!--            <div v-if="product.weight" class="flex justify-between">-->
+<!--              <span class="text-gray-600 dark:text-gray-400">Weight:</span>-->
+<!--              <span class="font-medium text-gray-900 dark:text-white">{{ product.weight }} kg</span>-->
+<!--            </div>-->
+<!--            <div class="flex justify-between">-->
+<!--              <span class="text-gray-600 dark:text-gray-400">Status:</span>-->
+<!--              <span class="font-medium text-gray-900 dark:text-white">{{ product.status }}</span>-->
+<!--            </div>-->
+<!--            <div v-if="product.variations && product.variations.length > 0" class="flex justify-between">-->
+<!--              <span class="text-gray-600 dark:text-gray-400">Variations:</span>-->
+<!--              <span class="font-medium text-gray-900 dark:text-white">{{ product.variations.length }} available</span>-->
+<!--            </div>-->
+<!--          </div>-->
 
           <!-- Quantity Selector -->
           <div v-if="currentInStock" class="flex flex-col sm:flex-row sm:items-center gap-3">
             <label class="text-sm font-medium text-gray-700 dark:text-gray-300 sm:whitespace-nowrap">Quantity:</label>
-            <div class="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-start">
+            <div class="flex items-center gap-2 w-full max-w-[220px] sm:w-auto sm:max-w-none justify-between sm:justify-start">
               <UButton
                   @click="quantity = Math.max(1, quantity - 1)"
                   icon="i-heroicons-minus"
@@ -259,10 +247,6 @@
               <span>Shipping calculated at checkout</span>
             </div>
             <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-              <UIcon name="i-heroicons-arrow-path"/>
-              <span>30-day return policy</span>
-            </div>
-            <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
               <UIcon name="i-heroicons-shield-check"/>
               <span>Secure checkout</span>
             </div>
@@ -270,8 +254,149 @@
         </div>
       </div>
 
+      <!-- Product Tabs -->
+      <div v-if="product" class="mt-12">
+        <div class="border-b border-gray-200 dark:border-gray-700">
+          <div class="flex flex-wrap gap-2">
+            <button
+                type="button"
+                class="px-4 py-2 text-sm font-medium border-b-2 transition-colors"
+                :class="activeTab === 'description'
+                  ? 'border-primary-500 text-primary-600 dark:text-primary-400'
+                  : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'"
+                @click="activeTab = 'description'"
+            >
+              Description
+            </button>
+            <button
+                type="button"
+                class="px-4 py-2 text-sm font-medium border-b-2 transition-colors"
+                :class="activeTab === 'share'
+                  ? 'border-primary-500 text-primary-600 dark:text-primary-400'
+                  : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'"
+                @click="activeTab = 'share'"
+            >
+              Share
+            </button>
+          </div>
+        </div>
+
+        <div v-if="activeTab === 'description'" class="mt-6">
+          <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">Full Description</h2>
+          <div
+              v-if="product.description || product.short_description"
+              class="text-gray-600 dark:text-gray-400 leading-relaxed whitespace-pre-line"
+          >
+            {{ product.description || product.short_description }}
+          </div>
+          <p v-else class="text-gray-500 dark:text-gray-400">No description available for this product.</p>
+        </div>
+
+        <div v-if="activeTab === 'share'" class="mt-6">
+          <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">Share This Product</h2>
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            Share this product with your friends on social media.
+          </p>
+          <div class="flex flex-wrap gap-3">
+            <UButton color="secondary" variant="soft" @click="shareOnFacebook">
+              Facebook
+            </UButton>
+            <UButton color="secondary" variant="soft" @click="shareOnWhatsApp">
+              WhatsApp
+            </UButton>
+            <UButton color="secondary" variant="soft" @click="shareOnX">
+              X
+            </UButton>
+            <UButton color="primary" variant="soft" @click="copyProductLink">
+              Copy Link
+            </UButton>
+            <UButton v-if="canUseNativeShare" color="primary" @click="shareNatively">
+              Share
+            </UButton>
+          </div>
+        </div>
+      </div>
+
+      <!-- Image Viewer Modal -->
+      <div
+          v-if="imageViewerOpen && productImageUrls.length > 0"
+          class="fixed inset-0 z-[1200] bg-black/90 flex items-center justify-center p-3 sm:p-6"
+          @click.self="closeImageViewer"
+      >
+        <button
+            type="button"
+            class="absolute top-4 right-4 z-20 text-white/90 hover:text-white"
+            @click="closeImageViewer"
+            aria-label="Close image viewer"
+        >
+          <UIcon name="i-heroicons-x-mark" class="text-3xl"/>
+        </button>
+
+        <button
+            v-if="productImageUrls.length > 1"
+            type="button"
+            class="absolute left-2 sm:left-6 z-20 text-white/80 hover:text-white"
+            @click="showPreviousImage"
+            aria-label="Previous image"
+        >
+          <UIcon name="i-heroicons-chevron-left" class="text-3xl sm:text-4xl"/>
+        </button>
+
+        <div class="relative w-full max-w-6xl h-full max-h-[90vh] flex flex-col items-center justify-center">
+          <img
+              :src="activeViewerImage"
+              :alt="product.name"
+              class="max-w-full max-h-[78vh] object-contain transition-transform duration-200"
+              :style="{ transform: `scale(${viewerZoomLevel})`, transformOrigin: 'center center' }"
+              @load="handleViewerImageLoad"
+              @error="handleImageError"
+          />
+        </div>
+
+        <div
+            class="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 rounded-full bg-black/60 backdrop-blur px-3 py-2 text-white"
+        >
+          <span class="text-sm text-white/90 whitespace-nowrap">
+            {{ viewerImageIndex + 1 }} / {{ productImageUrls.length }}
+          </span>
+          <UButton
+              v-if="canZoomCurrentModalImage"
+              size="sm"
+              color="secondary"
+              variant="soft"
+              :disabled="viewerZoomLevel <= 1"
+              @click="zoomOutViewerImage"
+          >
+            Zoom Out
+          </UButton>
+          <UButton
+              v-if="canZoomCurrentModalImage"
+              size="sm"
+              color="primary"
+              variant="soft"
+              :disabled="viewerZoomLevel >= maxViewerZoomLevel"
+              @click="zoomInViewerImage"
+          >
+            Zoom In
+          </UButton>
+          <span v-if="!canZoomCurrentModalImage" class="text-xs text-white/80 whitespace-nowrap">
+            Zoom unavailable for this image size
+          </span>
+        </div>
+
+        <button
+            v-if="productImageUrls.length > 1"
+            type="button"
+            class="absolute right-2 sm:right-6 z-20 text-white/80 hover:text-white"
+            @click="showNextImage"
+            aria-label="Next image"
+        >
+          <UIcon name="i-heroicons-chevron-right" class="text-3xl sm:text-4xl"/>
+        </button>
+      </div>
+
       <!-- Product Not Found -->
-      <div v-else class="text-center py-16">
+      <div v-if="!loading && !displayError && !product" class="text-center py-16">
         <UIcon name="i-heroicons-shopping-bag" class="text-6xl text-gray-300 mb-4"/>
         <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Product not found</h3>
         <p class="text-gray-600 dark:text-gray-400 mb-4">The product you're looking for doesn't exist</p>
@@ -302,11 +427,15 @@ const { formatCurrency } = useCurrency()
 const product = ref<Product | null>(null)
 const quantity = ref(1)
 const selectedImage = ref('')
-const isZoomed = ref(false)
-const zoomStyle = ref({})
 const relatedProducts = ref<Product[]>([])
 const selectedVariationId = ref<number | null>(null)
 const selectedVariation = ref<ProductVariation | null>(null)
+const activeTab = ref<'description' | 'share'>('description')
+const imageViewerOpen = ref(false)
+const viewerImageIndex = ref(0)
+const viewerZoomLevel = ref(1)
+const maxViewerZoomLevel = 3
+const canZoomCurrentModalImage = ref(false)
 
 const toLargeVariant = (url?: string): string => {
   if (!url) return ''
@@ -336,6 +465,25 @@ const getGalleryLargeImage = (image: any): string => {
   )
 }
 
+const productImageUrls = computed(() => {
+  if (!product.value) return []
+
+  const urls = (product.value.images?.all || [])
+    .map((image: any) => getGalleryLargeImage(image))
+    .filter((url: string) => Boolean(url))
+
+  if (!urls.length && selectedImage.value) {
+    return [selectedImage.value]
+  }
+
+  return Array.from(new Set(urls))
+})
+
+const activeViewerImage = computed(() => {
+  if (!productImageUrls.value.length) return ''
+  return productImageUrls.value[viewerImageIndex.value] || productImageUrls.value[0]
+})
+
 // Fetch product on server and client
 // Using pending from useAsyncData as the single source of truth for loading state
 const { data: asyncProduct, pending: loading, error } = await useAsyncData(
@@ -356,6 +504,11 @@ watch(() => route.params.slug, () => {
   product.value = null
   selectedVariation.value = null
   selectedVariationId.value = null
+  activeTab.value = 'description'
+  imageViewerOpen.value = false
+  viewerImageIndex.value = 0
+  viewerZoomLevel.value = 1
+  canZoomCurrentModalImage.value = false
   quantity.value = 1
   selectedImage.value = ''
 }, { immediate: false })
@@ -451,24 +604,68 @@ const breadcrumbLinks = computed(() => {
   return links
 })
 
-// Image zoom handlers
-const toggleZoom = () => {
-  isZoomed.value = !isZoomed.value
-  if (!isZoomed.value) {
-    zoomStyle.value = {}
-  }
+const setSelectedImageAndOpen = (image: any) => {
+  const url = getGalleryLargeImage(image)
+  selectedImage.value = url
+  openImageViewerByUrl(url)
 }
 
-const handleMouseMove = (event: MouseEvent) => {
-  if (!isZoomed.value) return
+const openImageViewerByUrl = (url: string) => {
+  const index = productImageUrls.value.findIndex((item) => item === url)
+  viewerImageIndex.value = index >= 0 ? index : 0
+  viewerZoomLevel.value = 1
+  canZoomCurrentModalImage.value = false
+  imageViewerOpen.value = true
+}
 
-  const target = event.currentTarget as HTMLElement
-  const rect = target.getBoundingClientRect()
-  const x = ((event.clientX - rect.left) / rect.width) * 100
-  const y = ((event.clientY - rect.top) / rect.height) * 100
+const closeImageViewer = () => {
+  imageViewerOpen.value = false
+  viewerZoomLevel.value = 1
+}
 
-  zoomStyle.value = {
-    transformOrigin: `${x}% ${y}%`
+const showPreviousImage = () => {
+  if (!productImageUrls.value.length) return
+  viewerImageIndex.value = (viewerImageIndex.value - 1 + productImageUrls.value.length) % productImageUrls.value.length
+  viewerZoomLevel.value = 1
+}
+
+const showNextImage = () => {
+  if (!productImageUrls.value.length) return
+  viewerImageIndex.value = (viewerImageIndex.value + 1) % productImageUrls.value.length
+  viewerZoomLevel.value = 1
+}
+
+const handleViewerImageLoad = (event: Event) => {
+  const target = event.target as HTMLImageElement
+  const imageWidth = target.naturalWidth || 0
+  const imageHeight = target.naturalHeight || 0
+  canZoomCurrentModalImage.value = imageWidth >= 1400 || imageHeight >= 1400
+}
+
+const zoomInViewerImage = () => {
+  if (!canZoomCurrentModalImage.value) return
+  viewerZoomLevel.value = Math.min(maxViewerZoomLevel, Number((viewerZoomLevel.value + 0.25).toFixed(2)))
+}
+
+const zoomOutViewerImage = () => {
+  viewerZoomLevel.value = Math.max(1, Number((viewerZoomLevel.value - 0.25).toFixed(2)))
+}
+
+const handleViewerKeyboardEvents = (event: KeyboardEvent) => {
+  if (!imageViewerOpen.value) return
+
+  if (event.key === 'Escape') {
+    closeImageViewer()
+    return
+  }
+
+  if (event.key === 'ArrowLeft') {
+    showPreviousImage()
+    return
+  }
+
+  if (event.key === 'ArrowRight') {
+    showNextImage()
   }
 }
 
@@ -557,6 +754,92 @@ const handleImageError = (event: Event) => {
   target.src = 'https://placehold.co/600x600'
 }
 
+const getProductUrl = (): string => {
+  if (import.meta.client) {
+    return window.location.href
+  }
+
+  const path = route.fullPath || `/shop/product/${route.params.slug}`
+  return path.startsWith('/') ? path : `/${path}`
+}
+
+const getShareText = (): string => {
+  if (!product.value) return 'Check out this product'
+  return `Check out ${product.value.name}`
+}
+
+const openShareWindow = (url: string) => {
+  if (!import.meta.client) return
+
+  const width = 620
+  const height = 700
+  const left = Math.max(0, Math.round((window.screen.width - width) / 2))
+  const top = Math.max(0, Math.round((window.screen.height - height) / 2))
+  const features = `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes,status=no,toolbar=no,menubar=no`
+
+  const popup = window.open(url, 'share-popup', features)
+  if (popup) {
+    popup.opener = null
+    popup.focus()
+  } else {
+    window.open(url, '_blank', 'noopener,noreferrer')
+  }
+}
+
+const shareOnFacebook = () => {
+  const url = encodeURIComponent(getProductUrl())
+  openShareWindow(`https://www.facebook.com/sharer/sharer.php?u=${url}`)
+}
+
+const shareOnWhatsApp = () => {
+  const text = encodeURIComponent(`${getShareText()} ${getProductUrl()}`)
+  openShareWindow(`https://wa.me/?text=${text}`)
+}
+
+const shareOnX = () => {
+  const text = encodeURIComponent(getShareText())
+  const url = encodeURIComponent(getProductUrl())
+  openShareWindow(`https://twitter.com/intent/tweet?text=${text}&url=${url}`)
+}
+
+const copyProductLink = async () => {
+  if (!import.meta.client) return
+
+  const url = getProductUrl()
+  try {
+    await navigator.clipboard.writeText(url)
+    toast.add({
+      title: 'Link copied',
+      description: 'Product link copied to clipboard',
+      color: 'success',
+      icon: 'i-heroicons-clipboard-document-check'
+    })
+  } catch {
+    toast.add({
+      title: 'Copy failed',
+      description: 'Unable to copy link',
+      color: 'error',
+      icon: 'i-heroicons-x-circle'
+    })
+  }
+}
+
+const canUseNativeShare = computed(() => import.meta.client && typeof navigator.share === 'function')
+
+const shareNatively = async () => {
+  if (!import.meta.client || !canUseNativeShare.value) return
+
+  try {
+    await navigator.share({
+      title: product.value?.name || 'Product',
+      text: getShareText(),
+      url: getProductUrl()
+    })
+  } catch {
+    // User cancelled native share dialog.
+  }
+}
+
 // Initialize wishlist on client (in case it wasn't loaded by plugin)
 onMounted(async () => {
   try {
@@ -564,6 +847,12 @@ onMounted(async () => {
   } catch (err) {
     console.error('Failed to initialize wishlist:', err)
   }
+
+  window.addEventListener('keydown', handleViewerKeyboardEvents)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleViewerKeyboardEvents)
 })
 
 watchEffect(() => {

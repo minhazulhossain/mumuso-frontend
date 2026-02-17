@@ -13,7 +13,7 @@
                 <NuxtImg
                     :src="settings.branding.logo"
                     :alt="settings.site.name"
-                    :class="['h-10 md:h-14 w-auto dark:hidden']"
+                    :class="['h-6 md:h-10 w-auto dark:hidden']"
                     loading="eager"
                     format="webp"
                 />
@@ -68,9 +68,9 @@
                 <ul class="space-y-3">
                   <li v-for="item in menu.items" :key="item.id">
                     <NuxtLink
-                        :to="item.url || '#'"
-                        :external="isExternalUrl(item.url)"
-                        :target="isExternalUrl(item.url) ? '_blank' : undefined"
+                        :to="getLinkUrl(item.url)"
+                        :external="isLinkExternal(item.url)"
+                        :target="isLinkExternal(item.url) ? '_blank' : undefined"
                         class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm transition-colors flex items-center"
                     >
                       {{ item.label }}
@@ -87,14 +87,14 @@
                 <ul class="space-y-3 mt-3">
                   <li v-for="item in menu.items" :key="item.id">
                     <NuxtLink
-                        :to="item.url || '#'"
-                        :external="isExternalUrl(item.url)"
-                        :target="isExternalUrl(item.url) ? '_blank' : undefined"
+                        :to="getLinkUrl(item.url)"
+                        :external="isLinkExternal(item.url)"
+                        :target="isLinkExternal(item.url) ? '_blank' : undefined"
                         class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm transition-colors flex items-center"
                     >
                       {{ item.label }}
                       <UIcon
-                          v-if="isExternalUrl(item.url)"
+                          v-if="isLinkExternal(item.url)"
                           name="i-heroicons-arrow-top-right-on-square"
                           class="w-3 h-3 ml-1"
                       />
@@ -124,10 +124,12 @@
             <NuxtLink
                 v-for="item in settings.footer.menu_items"
                 :key="item.id"
-                :to="item.url"
+                :to="getLinkUrl(item.url)"
+                :external="isLinkExternal(item.url)"
+                :target="isLinkExternal(item.url) ? '_blank' : undefined"
                 class="text-sm transition-colors"
                 :class="[
-                $route.path === item.url
+                !isLinkExternal(item.url) && $route.path === getLinkUrl(item.url)
                   ? 'text-indigo-600 dark:text-indigo-400 font-medium'
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
               ]"
@@ -158,11 +160,34 @@ const loadingMenus = ref(true)
 // Define which footer menus to display (adjust these menu slugs as needed)
 const FOOTER_MENU_SLUGS = ['footer-product-menu', 'footer-company-menu']
 
-// Check if URL is external
-const isExternalUrl = (url: string): boolean => {
-  if (!url) return false
-  return url.startsWith('http://') || url.startsWith('https://') || url.startsWith('//')
+const FILE_PATH_PATTERN = /\.(mp4|webm|mov|avi|mkv|jpg|jpeg|png|gif|svg|webp|avif|pdf|docx?|xlsx?|zip|rar)(\?.*)?$/i
+const INVALID_ROUTE_TOKEN_PATTERN = /^\/?\d+w$/i
+
+const isExternalUrl = (url: string): boolean => /^https?:\/\//i.test(url) || url.startsWith('//')
+const isProtocolUrl = (url: string): boolean => /^(mailto:|tel:|sms:|whatsapp:)/i.test(url)
+const isStaticAssetPath = (url: string): boolean => FILE_PATH_PATTERN.test(url)
+
+const normalizeLinkUrl = (url?: string | null): string => {
+  if (!url) return '#'
+
+  const trimmed = String(url).trim()
+  if (!trimmed || INVALID_ROUTE_TOKEN_PATTERN.test(trimmed)) return '#'
+  if (trimmed === '#') return '#'
+  if (isExternalUrl(trimmed) || isProtocolUrl(trimmed)) return trimmed
+  if (trimmed.startsWith('/')) return trimmed
+  if (isStaticAssetPath(trimmed)) return `/${trimmed.replace(/^\/+/, '')}`
+  if (trimmed.includes(' ')) return '#'
+
+  return `/${trimmed.replace(/^\/+/, '')}`
 }
+
+const isLinkExternal = (url?: string | null): boolean => {
+  const normalized = normalizeLinkUrl(url)
+  if (normalized === '#') return true
+  return isExternalUrl(normalized) || isProtocolUrl(normalized) || isStaticAssetPath(normalized)
+}
+
+const getLinkUrl = (url?: string | null): string => normalizeLinkUrl(url)
 
 // Fetch footer menus on mount
 const loadFooterMenus = async () => {

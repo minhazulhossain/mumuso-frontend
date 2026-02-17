@@ -48,16 +48,18 @@ export const useMenus = () => {
                 }>('/api/menu-builder')
             }
 
-            if (response?.data && Array.isArray(response.data)) {
+            const menuList = Array.isArray(response?.data) ? response.data : (Array.isArray(response) ? response : [])
+
+            if (menuList.length > 0) {
                 // Store menus by slug for easy access
-                response.data.forEach((menu: any) => {
+                menuList.forEach((menu: any) => {
                     const normalized = normalizeMenu(menu)
                     menus.value[normalized.slug] = normalized
                 })
                 console.log('[useMenus] Menus loaded:', Object.keys(menus.value).length)
             }
 
-            return response?.data || []
+            return menuList
         } catch (err: any) {
             error.value = err.data?.message || 'Failed to fetch menus'
             console.error('[useMenus] Error fetching all menus:', err)
@@ -101,8 +103,10 @@ export const useMenus = () => {
                 }>(`/api/menu-builder/${slug}`)
             }
 
-            if (response?.data) {
-                const normalized = normalizeMenu(response.data)
+            const rawMenu = response?.data ?? response
+
+            if (rawMenu) {
+                const normalized = normalizeMenu(rawMenu)
                 menus.value[normalized.slug] = normalized
                 console.log('[useMenus] Menu loaded:', slug)
                 return normalized
@@ -136,12 +140,20 @@ export const useMenus = () => {
         // }
 
     const fetchMenus = async (slugs: string[]) => {
-            const results = await Promise.all(
-                slugs.map(slug => $fetch(`/api/menus/${slug}`))
-            )
+        const results = await Promise.all(
+            slugs.map(async (slug) => {
+                const response: any = await $fetch(`/api/menus/${slug}`)
+                const rawMenu = response?.data ?? response
+                const normalized = normalizeMenu(rawMenu)
 
-            return Object.fromEntries(results.map((m: any) => [m.slug, m]))
-        }
+                menus.value[normalized.slug] = normalized
+
+                return normalized
+            })
+        )
+
+        return Object.fromEntries(results.map((menu: any) => [menu.slug, menu]))
+    }
 
     /**
      * Get menu by slug from cache
