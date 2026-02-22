@@ -1,3 +1,9 @@
+const rawApiBase = process.env.NUXT_PUBLIC_API_BASE || 'https://admin.mumuso.com.bd/api/v1/'
+const normalizedApiBase = rawApiBase.endsWith('/') ? rawApiBase : `${rawApiBase}/`
+const isProduction = process.env.NODE_ENV === 'production'
+if (isProduction && !/^https:\/\//i.test(normalizedApiBase)) {
+    throw new Error('NUXT_PUBLIC_API_BASE must use HTTPS in production')
+}
 export default defineNuxtConfig({
     modules: ['@nuxt/ui', '@nuxt/image', '@nuxt/fonts', 'nuxt-auth-utils'],
     css: [
@@ -62,26 +68,27 @@ export default defineNuxtConfig({
         }
     },
 
-    compatibilityDate: '2024-11-16', // ✅ Fixed - current date
+    compatibilityDate: '2024-11-16', // Fixed - current date
 
     nitro: {
         preset: 'node-server',
         compressPublicAssets: true,
-        // ✅ Removed problematic proxy
+        // Removed problematic proxy
     },
 
-    devtools: { enabled: process.env.NODE_ENV !== 'production' }, // ✅ Disable in production
+    devtools: { enabled: process.env.NODE_ENV !== 'production' }, // Disable in production
 
     runtimeConfig: {
         // Backend API URL - used by server-side code and client-side code
         public: {
-            apiBase: process.env.NUXT_PUBLIC_API_BASE || 'https://admin.mumuso.com.bd/api/v1/'
+            apiBase: normalizedApiBase
         },
-        // ✅ Session config for nuxt-auth-utils
+        // Session config for nuxt-auth-utils
         // WARNING: Must be set via environment variable in production
         session: {
             password: process.env.NUXT_SESSION_PASSWORD || 'dev-secret-key-change-in-production-min-32-xxx'
         }
     }
 })
+
 
